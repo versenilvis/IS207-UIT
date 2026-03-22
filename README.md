@@ -10,23 +10,25 @@
   [![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
   
   <a href="#">Khám phá trang chủ »</a>
+  
+  <img src="https://camo.githubusercontent.com/b16ecdcac9c3d21ec3a49459430f747b46b3a37acc95ee468d87d0ec61ff2392/68747470733a2f2f692e696d6775722e636f6d2f576d4d6e5352742e706e67">
+  <p><i>Đồ án cuối kì môn học Phát triển ứng dụng web - IS207 - UIT 2025-2026</i></p>
 </div>
 <br><br>
 
-
   
-Đồ án môn học Phát triển ứng dụng web - IS207 - UIT 2025-2026
 
 > [!WARNING]
-> **Đây chỉ là dự án nhằm mục đích học tập, là sản phẩm để nộp đồ án cuối kì**  
+> **Đây chỉ là dự án nhằm mục đích học tập, là đồ án cuối kì của một môn học**  
 > Dự án không nhằm mục đích thay thế bất cứ sản phẩm nào
 
 <details>
   <summary><b>Mục lục</b></summary>
   <ol>
     <li><a href="#thành-viên">Thành viên</a></li>
+    <li><a href="#giới-thiệu-môn-học">Giới thiệu môn học</a></li>
     <li><a href="#tài-liệu">Tài liệu</a></li>
-    <li><a href="#lời-cảm ơn">Lời cảm ơn</a></li>
+    <li><a href="#lời-cảm-ơn">Lời cảm ơn</a></li>
   </ol>
 </details>
 
@@ -58,6 +60,14 @@ Dưới đây là danh sách thành viên của **Nhóm 2**
 <!--
 [![Contributors](https://contrib.rocks/image?repo=versenilvis/whiteboard)](https://github.com/666ghj/versenilvis/graphs/contributors) 
 -->
+
+## Giới thiệu môn học
+- Tên môn học: Phát triển ứng dụng Web
+- Mã môn học: IS207
+- Mã lớp: IS207.Q23
+- Năm học: HK2 (2025 - 2026)
+- Giảng viên: Trình Trọng Tín
+
 
 ## Tài liệu
 Tài liệu bao gồm cả tài liệu source code cũng như các tài liệu khác về việc quản lí của nhóm, các hướng dẫn, quản lí các task, ...
