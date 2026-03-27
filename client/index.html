@@ -1,142 +1,117 @@
+//this is a comment
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Virtual Whiteboard</title>
-    <style>
-      html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-        text-align: center;
-      }
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Virtual Whiteboard</title>
+		<style>
+			html,
+			body {
+				margin: 0 !important;
+				padding: 0 !important;
+			}
+			body {
+				font-family: Arial, sans-serif;
+				text-align: center;
+			}
 
-      #canvas {
-        border: 1px solid #000;
-        margin-top: 20px;
-        cursor: crosshair;
-      }
+			#canvas {
+				border: 1px solid #000;
+				margin-top: 20px;
+				cursor: crosshair;
+			}
+			button {
+				padding: 0;
+				margin: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Virtual Whiteboard</h1>
+		<button onclick="clearBoard()">Clear Board</button>
+		<canvas id="canvas"></canvas>
 
-      .controls {
-        margin-top: 20px;
-      }
+		<script>
+			const canvas = document.getElementById("canvas");
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			const ctx = canvas.getContext("2d");
 
-      .color-picker {
-        padding: 5px;
-      }
+			let drawing = false;
+			let prevX = 0;
+			let prevY = 0;
 
-      button {
-        padding: 8px;
-        margin: 5px;
-      }
+			canvas.addEventListener("mousedown", startDrawing);
+			canvas.addEventListener("mousemove", draw);
+			canvas.addEventListener("mouseup", stopDrawing);
+			canvas.addEventListener("mouseleave", handleLeave);
 
-      #color-picker {
-        width: 50px;
-        height: 30px;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Virtual Whiteboard</h1>
+			function getMousePos(event) {
+				const rect = canvas.getBoundingClientRect();
+				return {
+					x: event.clientX - rect.left,
+					y: event.clientY - rect.top,
+				};
+			}
 
-    <div class="controls">
-      <label for="color-picker">Pick Color:</label>
-      <input
-        type="color"
-        id="color-picker"
-        class="color-picker"
-        value="#000000"
-      />
-      <button onclick="clearBoard()">Clear Board</button>
-    </div>
+			function startDrawing(event) {
+				drawing = true;
+				const pos = getMousePos(event);
+				prevX = pos.x;
+				prevY = pos.y;
+			}
 
-    <canvas id="canvas"></canvas>
+			function draw(event) {
+				if (!drawing) return;
 
-    <script>
-      const canvas = document.getElementById("canvas");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const ctx = canvas.getContext("2d");
+				const pos = getMousePos(event);
 
-      let drawing = false;
-      let prevX = 0;
-      let prevY = 0;
+				ctx.beginPath();
+				ctx.moveTo(prevX, prevY);
+				ctx.lineTo(pos.x, pos.y);
+				ctx.strokeStyle = "black";
+				ctx.lineWidth = 5;
+				ctx.lineCap = "round";
+				ctx.lineJoin = "round";
+				ctx.stroke();
 
-      canvas.addEventListener("mousedown", startDrawing);
-      canvas.addEventListener("mousemove", draw);
-      canvas.addEventListener("mouseup", stopDrawing);
-      canvas.addEventListener("mouseleave", handleLeave);
+				prevX = pos.x;
+				prevY = pos.y;
+			}
 
-      function getMousePos(event) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
-        };
-      }
+			function handleLeave(event) {
+				if (!drawing) return;
 
-      function startDrawing(event) {
-        drawing = true;
-        const pos = getMousePos(event);
-        prevX = pos.x;
-        prevY = pos.y;
-      }
+				const pos = getMousePos(event);
+				const edge = clampToCanvas(pos.x, pos.y);
 
-      function draw(event) {
-        if (!drawing) return;
+				ctx.beginPath();
+				ctx.moveTo(prevX, prevY);
+				ctx.lineTo(edge.x, edge.y);
+				ctx.strokeStyle = "black";
+				ctx.lineWidth = 5;
+				ctx.lineCap = "round";
+				ctx.lineJoin = "round";
+				ctx.stroke();
 
-        const pos = getMousePos(event);
+				drawing = false;
+			}
 
-        ctx.beginPath();
-        ctx.moveTo(prevX, prevY);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 5;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.stroke();
+			function clampToCanvas(x, y) {
+				return {
+					x: Math.max(0, Math.min(canvas.width, x)),
+					y: Math.max(0, Math.min(canvas.height, y)),
+				};
+			}
 
-        prevX = pos.x;
-        prevY = pos.y;
-      }
+			function stopDrawing() {
+				drawing = false;
+			}
 
-      function handleLeave(event) {
-        if (!drawing) return;
-
-        const pos = getMousePos(event);
-        const edge = clampToCanvas(pos.x, pos.y);
-
-        ctx.beginPath();
-        ctx.moveTo(prevX, prevY);
-        ctx.lineTo(edge.x, edge.y);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 5;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.stroke();
-
-        drawing = false;
-      }
-
-      function clampToCanvas(x, y) {
-        return {
-          x: Math.max(0, Math.min(canvas.width, x)),
-          y: Math.max(0, Math.min(canvas.height, y)),
-        };
-      }
-
-      function stopDrawing() {
-        drawing = false;
-      }
-
-      function clearBoard() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    </script>
-  </body>
+			function clearBoard() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+			}
+		</script>
+	</body>
 </html>
