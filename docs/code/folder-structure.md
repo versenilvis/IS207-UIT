@@ -18,19 +18,19 @@ whiteboard/
 │
 ├── server/                # backend (php thuần)
 │   ├── index.php          # entry point & router
-│   ├── config/
-│   │   └── database.php   # kết nối pdo mysql
+│   ├── db/
+│   │   └── mysql.php      # kết nối pdo mysql
 │   ├── controllers/       # xử lí logic api
-│   │   ├── AuthController.php
-│   │   └── BoardController.php
+│   │   ├── auth-controller.php
+│   │   └── board-controller.php
 │   ├── models/            # làm việc trực tiếp với database
-│   │   ├── User.php
-│   │   └── Board.php
+│   │   ├── user.php
+│   │   └── board.php
 │   ├── middleware/        # kiểm tra auth, validate
-│   │   └── AuthMiddleware.php
+│   │   └── auth.php
 │   └── utils/             # response & validator helpers
-│       ├── Response.php
-│       └── Validator.php
+│       ├── response.php
+│       └── validator.php
 │
 ├── docs/                  # tài liệu dự án (đã hoàn thành)
 │   ├── README.md          # mục lục tổng
