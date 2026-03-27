@@ -11,7 +11,7 @@
 | 3   | Research + lập kế hoạch, chia task       | Leader + Manager | ✅          | 21/3/2026 | đã xong                               |
 | 4   | Cả team đọc hiểu quy tắc + kiến thức nền | All              | ⬚          | 27/3/2026 | mỗi người đọc phần research liên quan |
 
-## Phase 2: Core Drawing
+## Phase 2: Core Drawing - Deadline: 3/4/2026
 
 | #   | Task                                        | Người phụ trách | Trạng thái | Deadline | Ghi chú                            |
 | --- | ------------------------------------------- | --------------- | ---------- | -------- | ---------------------------------- |
