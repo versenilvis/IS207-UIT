@@ -4,7 +4,7 @@
 
 ## ERD (Entity Relationship Diagram)
 
-<img width="1309" height="1109" alt="Untitled" src="https://github.com/user-attachments/assets/bfcdb7bf-f0a9-4ab6-be88-1cfe5b034cdc" />
+<img width="1309" height="1109" alt="Untitled" src="https://github.com/user-attachments/assets/684ddad8-2f6f-4f4e-8cae-9f9dbe3ee8e9" />
 
 ## Chi tiết từng bảng
 
