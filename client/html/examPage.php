@@ -6,7 +6,7 @@
     <title>Làm bài: ETS 2024 - PREHUB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="css/examstyle.css" />
+    <link rel="stylesheet" href="css/examStyle.css" />
 </head>
 <body>
 
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <script src="js/data.js"></script>
-    <script src="js/exam.js"></script>
+    <script src="/client/js/data.js"></script>
+    <script src="/client/js/exam.js"></script>
 </body>
 </html>
