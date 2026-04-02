@@ -12,9 +12,10 @@
 
 <body>
 
+  <!-- INCLUDE NAVBAR FILE -->
+  <?php include './commonLayout/navBar.php'; ?>
   <!-- INCLUDE HEADER FILE -->
   <?php include './commonLayout/header.php'; ?>
-
   <main class="container mb-5">
 
     <section id="book-list-section">
