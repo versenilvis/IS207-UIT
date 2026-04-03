@@ -44,7 +44,7 @@
     </div>
   </nav>
   <!-- INCLUDE HEADER FILE -->
-  <?php include './commonLayout/header.php'; ?>
+  <?php include './componants/header.php'; ?>
   <main class="container mb-5">
 
     <section id="book-list-section">
@@ -73,7 +73,7 @@
   </main>
 
   <!-- INCLUDE FOOTER FILE -->
-  <?php include './commonLayout/footer.php'; ?>
+  <?php include './componants/footer.php'; ?>
 
   <script src="../js/data.js"></script>
   <script src="../js/main.js"></script>

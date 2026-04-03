@@ -22,7 +22,7 @@ if (isset($_POST['register'])){
             die($conn->error);
         }
     }
-    header("Location: ../../client/html/login.php");
+    header("Location: ../../client/page/login.php");
     exit();
 }
 
@@ -39,14 +39,14 @@ if (isset($_POST['login'])){
             $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['last_name'] = $user['last_name'];
             $_SESSION['email'] = $user['email'];
-            header("Location: ../../client/html/user.php");
+            header("Location: ../../client/page/user.php");
             exit();
         }
     }
     //Nếu nhập sai mật khẩu thì chuyển tới home.php
     $_SESSION['login_error'] = 'Incorrect email or password';
     $_SESSION['active_form'] = 'login';
-    header("Location: ../../client/html/login.php");
+    header("Location: ../../client/page/login.php");
     exit();
 }
 

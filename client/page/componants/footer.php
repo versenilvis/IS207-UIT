@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <title>Document</title>
-    <link rel="stylesheet" href="./commonLayout/commonLayoutCSS.css">
+    <link rel="stylesheet" href="./componants/componantsStyle.css">
 </head>
 <style>
 
@@ -61,7 +61,6 @@
         <div class="company-info">
             <h5><B>Thông tin doanh nghiệp</B></h5>
             <ul>
-                <li>CÔNG TY TNHH CÔNG NGHỆ SKIBIDI</li>
                 <li>Điện thoại liên hệ/Hotline: 123 456 7890</li>
                 <li>Email: prephub.team@gmail.com</li>
                 <li>Địa chỉ trụ sở: Trường đại học Công Nghệ Thông Tin - UIT</li>
