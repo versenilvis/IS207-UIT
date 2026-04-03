@@ -71,124 +71,23 @@ const tests = [
     { id: 609, book_id: 6, title: "ETS 2024 - Test 9", duration: 120, total_questions: 200 },
     { id: 610, book_id: 6, title: "ETS 2024 - Test 10", duration: 120, total_questions: 200 },
 ];
+// ==========================================
+// CẤU HÌNH CHUNG CHO TOÀN BỘ TRANG THI
+// ==========================================
 
-// 3. Câu hỏi mẫu 7 part (Bảng questions + options trong ERD)
-const sampleQuestions = [
-    // PART 1: PHOTO DESCRIPTION (Có Ảnh + Audio + 4 đáp án)
-    {
-        id: 1,
-        test_id: 101,
-        part: 1,
-        question_number: 1,
-        image_url: "assets/images/part1_01.jpg",
-        audio_url: "assets/audio/part1_01.mp3",
-        content: "Look at the picture and choose the best description.",
-        options: [
-            { label: "A", text: "They're working at their desks." },
-            { label: "B", text: "They're standing in a hallway." },
-            { label: "C", text: "They're walking out of a building." },
-            { label: "D", text: "They're sitting in a cafeteria." }
-        ],
-        correct_answer: "A"
-    },
+// 1. Đường dẫn API (Sau này up host thật chỉ cần sửa ở duy nhất chỗ này)
+const API_BASE_URL = "http://localhost/prehub/api/";
 
-    // PART 2: QUESTION-RESPONSE (Chỉ có Audio + 3 đáp án A, B, C)
-    {
-        id: 2,
-        test_id: 101,
-        part: 2,
-        question_number: 7,
-        audio_url: "assets/audio/part2_07.mp3",
-        content: "(Listen to the audio and choose the best response)",
-        options: [
-            { label: "A", text: "In the conference room." },
-            { label: "B", text: "Yes, at three o'clock." },
-            { label: "C", text: "Mr. Kim handled that." }
-        ],
-        correct_answer: "C"
-    },
+// 2. Thời gian làm bài mặc định (120 phút = 7200 giây)
+const EXAM_TIME_SECONDS = 120 * 60;
 
-    // PART 3: CONVERSATIONS (Audio + Câu hỏi chữ + 4 đáp án)
-    {
-        id: 3,
-        test_id: 101,
-        part: 3,
-        question_number: 32,
-        audio_url: "assets/audio/part3_32.mp3",
-        content: "What does the woman imply about the schedule?",
-        options: [
-            { label: "A", text: "It has been cancelled." },
-            { label: "B", text: "It needs to be revised." },
-            { label: "C", text: "It is too tight." },
-            { label: "D", text: "It was sent by email." }
-        ],
-        correct_answer: "B"
-    },
-
-    // PART 4: SHORT TALKS (Tương tự Part 3 nhưng là độc thoại)
-    {
-        id: 4,
-        test_id: 101,
-        part: 4,
-        question_number: 71,
-        audio_url: "assets/audio/part4_71.mp3",
-        content: "What is the purpose of the announcement?",
-        options: [
-            { label: "A", text: "To introduce a new employee" },
-            { label: "B", text: "To announce a building closure" },
-            { label: "C", text: "To describe a policy change" },
-            { label: "D", text: "To advertise a grand opening" }
-        ],
-        correct_answer: "D"
-    },
-
-    // PART 5: INCOMPLETE SENTENCES (Chỉ có chữ + 4 đáp án)
-    {
-        id: 5,
-        test_id: 101,
-        part: 5,
-        question_number: 101,
-        content: "The new software update _______ the system speed significantly.",
-        options: [
-            { label: "A", text: "improves" },
-            { label: "B", text: "improved" },
-            { label: "C", text: "improving" },
-            { label: "D", text: "improvement" }
-        ],
-        correct_answer: "B"
-    },
-
-    // PART 6: TEXT COMPLETION (Có đoạn văn ngắn + Điền từ)
-    {
-        id: 6,
-        test_id: 101,
-        part: 6,
-        passage_id: 10, // Liên kết với bảng Passages trong ERD
-        question_number: 131,
-        content: "Please _______ your application by the end of the week.",
-        options: [
-            { label: "A", text: "submit" },
-            { label: "B", text: "submission" },
-            { label: "C", text: "submitting" },
-            { label: "D", text: "submitted" }
-        ],
-        correct_answer: "A"
-    },
-
-    // PART 7: READING COMPREHENSION (Có đoạn văn dài + Câu hỏi)
-    {
-        id: 7,
-        test_id: 101,
-        part: 7,
-        passage_id: 11, // Liên kết với bảng Passages
-        question_number: 147,
-        content: "What is indicated about the delivery?",
-        options: [
-            { label: "A", text: "It will be delayed." },
-            { label: "B", text: "It is free for members." },
-            { label: "C", text: "It requires a signature." },
-            { label: "D", text: "It has already arrived." }
-        ],
-        correct_answer: "C"
-    }
+// 3. Cấu trúc chia 7 Part của TOEIC (Dùng để vẽ Sidebar)
+const TOEIC_PART_RANGES = [
+    { part: 1, start: 1, end: 6 },
+    { part: 2, start: 7, end: 31 },
+    { part: 3, start: 32, end: 70 },
+    { part: 4, start: 71, end: 100 },
+    { part: 5, start: 101, end: 130 },
+    { part: 6, start: 131, end: 146 },
+    { part: 7, start: 147, end: 200 }
 ];
