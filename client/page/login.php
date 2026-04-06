@@ -39,7 +39,7 @@ function isActiveForm($formName, $activeForm)
         }
     </style>
 </head>
-<!--http://localhost/Web/PrepHub/IS207-UIT/client/html/login.php-->
+<!--http://localhost:81/Web/PrepHub/IS207-UIT/client/page/login.php-->
 
 <body>
     <div class="container">
@@ -48,7 +48,11 @@ function isActiveForm($formName, $activeForm)
                 <h2>Login</h2>
                 <?= showError($errors['login']); ?>
                 <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <div class="password-row">
+                    <input type="password" name="password" placeholder="Password" required> 
+                    <img src="../img/eye_close.png" class="eye" onclick="togglePassword(this)">
+                </div>
+                
                 <button type="submit" name="login">Login</button>
                 <p>Don't have an account ? <a href="#" onclick="showForm('register-form')">Sign Up</a></p>
             </form>
@@ -62,8 +66,15 @@ function isActiveForm($formName, $activeForm)
                     <input type="name" name="last_name" placeholder="Last name" required>
                 </div>
                 <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <input type="password" name="reenter_password" placeholder="Re-enter Password" required>
+                <div class="password-row">
+                    <input type="password" name="password" placeholder="Password" id="password" required>
+                    <img src="../img/eye_close.png" class="eye" onclick="togglePassword(this)">
+                </div>   
+                <div class="password-row">
+                    <input type="password" name="reenter_password" placeholder="Re-enter Password" id="rePassword" required>
+                    <img src="../img/eye_close.png" class="eye" onclick="togglePassword(this)">
+                </div> 
+                <p id="checkPasswordError"></p>
                 <button type="submit" name="register">Register</button>
                 <p>Already have an account? <a href="#" onclick="showForm('login-form')">Login</a></p>
             </form>

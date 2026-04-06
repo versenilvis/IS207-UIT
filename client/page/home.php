@@ -21,7 +21,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="#">
+      <a class="navbar-brand fw-bold" href="./home.php">
         <i class="fas fa-graduation-cap me-2"></i>PREPHUB
       </a>
 
