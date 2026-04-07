@@ -6,10 +6,16 @@
 > Vậy nếu muốn update data với Master, hoặc ngược lại tới database local thì phải tự export rồi import  
 > Sử dụng docker để hạn chế vấn đề lỡ 1 người có nhầm lẫn trong quá trình làm việc thì cả team không bị thiệt theo
 
+
 ### Khởi tạo database
 - Chạy `make db` để pull MySQl 8.0 docker image về
 
 ### Kết nối database
+> [!NOTE]
+> Một lưu ý nhỏ là docker đã tự động detect file `.env` rồi, mỗi database có thể có thông tin khác nhau nhưng vì dùng chung schema nên là về cơ bản database mỗi máy là như nhau khi dev  
+> Mỗi database của mỗi máy là một database test, có thể làm gì làm, chủ yếu vẫn làm việc qua data của Master + query schema  
+> Chúng ta chỉ quan tâm tới data chính trên Master thôi
+
 Có 2 cách:
 #### Cách 1. Dùng terminal (với docker):
 - Vui lòng sử dụng thông tin kết nối database có trong `.env`
