@@ -1,0 +1,41 @@
+:root {
+    --primary-color: #2c3e50;
+    --accent-color: #3498db;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    background-color: var(--primary-color);
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: white;
+    padding: 60px 0;
+}
+
+.footer-logo{
+    font-size: 25px;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.site-socials{
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.social-link {
+    font-size: 30px;
+    color: #4c7ce3;
+    transition: 0.3s;
+}
+
+.social-link:hover {
+    color: #1842b4;
+}
