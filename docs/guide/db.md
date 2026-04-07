@@ -8,7 +8,7 @@
 
 
 ### Khởi tạo database
-- Chạy `make db` để pull MySQl 8.0 docker image về
+- Chạy `make db` để pull MySQL 8.0 docker image về
 
 ### Kết nối database
 > [!NOTE]
@@ -52,7 +52,7 @@ Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 Ví dụ có 2 người A và B:
 - Khi A muốn thêm 1 bảng mới (ví dụ bảng chat):
 - A viết thêm CREATE TABLE chat ... vào cuối file [`server/db/schema.sql`](../server/db/schema.sql)
-- A chạy lệnh đó trên database máy bạn để làm việc
+- A chạy lệnh đó trên database máy A để làm việc
 - Sau khi xong xuôi, A git commit và push file schema.sql đó lên bằng Pull Request
 <br>
 
