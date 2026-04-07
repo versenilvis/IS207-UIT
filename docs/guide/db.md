@@ -1,7 +1,7 @@
 # Hướng dẫn làm việc với database
 - Dùng MySQL 8.0
 > [!IMPORTANT]
-> Khi sử dụng docker, database mỗi người là độc lập trên mỗi masy, vì vậy data cũng độc lập  
+> Khi sử dụng docker, database mỗi người là độc lập trên mỗi máy, vì vậy data cũng độc lập  
 > Sẽ có 1 database là Master, nó là database gốc cũng như là database sử dụng chính của web  
 > Vậy nếu muốn update data với Master, hoặc ngược lại tới database local thì phải tự export rồi import  
 > Sử dụng docker để hạn chế vấn đề lỡ 1 người có nhầm lẫn trong quá trình làm việc thì cả team không bị thiệt theo
