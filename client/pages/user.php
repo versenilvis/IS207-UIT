@@ -13,9 +13,9 @@
 <body>
 
   <!-- INCLUDE NAVBAR FILE -->
-  <?php include './componants/navBar.php'; ?>
+  <?php include './components/navBar.php'; ?>
   <!-- INCLUDE HEADER FILE -->
-  <?php include './componants/header.php'; ?>
+  <?php include './components/header.php'; ?>
   <main class="container mb-5">
 
     <section id="book-list-section">
@@ -44,7 +44,7 @@
   </main>
 
   <!-- INCLUDE FOOTER FILE -->
-  <?php include './componants/footer.php'; ?>
+  <?php include './components/footer.php'; ?>
 
   <script src="../js/data.js"></script>
   <script src="../js/main.js"></script>

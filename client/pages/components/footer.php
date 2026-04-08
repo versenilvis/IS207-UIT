@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <title>Document</title>
-    <link rel="stylesheet" href="./componants/componantsStyle.css">
+    <link rel="stylesheet" href="./components/componentsStyle.css">
 </head><!-- CSS để ở đây để ghi đè bootstrap -->
 <style>
     .info-link {
@@ -37,7 +37,9 @@
 <body>
     <div class="container">
         <footer class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-3 my-3 border-top">
-            <div class="col mb-3"> <a href="/" class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none" aria-label="Bootstrap"> <svg class="bi me-2" width="40" height="32" aria-hidden="true">
+            <div class="col mb-3"> <a href="/"
+                    class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none"
+                    aria-label="Bootstrap"> <svg class="bi me-2" width="40" height="32" aria-hidden="true">
                         <use xlink:href="#bootstrap"></use>
                     </svg> </a>
                 <a class="navbar-brand fw-bold footer-logo" href="#">

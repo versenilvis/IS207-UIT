@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <title>Document</title>
-  <link rel="stylesheet" href="./componants/componantsStyle.css">
+  <link rel="stylesheet" href="./components/componentsStyle.css">
 </head>
 <style>
   .nav-link.btn.btn-outline-light.ms-lg-3.px-4:hover:hover {
