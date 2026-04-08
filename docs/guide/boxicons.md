@@ -3,9 +3,9 @@ Dùng icon từ bên thứ 3 để tiết kiệm dung lượng cho dự án
 
 Link: https://docs.boxicons.com/font/usage
 
-- Đã có sẵn cdn font trong file [`client/pages/components/head.php`](../client/pages/components/head.php), cách dùng đơn giản tại page nào cần thì chỉ cần import:
+- Đã có sẵn cdn font trong file [`client/pages/components/metadata.php`](../client/pages/components/metadata.php), cách dùng đơn giản tại page nào cần thì chỉ cần import:
 ```php
-<?php include './commonLayout/head.php'; ?>
+<?php include './components/metadata.php'; ?>
 ```
 - Sau đó lên web Boxicons, chọn icon cần thêm và sử dụng với iframe tag
 - Ví dụ:

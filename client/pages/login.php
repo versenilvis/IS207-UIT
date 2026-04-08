@@ -27,8 +27,7 @@ function isActiveForm($formName, $activeForm)
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<?php include './components/metadata.php'; ?>
 	<!-- cái này nhằm mục đích để hiện chính xác trang hiện tại là login hay register -->
 	<title>PrepHub - <?= $activeForm === 'login' ? 'Đăng nhập' : 'Đăng ký' ?></title>
 
