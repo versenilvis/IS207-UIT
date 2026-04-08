@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Exempt /uploads/ and /server/uploads/ from routing
+    RewriteRule ^(uploads|server/uploads)/ - [L]
+    
+    # Route all other requests to server/index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /IS207-UIT/server/index.php [QSA,L]
+</IfModule>

@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine Off
+</IfModule>
+
+# Allow direct access to media files
+<FilesMatch "\.(jpg|jpeg|png|gif|mp3|wav|ogg|m4a)$">
+    Allow from all
+</FilesMatch>
+
+# Set proper MIME types
+AddType image/jpeg .jpg .jpeg
+AddType image/png .png
+AddType image/gif .gif
+AddType audio/mpeg .mp3
+AddType audio/wav .wav
+AddType audio/ogg .ogg
+AddType audio/mp4 .m4a
