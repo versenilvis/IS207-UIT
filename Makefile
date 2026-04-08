@@ -1,4 +1,4 @@
-.PHONY: all up down frontend backend db logs clean build
+.PHONY: all up down frontend backend db logs clean build query
 
 # lệnh chạy toàn bộ khi chỉ gõ `make`
 all: up
@@ -24,6 +24,10 @@ backend:
 
 db:
 	docker compose up -d db
+
+# chạy thẳng vào prephub + đổi tên [mysql] trong terminal thành [prephub luôn]
+query:
+	docker exec -it prephub_db mysql -u root -p --prompt="[\d]> " prephub
 
 # xem màn hình console log realtime của toàn cục
 logs:

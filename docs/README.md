@@ -12,9 +12,11 @@
 | File | Mô tả |
 |------|--------|
 | [README.md](guide/README.md) | Hướng dẫn chung phương thức pull nhánh khởi tạo hệ thống môi trường lần đầu |
+| [db.md](guide/db.md) | **Hướng dẫn kết nối Database, dùng Docker & quy trình đồng bộ Master** |
 | [workflow.md](guide/workflow.md) | Chi tiết luồng thao tác kéo push code upstream cá nhân |
 | [commit.md](guide/commit.md) | Chuẩn quy ước cấu trúc ghi chú chữ commit trên github |
 | [pull-request.md](guide/pull-request.md) | Luật bắt buộc khi tạo PR và cách thức ngăn merge thẳng dính conflict vào dev/main |
+| [boxicons.md](guide/boxicons.md) | Hướng dẫn sử dụng và tích hợp Icon set cho giao diện |
 | [docs.md](guide/docs.md) | Các quy định ngầm định cách hành văn khi giải nghĩa code |
 
 ## 3. Code docs (giải nghĩa hệ thống thư mục)
