@@ -59,6 +59,8 @@ if (isset($_POST['login'])) {
 		if ($user) {
 			// Nếu nhập đúng mật khẩu thì chuyển tới trang user.php
 			if (password_verify($password, $user['password'])) {
+				$_SESSION['user_id'] = $user['id'];
+				$_SESSION['role'] = $user['role'];
 				$_SESSION['first_name'] = $user['first_name'];
 				$_SESSION['last_name'] = $user['last_name'];
 				$_SESSION['email'] = $user['email'];
