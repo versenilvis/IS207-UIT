@@ -27,15 +27,14 @@ services:
       - db
 
   frontend:
-    image: oven/bun:latest
+    image: php:8.2-apache
     container_name: prephub_frontend
-    working_dir: /app/client
-    volumes:
-      - ./client:/app/client
-    # tự động bật dev server tĩnh không cache
-    command: /bin/sh -c "bunx --bun http-server -p 3000 -c-1"
+    restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3000:80"
+    volumes:
+      - ./client:/var/www/html
+    command: /bin/sh -c "a2enmod rewrite && apache2-foreground"
 
 volumes:
   db_data:
