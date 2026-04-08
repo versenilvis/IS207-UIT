@@ -2,7 +2,7 @@
 session_start();
 session_unset();
 session_destroy();
-header("Location: ../../client/page/home.php");
+header("Location: ../../client/pages/home.php");
 exit();
 
 ?>
