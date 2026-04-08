@@ -73,7 +73,6 @@ CREATE TABLE IF NOT EXISTS `options` (
     `question_id` INT NOT NULL,
     `label` CHAR(1) NOT NULL,
     `content` TEXT NOT NULL,
-    `image_url` VARCHAR (255) DEFAULT NULL,
     CONSTRAINT `fk_option_question` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`) ON DELETE CASCADE,
     INDEX `idx_question` (`question_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
