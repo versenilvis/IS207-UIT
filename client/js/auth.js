@@ -4,6 +4,12 @@
 function showForm(formID) {
     document.querySelectorAll(".form-box").forEach(form => form.classList.remove("active"));
     document.getElementById(formID).classList.add("active");
+
+    if (formID === 'login-form') {
+        document.title = "PrepHub - Đăng nhập";
+    } else if (formID === 'register-form') {
+        document.title = "PrepHub - Đăng ký";
+    }
 }
 
 //Kiểm tra xem ô nhập lại password có giống với ô password chưa
@@ -15,7 +21,7 @@ let checkPasswordMatch = document.getElementById("checkPasswordError");
 registerForm.addEventListener("submit", function(event){
     if (passwordInput.value !== reEnterPassword.value){
         event.preventDefault();
-        checkPasswordMatch.textContent = "Password does not match!";
+        checkPasswordMatch.textContent = "Mật khẩu nhập lại không khớp!";
         checkPasswordMatch.style.display = "block";
     }else{
         checkPasswordMatch.textContent = "";

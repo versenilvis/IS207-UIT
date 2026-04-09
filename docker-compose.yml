@@ -11,30 +11,20 @@ services:
       - db_data:/var/lib/mysql
       - ./server/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
 
-  backend:
+  app:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: prephub_backend
+    container_name: prephub_app
     restart: unless-stopped
     env_file:
       - .env
     ports:
-      - "8000:80"
-    volumes:
-      - ./server:/var/www/html
-    depends_on:
-      - db
-
-  frontend:
-    image: php:8.2-apache
-    container_name: prephub_frontend
-    restart: unless-stopped
-    ports:
       - "3000:80"
     volumes:
-      - ./client:/var/www/html
-    command: /bin/sh -c "a2enmod rewrite && apache2-foreground"
+      - .:/var/www/html
+    depends_on:
+      - db
 
 volumes:
   db_data:

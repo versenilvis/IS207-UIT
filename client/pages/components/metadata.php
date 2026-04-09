@@ -1,3 +1,8 @@
+<!-- metadata.php có công dụng là thay vì import các thẻ  meta, link rel, ... lặp lại ở nhiều phần html của các file
+	thì giờ mình chỉ cần import đúng cái file này thôi, code sẽ gọn hơn rất nhiều
+	nói chung là cái này có tác dụng như import đầu file html vậy
+ -->
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 

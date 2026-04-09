@@ -1,4 +1,4 @@
-.PHONY: all up down frontend backend db logs clean build query
+.PHONY: all up down app db logs clean build query
 
 # lệnh chạy toàn bộ khi chỉ gõ `make`
 all: up
@@ -15,12 +15,9 @@ down:
 build:
 	docker compose up -d --build
 
-# chạy test riêng lẻ từng phân nhánh project
-frontend:
-	docker compose up -d frontend
-
-backend:
-	docker compose up -d backend
+# chạy cả ui và server
+app:
+	docker compose up -d app
 
 db:
 	docker compose up -d db
@@ -34,11 +31,8 @@ logs:
 	docker compose logs -f
 
 # xem log cá nhân từng phân khu nhỏ để tiện debug
-logs-fe:
-	docker compose logs -f frontend
-
-logs-be:
-	docker compose logs -f backend
+logs-app:
+	docker compose logs -f app
 
 logs-db:
 	docker compose logs -f db
