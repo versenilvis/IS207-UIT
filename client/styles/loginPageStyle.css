@@ -97,16 +97,25 @@ p a:hover{
     text-align: center;
     margin-bottom: 20px;
 }
-.eye{
-    height: 40px;
-    width: 40px;
-    margin-left: 17px;
-    margin-right: 5px;
-    cursor: pointer;
+.password-row{
+    position: relative;
+    width: 100%;
     margin-bottom: 20px;
 }
-.password-row{
-    display: inline-flex;
+
+.password-row input{
     width: 100%;
-    align-items: center;
+    padding: 12px;
+    padding-right: 45px;
+    margin-bottom: 0;
+}
+
+.password-row .eye{
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
 }
