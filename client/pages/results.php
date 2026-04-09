@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết bài thi - Nhân P4</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .question-box {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 5px; margin: 5px; font-weight: bold; font-size: 14px;
+            cursor: pointer; border: 1px solid #ddd;
+        }
+        .correct { background-color: #28a745; color: white; border: none; }
+        .wrong { background-color: #dc3545; color: white; border: none; }
+        .not-answered { background-color: #f8f9fa; color: #666; }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="card shadow-sm p-4">
+        <h3 class="mb-4">Chi tiết đáp án - Lần thi #1</h3>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <h5>Bảng đáp án (Part 1 - 7)</h5>
+                <div id="answer-grid" class="d-flex flex-wrap">
+                    </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-3 border rounded bg-white">
+                    <h6>Chú thích</h6>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="question-box correct"></div> <span>Câu đúng</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="question-box wrong"></div> <span>Câu sai</span>
+                    </div>
+                    <hr>
+                    <a href="dashboard.php" class="btn btn-primary w-100">Quay lại Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Giả lập dữ liệu từ bảng attempt_answers (Tuần 3 sẽ lấy từ DB thật)
+    const mockResults = [];
+    for(let i=1; i<=200; i++) {
+        mockResults.push({
+            question_no: i,
+            is_correct: Math.random() > 0.3 // Giả lập đúng/sai ngẫu nhiên
+        });
+    }
+
+    // Đổ dữ liệu vào Grid
+    let gridHtml = '';
+    mockResults.forEach(item => {
+        let statusClass = item.is_correct ? 'correct' : 'wrong';
+        gridHtml += `<div class="question-box ${statusClass}">${item.question_no}</div>`;
+    });
+    $('#answer-grid').html(gridHtml);
+});
+</script>
+</body>
+</html>
