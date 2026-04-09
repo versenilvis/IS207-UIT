@@ -28,9 +28,9 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="#">Trang chủ</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Danh sách đề thi</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Premium</a></li>
+          <li class="nav-item"><a id="nav-home" class="nav-link" href="home.php">Trang chủ</a></li>
+          <li class="nav-item"><a id="nav-list" class="nav-link" href="home.php#book-list-section" onclick="handleNavClick(event)">Danh sách đề thi</a></li>
+          <li class="nav-item"><a id="nav-premium" class="nav-link" href="premium.php">Premium</a></li>
           <li class="nav-item">
             <a class="nav-link btn btn-outline-light ms-lg-3 px-4" href="login.php">
               Đăng nhập <i class="fas fa-sign-in-alt ms-2"></i>
