@@ -1,0 +1,124 @@
+/* --- 1. TỔNG QUAN HỆ THỐNG --- */
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f7f6; /* Nền xám nhạt làm nổi bật các Card trắng */
+    color: #333;
+}
+
+/* --- 2. THẺ THỐNG KÊ (STAT CARDS) --- */
+.card {
+    border: none;
+    border-radius: 15px; /* Bo góc hiện đại */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* Hiệu ứng bay lên khi di chuột giống các trang web hiện đại */
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* Hiệu ứng Gradient cho 3 thẻ chỉ số trên cùng */
+.bg-primary-gradient { 
+    background: linear-gradient(135deg, #4e73df, #224abe) !important; 
+}
+.bg-success-gradient { 
+    background: linear-gradient(135deg, #1cc88a, #13855c) !important; 
+}
+.bg-info-gradient { 
+    background: linear-gradient(135deg, #36b9cc, #258391) !important; 
+}
+
+.card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+#max-score, #total-tests, #avg-time {
+    font-weight: 800;
+    font-size: 2.5rem;
+}
+
+/* --- 3. BIỂU ĐỒ (CHART SECTION) --- */
+.chart-card {
+    border-radius: 15px !important;
+}
+
+.chart-wrapper {
+    position: relative;
+    padding: 10px;
+}
+
+/* --- 4. BẢNG LỊCH SỬ (HISTORY TABLE) --- */
+.table-container {
+    background: white;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+/* IOT thường dùng bảng có khoảng cách giữa các dòng (separate) */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 10px; 
+}
+
+.table thead th {
+    border: none;
+    color: #858796;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    padding: 15px;
+}
+
+.table tbody tr {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.table tbody tr:hover {
+    background-color: #f8fbff;
+    transform: scale(1.01); /* Phóng to nhẹ dòng đang chọn */
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 15px;
+    border: none;
+}
+
+/* Nút Chi tiết bo tròn kiểu IOT */
+.btn-detail {
+    border-radius: 20px;
+    padding: 5px 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 2px solid #4e73df;
+    color: #4e73df;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-detail:hover {
+    background-color: #4e73df;
+    color: white;
+    box-shadow: 0 4px 10px rgba(78, 115, 223, 0.3);
+}
+
+/* --- 5. RESPONSIVE CHO MOBILE --- */
+@media (max-width: 576px) {
+    #max-score, #total-tests, #avg-time {
+        font-size: 1.8rem;
+    }
+    
+    .table thead {
+        display: none; /* Ẩn tiêu đề bảng trên mobile cho gọn */
+    }
+}
