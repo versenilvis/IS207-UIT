@@ -11,7 +11,7 @@
 
     <header class="top-header text-center shadow-sm">
         <span class="fw-bold fs-5 me-3" id="exam-title">ETS 2019 Test 1</span>
-        <a href="index.html" class="btn btn-outline-secondary btn-sm">Thoát</a>
+        <a href="home.php" class="btn btn-outline-secondary btn-sm">Thoát</a>
     </header>
 
     <div class="container-fluid py-4 px-lg-5">
@@ -20,7 +20,7 @@
             <div class="col-lg-9">
                 <div class="main-content shadow-sm">
 
-                    <<div class="sticky-audio shadow-sm mb-4">
+                    <div class="sticky-audio shadow-sm mb-4">
                         <div class="d-flex align-items-center w-100 flex-wrap">
                             <button id="custom-play-btn" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
                                 <i class="fas fa-play me-2"></i> Bắt đầu nghe Audio
