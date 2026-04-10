@@ -64,3 +64,119 @@ $('#history-body').html(tableHtml);
         }
     });
 });
+
+const ctx = document.getElementById('scoreChart').getContext('2d');
+
+// Tạo Gradient (IOT thường dùng cái này để biểu đồ nhìn sang hơn)
+const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+gradient.addColorStop(0, 'rgba(78, 115, 223, 0.2)'); // Xanh nhạt ở trên
+gradient.addColorStop(1, 'rgba(78, 115, 223, 0)');   // Trong suốt ở dưới
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: chartData.map(item => item.created_at.split(' ')[0]),
+        datasets: [{
+            label: 'Tổng điểm',
+            data: chartData.map(item => item.total_score),
+            borderColor: '#4e73df', // Màu xanh đặc trưng
+            borderWidth: 3,
+            backgroundColor: gradient, // Dùng gradient đã tạo ở trên
+            fill: true,
+            tension: 0.4, // Tạo đường cong mềm mại
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#4e73df',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false } // Ẩn legend để giống IOT (tối giản)
+        },
+        scales: {
+            x: {
+                grid: { display: false }, // Ẩn lưới dọc
+                ticks: { color: '#999', font: { size: 12 } }
+            },
+            y: {
+                beginAtZero: true,
+                max: 990,
+                grid: { color: '#f0f0f0' }, // Lưới ngang nhạt
+                ticks: { stepSize: 200, color: '#999' }
+            }
+        },
+        interaction: {
+            intersect: false,
+            mode: 'index',
+        }
+    }
+});
+
+$(document).ready(function() {
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+
+    // 1. Tạo Gradient Fill (Màu xanh IOT nhạt dần xuống dưới)
+    const chartGradient = ctx.createLinearGradient(0, 0, 0, 300);
+    chartGradient.addColorStop(0, 'rgba(78, 115, 223, 0.3)'); // Màu xanh nhạt phía trên
+    chartGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');  // Trong suốt phía dưới
+
+    // Giả lập dữ liệu hoặc lấy từ history của Nhân
+    const history = JSON.parse(localStorage.getItem('toeic_history')) || [];
+    const chartLabels = history.map(item => item.created_at.split(' ')[0]).reverse();
+    const chartScores = history.map(item => item.total_score).reverse();
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Tổng điểm',
+                data: chartScores,
+                // --- Style giống IOT ---
+                borderColor: '#4e73df',       // Màu xanh Navy chuẩn
+                borderWidth: 3,               // Đường kẻ dày hơn
+                backgroundColor: chartGradient, // Đổ màu vùng bên dưới
+                fill: true,                   // Bật chế độ đổ màu
+                tension: 0.4,                 // Bo cong đường (không bị gãy khúc)
+                pointRadius: 4,               // Điểm nút nhỏ lại
+                pointBackgroundColor: '#fff',
+                pointBorderWidth: 2,
+                pointHoverRadius: 6,
+                pointHoverBackgroundColor: '#4e73df'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // Để nó tự fit vào thẻ cha
+            plugins: {
+                legend: { display: false } // Ẩn chú thích (IOT thường ẩn để cho thoáng)
+            },
+            scales: {
+                x: {
+                    grid: { display: false }, // Ẩn lưới dọc cho giống IOT
+                    ticks: { color: '#858796', font: { size: 12 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: 990,
+                    grid: { 
+                        color: '#f1f1f1',
+                        drawBorder: false // Ẩn đường viền trục
+                    },
+                    ticks: { 
+                        stepSize: 200, 
+                        color: '#858796' 
+                    }
+                }
+            },
+            // Hiệu ứng khi rê chuột vào (Tooltip)
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            }
+        }
+    });
+});
