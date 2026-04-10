@@ -2,14 +2,16 @@
     # Bật công cụ viết lại URL
     RewriteEngine On
     
-    # Cho phép các thư mục /uploads/ và /server/uploads/ truy cập trực tiếp (không viết lại)
-    RewriteRule ^(uploads|server/uploads)/ - [L]
+    # Cho phép truy cập trực tiếp đến các thư mục uploads (không viết lại)
+    RewriteRule ^uploads/ - [L]
     
-    # Định tuyến tất cả các request khác đến server/index.php (API router)
-    # Các điều kiện:
-    # - %{REQUEST_FILENAME} !-f: Nếu không phải là file thực tế
-    # - %{REQUEST_FILENAME} !-d: Nếu không phải là thư mục thực tế
+    # Định tuyến các API requests: /api/* → server/index.php?request=api/*
+    RewriteRule ^api/(.*)$ /IS207-UIT/server/index.php?request=api/$1 [QSA,L]
+    
+    # Cho phép các file và thư mục thực tế (CSS, JS, images, v.v.)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Định tuyến tất cả các request còn lại đến server/index.php
     RewriteRule ^(.*)$ /IS207-UIT/server/index.php [QSA,L]
 </IfModule>
