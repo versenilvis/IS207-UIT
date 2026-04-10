@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TOEIC Dashboard </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="..\styles\dashboardStyle.css">
 </head>
 <body class="bg-light">
 
@@ -40,15 +40,20 @@
     </div>
 
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white"><strong>Biểu đồ tiến độ điểm số</strong></div>
-                <div class="card-body">
-                    <canvas id="scoreChart" height="100"></canvas>
+    <div class="col-12">
+        <div class="card shadow-sm border-0 chart-card">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <strong class="text-secondary"><i class="fas fa-chart-line me-2"></i>BIỂU ĐỒ TIẾN ĐỘ ĐIỂM SỐ</strong>
+                <small class="text-muted">Dữ liệu tính theo từng lần thi</small>
+            </div>
+            <div class="card-body">
+                <div class="chart-wrapper" style="position: relative; height:600px; width:200%">
+                    <canvas id="scoreChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <div class="card shadow-sm">
         <div class="card-header bg-white"><strong>Lịch sử làm bài gần đây</strong></div>
