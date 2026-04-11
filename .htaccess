@@ -2,19 +2,26 @@
     # Bật công cụ viết lại URL
     RewriteEngine On
     
-    # Cho phép truy cập trực tiếp đến các thư mục uploads (không viết lại)
-    RewriteRule ^uploads/ - [L]
+    # skip các file tài nguyên như CSS, JS, Images, Uploads
+   	RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
     
-    # Định tuyến các API requests: /api/* → server/index.php?request=$1
+    # Định tuyến API (server/index.php xử lý)
     RewriteRule ^api/(.*)$ server/index.php?request=$1 [QSA,L]
 	# QSA để giữa lại các query sau dấu "?" trong URL
 	# L là để nói với apache tới đây dừng được rồi không cần quét thêm rewrite bên dưới (có thể thêm vào tương lai)
+    
+    # Loại bỏ client/pages/
+    # Nếu truy cập root domain thì vào thẳng trang home.php
+    RewriteRule ^$ client/pages/home.php [L]
+    
+    
+    # Nếu gõ /abc/xyz -> Kiểm tra xem client/pages/abc/xyz.php có tồn tại không
+    RewriteCond %{DOCUMENT_ROOT}/client/pages/$1.php -f
+    RewriteRule ^(.*)$ client/pages/$1.php [L]
 
-    
-    # Cho phép các file và thư mục thực tế (CSS, JS, images, v.v.)
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    
-    # Định tuyến tất cả các request còn lại đến server/index.php
+    # 4. Fallback: Nếu không khớp gì cả thì về index.php (tùy chọn)
+    RewriteCond %{REQUEST_URI} !^/api/
     RewriteRule ^(.*)$ server/index.php [QSA,L]
 </IfModule>
