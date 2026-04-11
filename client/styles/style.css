@@ -95,18 +95,29 @@ body {
 }
 /* --- SỬA LỖI NAVBAR ĐỔI MÀU VĨNH VIỄN --- */
 
-/* Reset lại màu khi hover hoặc focus (đang click) */
-.part-tabs .nav-link:hover,
-.part-tabs .nav-link:focus {
-	color: #495057 !important; /* Bắt buộc màu chữ xám */
-	background-color: #e9ecef !important; /* Đổi màu nền tối hơn tí xíu khi hover để có hiệu ứng */
-	outline: none !important; /* Xóa viền bao quanh (nếu có) */
-	box-shadow: none !important; /* Xóa viền bóng (nếu có) */
+.nav-link.active {
+    color: #fff !important; /* Màu trắng sáng */
+    font-weight: bold;      /* Cho đậm lên cho nổi bật */
 }
 
-/* CHỈ đổi màu xanh dương CỰC ĐẬM khi thẻ đó THỰC SỰ ĐANG ACTIVE (đang xem Part đó) */
-.part-tabs .nav-link.active {
-	background-color: #e3f2fd !important;
-	color: #0d6efd !important;
-	font-weight: bold;
+.nav-link {
+    color: rgba(255, 255, 255, 0.6); /* Màu xám mờ cho những trang không chọn */
+}
+/* --- KHÓA THANH TUA AUDIO --- */
+.audio-blocker {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.audio-blocker::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 55px;  
+    right: 120px; 
+    z-index: 9999 !important; /* Tăng sức mạnh đè lên trên cùng */
+    background: rgba(255, 0, 0, 0.4) !important; /* ĐỔI SANG MÀU ĐỎ ĐỂ NHÌN THẤY */
+    cursor: not-allowed;
 }
