@@ -7,6 +7,9 @@
     
     # Định tuyến các API requests: /api/* → server/index.php?request=$1
     RewriteRule ^api/(.*)$ server/index.php?request=$1 [QSA,L]
+	# QSA để giữa lại các query sau dấu "?" trong URL
+	# L là để nói với apache tới đây dừng được rồi không cần quét thêm rewrite bên dưới (có thể thêm vào tương lai)
+
     
     # Cho phép các file và thư mục thực tế (CSS, JS, images, v.v.)
     RewriteCond %{REQUEST_FILENAME} !-f
