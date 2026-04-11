@@ -15,6 +15,7 @@
 <body>
 
 <div class="container">
+
     <div style="margin-top: 25px; margin-bottom: 20px; display: flex; justify-content: flex-end;">
         <a href="./questions.php?action=create" class="btn-submit" style="text-decoration: none; display: inline-block; background-color: var(--primary-color); color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; transition: 0.2s;">Tạo Bài Thi</a>
     </div>
@@ -84,10 +85,13 @@
 </div>
 
     <script>
-    // Lưu toàn bộ dữ liệu tests để filter
+
+    // ====== BIẾN TOÀN CỤC ======
+    /** Lưu trữ toàn bộ dữ liệu bài thi từ API để hỗ trợ filter */
     let allTests = [];
 
-    // Hàm định dạng ngày tháng
+    // ====== HÀM TIỆN ÍCH ======
+    /** Định dạng ngày tháng từ định dạng ISO sang định dạng Việt (DD/MM/YYYY) */
     function formatDate(dateString) {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
@@ -97,35 +101,40 @@
         return `${day}/${month}/${year}`;
     }
 
-    // Hàm render bảng dựa trên dữ liệu được truyền vào
+    // ====== RENDER BẢNG ======
+    /**Render bảng danh sách bài thi từ dữ liệu được truyền vào
+     * Mỗi hàng bao gồm: tiêu đề, phân loại badge, trạng thái badge, ngày tạo
+     */
     function renderTestsTable(tests) {
         const tbody = document.getElementById('testTableBody');
         tbody.innerHTML = '';
         
+        // Hiển thị thông báo nếu không có dữ liệu
         if (tests.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">Không tìm thấy bài thi nào</td></tr>';
             return;
         }
         
+        // Duyệt qua từng bài thi và render hàng
         tests.forEach(test => {
-            // Đảm bảo is_premium và is_active được xử lý đúng kiểu boolean
+            // Chuyển đổi giá trị số thành boolean (1 = true, 0 = false)
             const isPremiumValue = parseInt(test.is_premium) === 1;
             const isActiveValue = parseInt(test.is_active) === 1;
             
-            // Chuyển đổi giá trị boolean thành text và class tương ứng
+            // Chuẩn bị text và CSS class cho badge
             const isPremiumText = isPremiumValue ? 'Premium' : 'Thường';
             const premiumBadgeClass = isPremiumValue ? 'premium' : 'standard';
             const isActiveText = isActiveValue ? 'Hoạt động' : 'Tạm ẩn';
             const activeBadgeClass = isActiveValue ? 'active' : 'inactive';
             const createdDate = formatDate(test.created_at);
             
-            // Tạo hàng mới cho bảng
+            // Tạo phần tử <tr> mới
             const row = document.createElement('tr');
             row.dataset.id = test.id;
             row.dataset.premium = isPremiumValue ? '1' : '0';
             row.dataset.active = isActiveValue ? '1' : '0';
             
-            // Điền dữ liệu vào hàng
+            // Thêm nội dung HTML cho hàng
             row.innerHTML = `
                 <td class="td-title"><strong>${test.title}</strong></td>
                 <td><span class="badge ${premiumBadgeClass}">${isPremiumText}</span></td>
@@ -133,10 +142,10 @@
                 <td>${createdDate}</td>
             `;
             
-            // Thêm sự kiện click chuột phải
+            // Gán event listener cho chuột phải (context menu)
             row.addEventListener('contextmenu', handleRowContextMenu);
             
-            // Thêm sự kiện double-click để chuyển sang trang questions
+            // Gán event listener cho double-click để chuyển đến trang chỉnh sửa câu hỏi
             row.addEventListener('dblclick', function() {
                 const testId = this.getAttribute('data-id');
                 window.location.href = `./questions.php?test_id=${testId}&action=edit`;
@@ -146,43 +155,12 @@
         });
     }
 
-    // Hàm filter dữ liệu dựa trên tìm kiếm và filter
-    function filterTests() {
-        const searchInput = document.querySelector('.search-wrapper input');
-        const categoryFilter = document.querySelectorAll('.filter-wrapper select')[0];
-        const statusFilter = document.querySelectorAll('.filter-wrapper select')[1];
-        
-        const searchText = searchInput.value.toLowerCase().trim();
-        const categoryValue = categoryFilter.value;
-        const statusValue = statusFilter.value;
-        
-        let filtered = allTests.filter(test => {
-            // Tìm kiếm theo tiêu đề
-            const titleMatch = test.title.toLowerCase().includes(searchText);
-            
-            // Filter theo phân loại
-            let categoryMatch = true;
-            if (categoryValue === 'Premium') {
-                categoryMatch = parseInt(test.is_premium) === 1;
-            } else if (categoryValue === 'Thường') {
-                categoryMatch = parseInt(test.is_premium) === 0;
-            }
-            
-            // Filter theo trạng thái
-            let statusMatch = true;
-            if (statusValue === 'Hoạt động') {
-                statusMatch = parseInt(test.is_active) === 1;
-            } else if (statusValue === 'Tạm ẩn') {
-                statusMatch = parseInt(test.is_active) === 0;
-            }
-            
-            return titleMatch && categoryMatch && statusMatch;
-        });
-        
-        renderTestsTable(filtered);
-    }
-
-    // Tải danh sách bài thi từ database
+    // ====== LOAD DỮ LIỆU TỪ API ======
+    /**
+     * Tải danh sách toàn bộ bài thi từ API
+     * Lưu dữ liệu vào biến allTests
+     * Gọi renderTestsTable() để hiển thị bảng
+     */
     async function loadTestsList() {
         try {
             const response = await fetch('/IS207-UIT/server/index.php?path=/api/tests');
@@ -200,9 +178,59 @@
         }
     }
 
-    // Xử lý sự kiện click chuột phải trên hàng
+    // ====== FILTER DỮ LIỆU ======
+    /**
+     * Lọc dữ liệu bài thi dựa trên các tiêu chí:
+     * - Tìm kiếm theo tiêu đề
+     * - Lọc theo phân loại (Premium/Thường)
+     * - Lọc theo trạng thái (Hoạt động/Tạm ẩn)
+     */
+    function filterTests() {
+        const searchInput = document.querySelector('.search-wrapper input');
+        const categoryFilter = document.querySelectorAll('.filter-wrapper select')[0];
+        const statusFilter = document.querySelectorAll('.filter-wrapper select')[1];
+        
+        const searchText = searchInput.value.toLowerCase().trim();
+        const categoryValue = categoryFilter.value;
+        const statusValue = statusFilter.value;
+        
+        // Lọc dữ liệu allTests
+        let filtered = allTests.filter(test => {
+            // Tìm kiếm theo tiêu đề (không phân biệt hoa/thường)
+            const titleMatch = test.title.toLowerCase().includes(searchText);
+            
+            // Lọc theo phân loại
+            let categoryMatch = true;
+            if (categoryValue === 'Premium') {
+                categoryMatch = parseInt(test.is_premium) === 1;
+            } else if (categoryValue === 'Thường') {
+                categoryMatch = parseInt(test.is_premium) === 0;
+            }
+            
+            // Lọc theo trạng thái
+            let statusMatch = true;
+            if (statusValue === 'Hoạt động') {
+                statusMatch = parseInt(test.is_active) === 1;
+            } else if (statusValue === 'Tạm ẩn') {
+                statusMatch = parseInt(test.is_active) === 0;
+            }
+            
+            return titleMatch && categoryMatch && statusMatch;
+        });
+        
+        // Render bảng với dữ liệu đã filter
+        renderTestsTable(filtered);
+    }
+
+    // ====== XỬ LÝ CLICK CHUỘT PHẢI ======
+    /**
+     * Xử lý sự kiện click chuột phải trên hàng bảng
+     * Hiển thị modal chỉnh sửa với dữ liệu của bài thi được chọn
+     * @param {event} e - Event object từ contextmenu
+     */
     function handleRowContextMenu(e) {
         e.preventDefault();
+        
         // Lấy dữ liệu từ hàng được click
         const modal = document.getElementById('editModal');
         const row = e.currentTarget;
@@ -218,18 +246,22 @@
         
         const title = titleElement.innerText;
         
-        // Đổ dữ liệu vào Modal
+        // Điền dữ liệu vào các input của modal
         document.getElementById('edit_id').value = testId;
         document.getElementById('edit_title').value = title;
         document.getElementById('edit_premium').checked = isPremium;
         document.getElementById('edit_active').checked = isActive;
         
-        // Hiển thị Modal
+        // Hiển thị modal
         modal.classList.add('show');
     }
 
+    // ====== KHỞI TẠO KHIBẤT ĐẦU TRANG ======
+    /**
+     * Khởi tạo các event listener và tải dữ liệu khi trang được load xong
+     */
     document.addEventListener("DOMContentLoaded", function () {
-        // Lấy các phần tử cần thiết
+        // Lấy các phần tử DOM cần thiết
         const modal = document.getElementById("editModal");
         const closeModalBtn = document.getElementById("closeModalBtn");
         const editForm = document.getElementById("editForm");
@@ -238,24 +270,31 @@
         // Tải danh sách bài thi từ database
         loadTestsList();
 
-        // Thêm event listener cho search input (gõ để tìm kiếm)
+        // Gán event listener cho search input - gõ để tìm kiếm real-time
         const searchInput = document.querySelector('.search-wrapper input');
         searchInput.addEventListener('input', filterTests);
 
-        // Thêm event listener cho các filter dropdown
+        // Gán event listener cho các dropdown filter
         const filterSelects = document.querySelectorAll('.filter-wrapper select');
         filterSelects.forEach(select => {
             select.addEventListener('change', filterTests);
         });
 
-        // Tắt Modal khi nhấn nút X hoặc click ra ngoài viền đen
+        // ====== ĐÓNG MODAL ======
+        // Tắt modal khi nhấn nút X hoặc click ra ngoài vùng modal
         const closeModal = () => modal.classList.remove("show");
         closeModalBtn.addEventListener("click", closeModal);
         modal.addEventListener("click", function (e) {
             if (e.target === modal) closeModal();
         });
 
-        // Xử lý Xóa Bài Thi
+        // ====== XÓA BÀI THI ======
+        /**
+         * Xử lý khi nhấn nút "Xóa Bài Thi"
+         * Gửi DELETE request đến API
+         * Nếu thành công: reload bảng và đóng modal
+         * Nếu thất bại: hiển thị thông báo lỗi
+         */
         btnDelete.addEventListener("click", async function () {
             const id = document.getElementById("edit_id").value;
             if (confirm("Bạn có chắc chắn muốn xóa bài thi này không? Dữ liệu không thể khôi phục.")) {
@@ -279,15 +318,25 @@
             }
         });
 
-        // Xử lý Lưu Thay Đổi
+        // ====== LƯU/CẬP NHẬT BÀI THI ======
+        /**
+         * Xử lý khi gửi form chỉnh sửa bài thi
+         * Lấy dữ liệu từ các field input trong modal
+         * Gửi PUT request đến API để cập nhật bài thi
+         * Nếu thành công: reload bảng, reset filter, đóng modal
+         * Nếu thất bại: hiển thị thông báo lỗi cho người dùng
+         */
         editForm.addEventListener("submit", async function (e) {
             e.preventDefault();
+            
+            // Lấy dữ liệu từ form modal
             const id = document.getElementById("edit_id").value;
             const title = document.getElementById("edit_title").value;
             const isPremium = document.getElementById("edit_premium").checked ? 1 : 0;
             const isActive = document.getElementById("edit_active").checked ? 1 : 0;
             
             try {
+                // Gửi PUT request để cập nhật bài thi
                 const response = await fetch(`/IS207-UIT/server/index.php?path=/api/tests/${id}`, {
                     method: 'PUT',
                     headers: {
@@ -300,11 +349,13 @@
                     })
                 });
                 const result = await response.json();
+                
+                // Xử lý kết quả từ server
                 if (result.success) {
                     alert("Đã lưu thay đổi thành công!");
-                    loadTestsList();
-                    filterTests();
-                    closeModal();
+                    loadTestsList();      // Tải lại danh sách từ database
+                    filterTests();         // Áp dụng filter lại
+                    closeModal();          // Đóng modal
                 } else {
                     alert("Lỗi lưu thay đổi: " + (result.message || 'Unknown error'));
                 }
