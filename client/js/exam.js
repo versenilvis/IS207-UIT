@@ -2,19 +2,12 @@
 // KHỞI CHẠY TẤT CẢ TÍNH NĂNG KHI WEB TẢI XONG
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. LUÔN LUÔN VẼ SIDEBAR TRƯỚC
-    renderSidebar();
-
-    // 2. ƯU TIÊN SỐ 1: BẬT ĐỒNG HỒ CHẠY NGAY LẬP TỨC 
-    // (Đưa lên trước fetchExamData để không bị lỗi Database chặn lại)
-    startTimer(120 * 60);
-
-    // 3. Kích hoạt tính năng Audio chỉ cho nghe 1 lần
-    setupAudioOnce();
-
-    // 4. Mọi thứ giao diện đã ổn định, giờ mới đi lấy dữ liệu
-    fetchExamData();
+  renderSidebar();
+  startTimer(EXAM_TIME_SECONDS);
+  setupAudioOnce();
+  loadDummyExamData();
 });
+
 
 
 // ==========================================
