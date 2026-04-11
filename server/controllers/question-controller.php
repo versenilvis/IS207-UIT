@@ -460,10 +460,16 @@ class QuestionController {
      */
     public function getTests() {
         try {
-            $sql = "SELECT id, title, description, is_active FROM tests WHERE is_active = 1 ORDER BY created_at DESC";
+            $sql = "SELECT id, title, description, is_premium, is_active, created_at FROM tests ORDER BY created_at DESC";
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
             $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Convert is_premium and is_active to integers for consistency
+            foreach ($tests as &$test) {
+                $test['is_premium'] = (int)$test['is_premium'];
+                $test['is_active'] = (int)$test['is_active'];
+            }
 
             return [
                 'success' => true,
