@@ -23,7 +23,7 @@
                     <div class="sticky-audio shadow-sm mb-4">
                         <div class="d-flex align-items-center w-100 flex-wrap">
                             <button id="custom-play-btn" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
-                                <i class="fas fa-play me-2"></i> Bắt đầu nghe Audio
+                                <i class="fas fa-play me-2"></i> Start audio
                             </button>
 
                             <span id="audio-status" class="ms-3 text-muted fw-bold"></span>
