@@ -106,8 +106,10 @@ function apiCreateQuestion(PDO $db)
 		];
 
 	} catch (Exception $e) {
-		if (isset($audioUrl)) FileHandler::deleteFile($audioUrl);
-		if (isset($imageUrl)) FileHandler::deleteFile($imageUrl);
+		if (isset($audioUrl))
+			FileHandler::deleteFile($audioUrl);
+		if (isset($imageUrl))
+			FileHandler::deleteFile($imageUrl);
 
 		return [
 			'success' => false,
@@ -284,8 +286,10 @@ function apiCreatePassage(PDO $db)
 		$part = helperGetPostValue('part');
 		$content = helperGetPostValue('content');
 
-		if (empty($testId)) throw new Exception("test_id là bắt buộc");
-		if (!helperTestExists($db, $testId)) throw new Exception("Đề thi không tồn tại");
+		if (empty($testId))
+			throw new Exception("test_id là bắt buộc");
+		if (!helperTestExists($db, $testId))
+			throw new Exception("Đề thi không tồn tại");
 
 		$audioUrl = null;
 		$imageUrl = null;
@@ -304,7 +308,8 @@ function apiCreatePassage(PDO $db)
 			try {
 				$imageUrl = FileHandler::uploadFile($_FILES['image_file'], 'image');
 			} catch (Exception $e) {
-				if ($audioUrl) FileHandler::deleteFile($audioUrl);
+				if ($audioUrl)
+					FileHandler::deleteFile($audioUrl);
 				throw new Exception("Lỗi upload hình ảnh: " . $e->getMessage());
 			}
 		} else {
@@ -334,8 +339,10 @@ function apiCreatePassage(PDO $db)
 		];
 
 	} catch (Exception $e) {
-		if (isset($audioUrl)) FileHandler::deleteFile($audioUrl);
-		if (isset($imageUrl)) FileHandler::deleteFile($imageUrl);
+		if (isset($audioUrl))
+			FileHandler::deleteFile($audioUrl);
+		if (isset($imageUrl))
+			FileHandler::deleteFile($imageUrl);
 
 		return [
 			'success' => false,
@@ -379,10 +386,13 @@ function apiDeleteQuestion(PDO $db, $questionId)
 	try {
 		$question = questionGetById($db, $questionId);
 
-		if (!$question) throw new Exception("Câu hỏi không tồn tại");
+		if (!$question)
+			throw new Exception("Câu hỏi không tồn tại");
 
-		if ($question['audio_url']) FileHandler::deleteFile($question['audio_url']);
-		if ($question['image_url']) FileHandler::deleteFile($question['image_url']);
+		if ($question['audio_url'])
+			FileHandler::deleteFile($question['audio_url']);
+		if ($question['image_url'])
+			FileHandler::deleteFile($question['image_url']);
 
 		questionDelete($db, $questionId);
 
@@ -406,11 +416,14 @@ function apiDeletePassage(PDO $db, $passageId)
 {
 	try {
 		$passage = passageGetById($db, $passageId);
-		if (!$passage) throw new Exception("Đoạn văn không tồn tại");
+		if (!$passage)
+			throw new Exception("Đoạn văn không tồn tại");
 
 		// Xóa file của passage
-		if ($passage['audio_url']) FileHandler::deleteFile($passage['audio_url']);
-		if ($passage['image_url']) FileHandler::deleteFile($passage['image_url']);
+		if ($passage['audio_url'])
+			FileHandler::deleteFile($passage['audio_url']);
+		if ($passage['image_url'])
+			FileHandler::deleteFile($passage['image_url']);
 
 		// Lấy danh sách câu hỏi thuộc passage này để dọn dẹp file
 		$sql = "SELECT id, audio_url, image_url FROM questions WHERE passage_id = :passage_id";
@@ -419,9 +432,11 @@ function apiDeletePassage(PDO $db, $passageId)
 		$questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		foreach ($questions as $q) {
-			if ($q['audio_url']) FileHandler::deleteFile($q['audio_url']);
-			if ($q['image_url']) FileHandler::deleteFile($q['image_url']);
-			
+			if ($q['audio_url'])
+				FileHandler::deleteFile($q['audio_url']);
+			if ($q['image_url'])
+				FileHandler::deleteFile($q['image_url']);
+
 			// Xóa options (nếu DB không có ON DELETE CASCADE)
 			$db->prepare("DELETE FROM options WHERE question_id = ?")->execute([$q['id']]);
 		}
