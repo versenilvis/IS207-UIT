@@ -63,7 +63,7 @@
         <!-- Tạo bài thi mới -->
         <div class="form-section">
             <h3 style="margin-top: 0; font-size: 20px;">Tạo Bài Thi Mới</h3>
-            <form id="createTestForm" action="/IS207-UIT/server/index.php?path=/api/tests" method="POST">
+            <form id="createTestForm" action="/api/tests" method="POST">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Tiêu đề <span class="required-mark">*</span></label>
