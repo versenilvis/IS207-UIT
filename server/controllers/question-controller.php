@@ -37,7 +37,8 @@ function apiCreateQuestion(PDO $db)
 			Validator::validateExplanation($explanation);
 		}
 
-		if (!helperTestExists($db, $testId)) {
+		$internalTestId = helperGetInternalTestId($db, $testId);
+		if (!$internalTestId) {
 			throw new Exception("Đề thi không tồn tại hoặc không hoạt động");
 		}
 
@@ -74,7 +75,7 @@ function apiCreateQuestion(PDO $db)
 		helperValidatePartRequirements($part, $content, $audioUrl, $imageUrl, $passageId, $isSubQuestion);
 
 		$questionData = [
-			'test_id' => $testId,
+			'test_id' => $internalTestId,
 			'part' => $part,
 			'question_number' => $questionNumber,
 			'passage_id' => !empty($passageId) ? $passageId : null,
@@ -134,7 +135,8 @@ function apiCreateQuestionsFromForm(PDO $db)
 			throw new Exception("Định dạng dữ liệu câu hỏi không hợp lệ");
 		}
 
-		if (!helperTestExists($db, $testId)) {
+		$internalTestId = helperGetInternalTestId($db, $testId);
+		if (!$internalTestId) {
 			throw new Exception("Đề thi không tồn tại");
 		}
 
@@ -154,7 +156,7 @@ function apiCreateQuestionsFromForm(PDO $db)
 				}
 
 				$qData = [
-					'test_id' => $testId,
+					'test_id' => $internalTestId,
 					'part' => $part,
 					'question_number' => $questionData['question_number'],
 					'passage_id' => $questionData['passage_id'] ?? null,
@@ -209,7 +211,8 @@ function apiCreateQuestionsFromForm(PDO $db)
 function apiGetQuestions(PDO $db, $testId)
 {
 	try {
-		if (!helperTestExists($db, $testId)) {
+		$internalTestId = helperGetInternalTestId($db, $testId);
+		if (!$internalTestId) {
 			throw new Exception("Đề thi không tồn tại");
 		}
 
@@ -218,7 +221,7 @@ function apiGetQuestions(PDO $db, $testId)
                 ORDER BY part ASC, question_number ASC";
 
 		$stmt = $db->prepare($sql);
-		$stmt->execute([':test_id' => $testId]);
+		$stmt->execute([':test_id' => $internalTestId]);
 		$questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		$optionsSql = "SELECT id, label, content FROM options WHERE question_id = :question_id ORDER BY label";
@@ -286,9 +289,10 @@ function apiCreatePassage(PDO $db)
 		$part = helperGetPostValue('part');
 		$content = helperGetPostValue('content');
 
+		$internalTestId = helperGetInternalTestId($db, $testId);
 		if (empty($testId))
 			throw new Exception("test_id là bắt buộc");
-		if (!helperTestExists($db, $testId))
+		if (!$internalTestId)
 			throw new Exception("Đề thi không tồn tại");
 
 		$audioUrl = null;
@@ -321,7 +325,7 @@ function apiCreatePassage(PDO $db)
 		}
 
 		$passageData = [
-			'test_id' => $testId,
+			'test_id' => $internalTestId,
 			'content' => !empty($content) ? trim($content) : null,
 			'audio_url' => $audioUrl,
 			'image_url' => $imageUrl
@@ -358,11 +362,12 @@ function apiCreatePassage(PDO $db)
 function apiGetPassages(PDO $db, $testId)
 {
 	try {
-		if (!helperTestExists($db, $testId)) {
+		$internalTestId = helperGetInternalTestId($db, $testId);
+		if (!$internalTestId) {
 			throw new Exception("Đề thi không tồn tại");
 		}
 
-		$passages = passageGetByTestId($db, $testId);
+		$passages = passageGetByTestId($db, $internalTestId);
 
 		return [
 			'success' => true,
@@ -472,13 +477,14 @@ function helperGetPostValue($key, $default = null)
 	return isset($_POST[$key]) ? $_POST[$key] : $default;
 }
 
-function helperTestExists(PDO $db, $testId)
+function helperGetInternalTestId(PDO $db, $uuid)
 {
 	try {
-		$sql = "SELECT id FROM tests WHERE id = :id AND is_active = 1";
+		$sql = "SELECT id FROM tests WHERE uuid = :uuid AND is_active = 1";
 		$stmt = $db->prepare($sql);
-		$stmt->execute([':id' => $testId]);
-		return $stmt->rowCount() > 0;
+		$stmt->execute([':uuid' => $uuid]);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result ? (int)$result['id'] : false;
 	} catch (Exception $e) {
 		return false;
 	}
