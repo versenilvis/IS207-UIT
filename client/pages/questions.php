@@ -404,8 +404,8 @@
         // ====== LOAD TESTS ======
         async function loadTests() {
             try {
-                // Sư dụng URL tương đối mà không hardcode port để tránh lỗi khi deploy hoặc chạy trên môi trường khác
-                const apiUrl = '/IS207-UIT/server/index.php?path=/api/tests';
+                // Sử dụng đường dẫn API sạch nhờ .htaccess
+                const apiUrl = '/api/tests';
                 const response = await fetch(apiUrl);
                 // Kiểm tra lỗi HTTP trước khi parse JSON
                 if (!response.ok) {
@@ -440,7 +440,7 @@
                     message: error.message,
                     stack: error.stack,
                     type: error.name,
-                    url: '/IS207-UIT/server/index.php?path=/api/tests'
+                    url: '/api/tests'
                 });
                 showMessage('Lỗi tải danh sách đề thi', 'error');
             }
@@ -517,7 +517,7 @@
 
             try {
                 // Su dụng URL tương đối mà không hardcode port để tránh lỗi khi deploy hoặc chạy trên môi trường khác
-                const apiUrl = '/IS207-UIT/server/index.php?path=/api/questions&test_id=' + testId;
+                const apiUrl = `/api/questions/${testId}`;
                 console.log('Fetching from:', apiUrl);
                 const response = await fetch(apiUrl);
 
@@ -579,7 +579,7 @@
                 // Lấy passages cho các câu hỏi nhóm
                 let passagesMap = {};
                 if (groupQuestions.length > 0) {
-                    const passagesUrl = '/IS207-UIT/server/index.php?path=/api/passages&test_id=' + testId;
+                    const passagesUrl = `/api/passages/${testId}`;
                     const passagesResponse = await fetch(passagesUrl);
 
                     if (!passagesResponse.ok) {
@@ -1424,7 +1424,7 @@
                 for (const qId of deletedQuestionIds) {
                     try {
                         // Gửi yêu cầu DELETE đến server để xóa câu hỏi với ID này
-                        const deleteResponse = await fetch('/IS207-UIT/server/index.php?path=/api/questions/' + qId, {
+                        const deleteResponse = await fetch('/api/questions/' + qId, {
                             method: 'DELETE'
                         });
                         
@@ -1444,7 +1444,7 @@
                 for (const pId of deletedPassageIds) {
                     try {
                         // Gửi yêu cầu DELETE đến server để xóa passage với ID này
-                        const deleteResponse = await fetch('/IS207-UIT/server/index.php?path=/api/passages/' + pId, {
+                        const deleteResponse = await fetch('/api/passages/' + pId, {
                             method: 'DELETE'
                         });
                         if (deleteResponse.ok) {
@@ -1541,7 +1541,7 @@
                 const questionId = block.dataset.questionId;
                 if (questionId) {
                     // Gửi yêu cầu DELETE đến server để xóa câu hỏi cũ với ID này trước khi tạo mới
-                    await fetch('/IS207-UIT/server/index.php?path=/api/questions/' + questionId, {
+                    await fetch('/api/questions/' + questionId, {
                         method: 'DELETE'
                     });
                 }
@@ -1579,7 +1579,7 @@
                 }
 
                 // Gửi yêu cầu đến API
-                const response = await fetch('/IS207-UIT/server/index.php?path=/api/questions', {
+                const response = await fetch('/api/questions', {
                     method: 'POST',
                     body: formData
                 });
@@ -1636,7 +1636,7 @@
                         // Nếu block này đã có passageId (tức là đã tồn tại trên server), thì chúng ta sẽ gửi yêu cầu DELETE để xóa passage cũ trước khi tạo mới
                         const existingPassageId = block.dataset.passageId;
                         if (existingPassageId) {
-                            await fetch('/IS207-UIT/server/index.php?path=/api/passages/' + existingPassageId, {
+                            await fetch('/api/passages/' + existingPassageId, {
                                 method: 'DELETE'
                             });
                             console.log('Deleted old passage:', existingPassageId);
@@ -1681,7 +1681,7 @@
 
                         console.log('Passage FormData ready, audio:', audioFile?.name || 'none', 'image:', imageFile?.name || 'none');
                         // Gửi yêu cầu đến API để tạo passage mới và nhận về passageId mới
-                        const passageResponse = await fetch('/IS207-UIT/server/index.php?path=/api/passages', {
+                        const passageResponse = await fetch('/api/passages', {
                             method: 'POST',
                             body: passageFormData
                         });
@@ -1741,7 +1741,7 @@
                         formData.append('explanation', explanation);
                         formData.append('options', JSON.stringify(options));
                         // Gửi yêu cầu đến API để tạo câu hỏi con mới với liên kết đến passage chính thông qua passageId
-                        const response = await fetch('/IS207-UIT/server/index.php?path=/api/questions', {
+                        const response = await fetch('/api/questions', {
                             method: 'POST',
                             body: formData
                         });

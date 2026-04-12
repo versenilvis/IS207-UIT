@@ -48,9 +48,9 @@ function isActiveForm($formName, $activeForm)
 <!--http://localhost:81/Web/PrepHub/IS207-UIT/client/page/login.php-->
 
 <body>
-	<div class="container">
+	<div class="auth-container">
 		<div class="form-box <?= isActiveForm('login', $activeForm) ?>" id="login-form">
-			<form action="../../server/controllers/auth-controller.php" method="post">
+			<form action="/api/auth/login" method="post">
 				<h2>Đăng nhập</h2>
 				<?= showSuccess($errors['success']); ?>
 
@@ -66,7 +66,7 @@ function isActiveForm($formName, $activeForm)
 			</form>
 		</div>
 		<div class="form-box <?= isActiveForm('register', $activeForm) ?>" id="register-form">
-			<form action="../../server/controllers/auth-controller.php" method="post">
+			<form action="/api/auth/register" method="post">
 				<h2>Đăng ký</h2>
 				<?= showError($errors['register']); ?>
 				<div class="name-row">
