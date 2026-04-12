@@ -16,7 +16,8 @@ function getTestList() {
         $role = $_SESSION['role'] ?? 'user';
 
 
-        $stmt = $conn->prepare("SELECT id, uuid, title, is_premium, total_questions FROM tests WHERE is_active = 1 ORDER BY id DESC");
+        // Lấy tất cả (cả ẩn và hiện) để admin quản lý
+        $stmt = $conn->prepare("SELECT id, uuid, title, is_premium, is_active, total_questions, created_at FROM tests ORDER BY id DESC");
         $stmt->execute();
         $tests = $stmt->fetchAll();
 
@@ -52,6 +53,8 @@ function getTestList() {
                 'id' => $test['uuid'], // Trả về UUID làm định danh công khai
                 'title' => $test['title'],
                 'is_premium' => $is_premium,
+                'is_active' => (int)$test['is_active'],
+                'created_at' => $test['created_at'],
                 'is_unlocked' => $is_unlocked
             ];
         }
