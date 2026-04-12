@@ -9,7 +9,7 @@ function toggleCreateTestForm(show) {
 
 function toggleOtherForms(show) {
 	const displayStyle = show ? 'block' : 'none';
-	const elements = ['.test-config', '#messageBox', '#partInfo', '.header-actions', '#questions-container'];
+	const elements = ['.test-config', '#partInfo', '.header-actions', '#questions-container'];
 	
 	elements.forEach(selector => {
 		const el = document.querySelector(selector);
@@ -23,6 +23,7 @@ function showMessage(message, type) {
 
 	messageBox.textContent = message;
 	messageBox.className = `message-box ${type}`;
+	messageBox.style.display = 'block';
 
 	if (type === 'success') {
 		setTimeout(() => { messageBox.className = 'message-box'; }, 5000);

@@ -72,13 +72,20 @@ function createTest() {
         // Hỗ trợ cả dữ liệu gửi từ Form hoặc từ JSON
         $input = json_decode(file_get_contents('php://input'), true);
         
-        $title = $_POST['title'] ?? $input['title'] ?? '';
-        $description = $_POST['description'] ?? $input['description'] ?? '';
+        $title = trim($_POST['title'] ?? $input['title'] ?? '');
+        $description = trim($_POST['description'] ?? $input['description'] ?? '');
         $is_premium = isset($_POST['is_premium']) ? 1 : ($input['is_premium'] ?? 0);
         $is_active = isset($_POST['is_active']) ? 1 : ($input['is_active'] ?? 1);
 
         if (empty($title)) {
             sendError("Tiêu đề không được để trống", 400);
+        }
+
+        // Kiểm tra tiêu đề trùng lặp
+        $stmt_check = $conn->prepare("SELECT id FROM tests WHERE title = :title LIMIT 1");
+        $stmt_check->execute(['title' => $title]);
+        if ($stmt_check->fetch()) {
+            sendError("Tiêu đề đề thi '{$title}' đã tồn tại, vui lòng chọn tên khác", 400);
         }
 
         // Tạo đề thi mới với UUID tự động từ MySQL
