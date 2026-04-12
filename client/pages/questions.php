@@ -6,17 +6,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Nhập Câu Hỏi TOEIC</title>
     <link href="../styles/questionsStyle.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-hover: #4338CA;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --border-color: #D1D5DB;
+            --danger-color: #EF4444;
+        }
+
+        /* Form Section Styling */
+        .form-section {
+            background-color: var(--card-bg);
+            padding: 20px 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            border-left: 5px solid #4CAF50;
+        }
+        .form-section h3 { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 15px;}
+        .full-width { grid-column: 1 / -1; }
+        .form-group label { font-weight: 600; margin-bottom: 6px; font-size: 13px; }
+        .required-mark { color: var(--danger-color); }
+        .form-group input[type="text"], 
+        .form-group textarea {
+            width: 100%; padding: 8px 12px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 14px; box-sizing: border-box; transition: 0.2s;
+        }
+        .form-group input:focus, 
+        .form-group textarea:focus { 
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1); 
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .form-actions { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); }
+        .checkbox-group-wrapper { display: flex; gap: 20px; }
+        .checkbox-group { display: flex; align-items: center; }
+        .checkbox-group input[type="checkbox"] { width: 16px; height: 16px; margin-right: 8px; cursor: pointer; accent-color: var(--primary-color); }
+        .checkbox-group label { cursor: pointer; font-weight: normal; margin-bottom: 0;}
+        .form-section .btn-submit { background-color: var(--primary-color); color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .form-section .btn-submit:hover { background-color: var(--primary-hover); }
+    </style>
 </head>
 
 <body>
     <!-- Icon -->
-    <?php include ('../pages/components/metadata.php'); ?>
+    <?php include ('./components/metadata.php'); ?>
     <!-- NavBar & Header -->
     <?php include('./components/navBar.php'); ?>
     <?php include('./components/header.php'); ?>
 
     <div class="container-wrapper">
         
+        <!-- Tạo bài thi mới -->
+        <div class="form-section">
+            <h3 style="margin-top: 0; font-size: 20px;">Tạo Bài Thi Mới</h3>
+            <form id="createTestForm" action="/IS207-UIT/server/index.php?path=/api/tests" method="POST">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tiêu đề <span class="required-mark">*</span></label>
+                        <input type="text" name="title" required placeholder="Nhập tiêu đề...">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Mô tả</label>
+                        <textarea name="description" placeholder="Nhập mô tả chi tiết..."></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <div class="checkbox-group-wrapper">
+                        <div class="checkbox-group">
+                            <input type="checkbox" name="is_premium" value="1">
+                            <label>Premium</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" name="is_active" value="1" checked>
+                            <label>Kích hoạt</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">Thêm Bài Thi</button>
+                </div>
+            </form>
+        </div>
+
         <!-- Chọn đề thi và phần -->
         <div class="test-config">
             <h3 style="margin-top: 0; color: #333;">Cấu Hình Đề Thi & Câu Hỏi</h3>
@@ -54,7 +127,8 @@
             <button class="btn btn-add-group" onclick="addBlock('group')">+ Thêm Cụm Câu Hỏi</button>
             <button class="btn btn-delete-all" onclick="deleteAllBlocks()">
                 <i class="bx bx-trash-alt" style="font-size: 1.2rem; vertical-align: -0.125em; margin-right: 5px;"></i>Xóa Tất Cả</button>
-            <button class="btn btn-submit" onclick="submitData()">Lưu Bài Test</button>
+            <button class="btn btn-submit" onclick="submitData()">
+                <i class="bx bx-save" style="font-size: 1.2rem; vertical-align: -0.125em; margin-right: 5px;"></i>Lưu Bài Test</button>
         </div>
 
         <div id="questions-container"></div>
@@ -145,6 +219,34 @@
     </template>
 
     <script>
+        // Lấy tham số từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const actionParam = urlParams.get('action');
+        const testIdParam = urlParams.get('test_id');
+        
+        // Hàm để ẩn/hiện form tạo bài thi
+        function toggleCreateTestForm(show) {
+            const formSection = document.querySelector('.form-section');
+            if (formSection) {
+                formSection.style.display = show ? 'block' : 'none';
+            }
+        }
+        
+        // Hàm để ẩn/hiện các form còn lại (test-config, partInfo, header-actions, questions-container)
+        function toggleOtherForms(show) {
+            const testConfig = document.querySelector('.test-config');
+            const messageBox = document.getElementById('messageBox');
+            const partInfo = document.getElementById('partInfo');
+            const headerActions = document.querySelector('.header-actions');
+            const questionsContainer = document.getElementById('questions-container');
+            
+            if (testConfig) testConfig.style.display = show ? 'block' : 'none';
+            if (messageBox) messageBox.style.display = show ? 'block' : 'none';
+            if (partInfo) partInfo.style.display = show ? 'block' : 'none';
+            if (headerActions) headerActions.style.display = show ? 'block' : 'none';
+            if (questionsContainer) questionsContainer.style.display = show ? 'block' : 'none';
+        }
+        
         // ====== Yêu cầu từng phần ======
         const PART_CONFIG = {
             1: {
@@ -198,10 +300,105 @@
 
         // Khởi tạo trang
         document.addEventListener('DOMContentLoaded', () => {
+            // Xử lý hiển thị form dựa trên action parameter
+            if (actionParam === 'create') {
+                // Chế độ tạo bài thi: ẩn các form khác, chỉ hiện form tạo bài thi
+                toggleOtherForms(false);
+                toggleCreateTestForm(true);
+            } else if (actionParam === 'edit' && testIdParam) {
+                // Chế độ chỉnh sửa: ẩn form tạo bài thi, hiện các form khác
+                toggleCreateTestForm(false);
+                toggleOtherForms(true);
+            } else {
+                // Chế độ mặc định: hiện tất cả các form
+                toggleCreateTestForm(true);
+                toggleOtherForms(true);
+            }
+            
             // Khóa chọn part cho đến khi chọn được đề thi
             document.getElementById('partSelect').disabled = true;
             loadTests();
-            addBlock('single');
+            
+            // Nếu là chế độ chỉnh sửa và có test_id, tự động chọn test đó
+            if (actionParam === 'edit' && testIdParam) {
+                // Chờ loadTests hoàn thành rồi tự động chọn test
+                setTimeout(() => {
+                    const testSelect = document.getElementById('testSelect');
+                    testSelect.value = testIdParam;
+                    onTestChange();
+                    
+                    // Sau đó chọn Part 1 mặc định
+                    setTimeout(() => {
+                        const partSelect = document.getElementById('partSelect');
+                        partSelect.value = '1';
+                        onPartChange();
+                    }, 300);
+                }, 500);
+            } else {
+                addBlock('single');
+            }
+            
+            // Xử lý form tạo bài thi mới
+            const createTestForm = document.getElementById('createTestForm');
+            if (createTestForm) {
+                createTestForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(createTestForm);
+                    const data = {
+                        title: formData.get('title'),
+                        description: formData.get('description'),
+                        is_premium: formData.get('is_premium') ? 1 : 0,
+                        is_active: formData.get('is_active') ? 1 : 0
+                    };
+                    
+                    try {
+                        const response = await fetch('/IS207-UIT/server/index.php?path=/api/tests', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            showMessage('Tạo bài thi thành công!', 'success');
+                            createTestForm.reset();
+                            
+                            // Ẩn form tạo bài thi, hiện các form khác
+                            toggleCreateTestForm(false);
+                            toggleOtherForms(true);
+                            
+                            // Reload danh sách đề thi
+                            const testSelect = document.getElementById('testSelect');
+                            testSelect.innerHTML = '<option value="">-- Chọn đề thi --</option>';
+                            loadTests();
+                            
+                            // Chọn bài thi mới vừa tạo
+                            setTimeout(() => {
+                                if (result.data && result.data.id) {
+                                    testSelect.value = result.data.id;
+                                    onTestChange();
+                                    
+                                    // Chọn Part 1 mặc định
+                                    setTimeout(() => {
+                                        const partSelect = document.getElementById('partSelect');
+                                        partSelect.value = '1';
+                                        onPartChange();
+                                    }, 300);
+                                }
+                            }, 500);
+                        } else {
+                            showMessage(`Lỗi: ${result.message || 'Không thể tạo bài thi'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error creating test:', error);
+                        showMessage('Lỗi tạo bài thi', 'error');
+                    }
+                });
+            }
         });
 
         // ====== LOAD TESTS ======
@@ -265,7 +462,9 @@
             // Cho phép chọn part khi đã chọn đề thi
             partSelect.disabled = false;
 
-            showMessage('Vui lòng chọn part', 'warning');
+            // Tự động chọn Part 1
+            partSelect.value = '1';
+            onPartChange();
         }
 
         // ====== Khi thay đổi part ======
@@ -1206,11 +1405,6 @@
                 });
             });
 
-            // So sánh với loadedQuestionIds và loadedPassageIds để tìm ra những ID nào đã bị xóa (có trong loaded nhưng không có trong current), sau đó chúng ta sẽ gửi yêu cầu xóa đến server cho những ID này
-            const deletedQuestionIds = Array.from(loadedQuestionIds).filter(id => !currentQuestionIds.has(id));
-            const deletedPassageIds = Array.from(loadedPassageIds).filter(id => !currentPassageIds.has(id));
-            console.log('Deleted questions:', deletedQuestionIds, 'Deleted passages:', deletedPassageIds);
-
             // Vô hiệu hóa nút submit và hiển thị trạng thái đang lưu để ngăn người dùng gửi nhiều lần trong khi chờ phản hồi từ server, điều này cũng giúp tránh việc gửi trùng lặp nếu người dùng nhấn nhiều lần
             const submitBtn = event?.target || document.querySelector('.btn-submit');
             const originalText = submitBtn?.textContent;
@@ -1218,6 +1412,12 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Đang lưu...';
             }
+
+            // --- Xóa các câu hỏi và passage đã bị xóa khỏi form trước khi gửi dữ liệu mới ---
+            // So sánh với loadedQuestionIds và loadedPassageIds để tìm ra những ID nào đã bị xóa (có trong loaded nhưng không có trong current), sau đó chúng ta sẽ gửi yêu cầu xóa đến server cho những ID này
+            const deletedQuestionIds = Array.from(loadedQuestionIds).filter(id => !currentQuestionIds.has(id));
+            const deletedPassageIds = Array.from(loadedPassageIds).filter(id => !currentPassageIds.has(id));
+            console.log('Deleted questions:', deletedQuestionIds, 'Deleted passages:', deletedPassageIds);
 
             try {
                 // Xử lý việc xóa các câu hỏi và passage đã bị xóa khỏi form trước khi gửi dữ liệu mới
@@ -1578,7 +1778,7 @@
             };
         }
     </script>
-    <script src="../js/api.js"></script>
+    <script src="../js/questions.js"></script>
 
     <?php include('./components/footer.php'); ?>
 </body>

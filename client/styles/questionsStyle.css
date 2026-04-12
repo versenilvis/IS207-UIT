@@ -12,11 +12,14 @@ body {
     gap: 10px;
     flex-wrap: wrap;
     position: sticky;
-    top: 0;
+    top: 56px;
+    left: 0;
+    right: 0;
     background: #f4f7f6;
     padding: 10px 0;
-    z-index: 100;
+    z-index: 99;
     border-bottom: 2px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn {
