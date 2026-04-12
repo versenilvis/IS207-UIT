@@ -39,11 +39,10 @@ try {
 	// Ví dụ như : api/tests thì ta lấy phần param là "tests"
 	// nếu như cấu hình .htaccess bị lỗi hay có lý do nào đó mà không xử lí được
 	// ta qua phương án B
-	// check nếu phần param đó trống, ta sẽ lấy toàn bộ phần URL path,
-	// sau đó xoá phần server/api hoặc api/ và chỉ giữ lại phần sau thôi
+	// xoá phần server/api hoặc api/ và chỉ giữ lại phần sau thôi
+	$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 	$request = $_GET['request'] ?? '';
 	if (empty($request)) {
-		$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 		$request = str_replace(['/server/api/', '/api/'], '', $path);
 	}
 
