@@ -14,10 +14,7 @@ function setupUIFromParams() {
 	const partSelect = document.getElementById('partSelect');
 	if (partSelect) partSelect.disabled = true;
 
-	if (ACTION_PARAM === 'create') {
-		toggleCreateTestForm(true);
-		toggleOtherForms(false);
-	} else if (ACTION_PARAM === 'edit' && TEST_ID_PARAM) {
+	if (ACTION_PARAM === 'edit' && TEST_ID_PARAM) {
 		toggleCreateTestForm(false);
 		toggleOtherForms(true);
 		
@@ -34,6 +31,7 @@ function setupUIFromParams() {
 			}
 		}, 500);
 	} else {
+		// Mặc định hiện tất cả nhưng form tạo có thể thu gọn (nếu muốn)
 		toggleCreateTestForm(true);
 		toggleOtherForms(true);
 		addBlock('single');
