@@ -13,11 +13,14 @@ class FileHandler {
      * Khởi tạo thư mục upload khi sử dụng lần đầu
      */
     private static function initUploadDir() {
-        if (self::$uploadDir === null) {
-            self::$uploadDir = realpath(__DIR__ . '/../uploads');
-            if (!self::$uploadDir) {
-                self::$uploadDir = __DIR__ . '/../uploads';
-            }
+        if (self::$uploadDir !== null) {
+            return;
+        }
+
+        self::$uploadDir = dirname(__DIR__) . '/uploads';
+        
+        if (!is_dir(self::$uploadDir)) {
+            mkdir(self::$uploadDir, 0777, true);
         }
     }
 
@@ -96,9 +99,8 @@ class FileHandler {
         }
 
         // Kiểm tra loại MIME
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($file['tmp_name']);
 
         if (!in_array($mimeType, self::$audioMimes)) {
             throw new Exception("Định dạng âm thanh không hợp lệ. Chỉ hỗ trợ: MP3, WAV, OGG. MIME nhận được: {$mimeType}");
@@ -124,9 +126,8 @@ class FileHandler {
         }
 
         // Kiểm tra loại MIME
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($file['tmp_name']);
 
         if (!in_array($mimeType, self::$imageMimes)) {
             throw new Exception("Định dạng hình ảnh không hợp lệ. Chỉ hỗ trợ: JPG, PNG, GIF. MIME nhận được: {$mimeType}");
@@ -193,9 +194,8 @@ class FileHandler {
         }
 
         // Kiểm tra loại MIME
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($file['tmp_name']);
 
         if (!in_array($mimeType, self::$excelMimes)) {
             throw new Exception("Định dạng Excel không hợp lệ. MIME nhận được: {$mimeType}");
@@ -220,7 +220,7 @@ class FileHandler {
 
         // Tạo thư mục nếu không tồn tại
         if (!is_dir($fullDir)) {
-            if (!mkdir($fullDir, 0755, true)) {
+            if (!mkdir($fullDir, 0777, true)) {
                 throw new Exception("Không thể tạo thư mục upload: {$fullDir}");
             }
         }
