@@ -1,12 +1,12 @@
 /**
- * api.js - Các hàm giao tiếp với Backend thông qua fetch API
+ * api.js - Các hàm giao tiếp của question với Backend thông qua fetch API
  */
 
 async function loadTestsData() {
 	try {
 		const response = await fetch('/api/tests');
 		if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
-		
+
 		const result = await response.json();
 		if (!result.success || !Array.isArray(result.data)) throw new Error('Định dạng dữ liệu không hợp lệ');
 
@@ -34,7 +34,7 @@ async function handleCreateTestSubmit(e) {
 	e.preventDefault();
 	const form = e.target;
 	const formData = new FormData(form);
-	
+
 	const data = {
 		title: formData.get('title'),
 		description: formData.get('description'),
@@ -55,7 +55,7 @@ async function handleCreateTestSubmit(e) {
 			form.reset();
 			toggleCreateTestForm(false);
 			toggleOtherForms(true);
-			
+
 			const testSelect = document.getElementById('testSelect');
 			if (testSelect) {
 				testSelect.innerHTML = '<option value="">-- Chọn đề thi --</option>';
@@ -240,7 +240,7 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 			try {
 				const opts = subQ.querySelectorAll('.sub-options-grid .option-content');
 				const options = { A: opts[0]?.value.trim(), B: opts[1]?.value.trim(), C: opts[2]?.value.trim(), D: opts[3]?.value.trim() };
-				
+
 				const qFormData = new FormData();
 				qFormData.append('test_id', testId);
 				qFormData.append('part', part);
@@ -259,16 +259,16 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 				} else {
 					errorMessages.push(`Câu ${qNum}: ${qResult.message}`);
 				}
-			} catch (e) { 
-				errorMessages.push("Lỗi kết nối"); 
+			} catch (e) {
+				errorMessages.push("Lỗi kết nối");
 			}
 		}
-		return { 
-			success: errorMessages.length === 0, 
-			created, 
-			message: errorMessages.join(' | ') 
+		return {
+			success: errorMessages.length === 0,
+			created,
+			message: errorMessages.join(' | ')
 		};
-	} catch (e) { 
+	} catch (e) {
 		return { success: false, created, message: e.message };
 	}
 }
