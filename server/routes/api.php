@@ -6,6 +6,8 @@ $parts = explode('/', trim($request, '/'));
 // NOTE: vì .htaccess nó đã có sẵn /api/* rồi nên resource sẽ lấy từ phần tiếp theo. VD: /api/[...] -> lấy phần [...]
 $resource = $parts[0] ?? '';
 
+$db_connection = $conn;
+
 switch ($resource) {
 	case 'auth':
 		require_once __DIR__ . '/auth.php';
