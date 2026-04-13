@@ -5,13 +5,16 @@
     # Cho phép truy cập trực tiếp đến các thư mục uploads (không viết lại)
     RewriteRule ^uploads/ - [L]
     
-    # Định tuyến các API requests: /api/* → server/index.php?request=api/*
-    RewriteRule ^api/(.*)$ /IS207-UIT/server/index.php?request=api/$1 [QSA,L]
+    # Định tuyến các API requests: /api/* → server/index.php?request=$1
+    RewriteRule ^api/(.*)$ server/index.php?request=$1 [QSA,L]
+	# QSA để giữa lại các query sau dấu "?" trong URL
+	# L là để nói với apache tới đây dừng được rồi không cần quét thêm rewrite bên dưới (có thể thêm vào tương lai)
+
     
     # Cho phép các file và thư mục thực tế (CSS, JS, images, v.v.)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     
     # Định tuyến tất cả các request còn lại đến server/index.php
-    RewriteRule ^(.*)$ /IS207-UIT/server/index.php [QSA,L]
+    RewriteRule ^(.*)$ server/index.php [QSA,L]
 </IfModule>
