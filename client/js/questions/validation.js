@@ -1,5 +1,41 @@
 /**
- * validation.js - Kiểm tra tính hợp lệ của dữ liệu trước khi gửi đi
+ validation.js
+ Chủ yếu để kiểm tra các thao tác trước khi submit data
+
+ Flow:
+ [Giao diện người dùng (DOM)] -> [validation.js] -> [form-handler.js / API call] -> [Backend Server]
+ 1. Kiểm tra logic số thứ tự: Không để trống, không trùng lặp trong cụm/đề, nằm trong khoảng [1-200]
+ 2. Kiểm tra nội dung: Bắt buộc nhập nội dung câu hỏi, đoạn văn (passage), và đầy đủ 4 lựa chọn
+ 3. Kiểm tra đáp án: Đảm bảo mỗi câu hỏi đều đã được chọn một đáp án đúng
+ 4. Kiểm tra Multimedia: 
+ - Part 1: Bắt buộc có Image hoặc Audio
+ - Part 2, 3, 4: Bắt buộc phải có Audio (File mới hoặc URL đã tồn tại)
+ Kiểm tra:
+
+ 1. Số thứ tự câu hỏi:
+ Phải có nhập, không được để trống
+ Nằm trong khoảng từ 1 đến 200
+ Không trùng lặp với các câu khác trong cùng một Part
+ Không trùng lặp với các Part khác đã có trong đề (check qua AppState)
+
+ 2. Nội dung văn bản:
+ Câu hỏi đơn/câu hỏi con phải có nội dung
+ Các group phải có nội dung đoạn văn 
+ Phải nhập đầy đủ nội dung cho cả 4 đáp án (A, B, C, D)
+ 
+ 3. Đáp án đúng:
+ Mỗi câu hỏi (đơn hoặc con) bắt buộc phải được tick chọn 1 đáp án đúng qua Radio button
+
+ 4.Img/audio:
+ Part 1: Bắt buộc có ảnh hoặc âm thanh
+ Part 2, 3, 4: Bắt buộc phải có tệp âm thanh (chấp nhận file mới hoặc URL cũ đã tồn tại)
+
+ 5. Cấu trúc group:
+ Mỗi cụm câu hỏi phải có ít nhất 1 câu hỏi con bên trong
+
+ @param {NodeList|Array} blocks - Danh sách các block câu hỏi (đơn hoặc cụm) lấy từ DOM
+ @param {string} part - Số thứ tự Part của đề thi (1-7) để áp dụng quy tắc validation tương ứng
+ @returns {boolean} - Trả về true nếu tất cả dữ liệu hợp lệ, ngược lại trả về false và hiển thị thông báo lỗi
  */
 
 function validateAllBlocks(blocks, part) {

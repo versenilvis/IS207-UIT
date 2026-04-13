@@ -84,6 +84,8 @@ curl -X POST http://localhost:3000/api/tests \
          }'
 
  */
+// tức là hàm này gửi POST request qua API/tests. xong api gọi createTest() trong test-controller.php
+// và trả về cho data cho hàm này
 async function handleCreateTestSubmit(e) {
 	e.preventDefault();
 	const form = e.target;

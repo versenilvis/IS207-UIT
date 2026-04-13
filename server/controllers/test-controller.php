@@ -101,6 +101,9 @@ function getTestList() {
 }
 
 // tạo một bài test mới
+// gửi 1 POST request qua api/tests để tạo đề thi
+// LƯU Ý: là tạo đề thi chứ không phải thêm câu hỏi và câu trả lời vào đề thi
+// hàm này chính là hàm trả xử lí cho handleCreateTestSubmit() ở file questions/api.js
 function createTest() {
     global $conn;
     try {
