@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+    # Bật công cụ viết lại URL
+    RewriteEngine On
+    
+    # Cho phép truy cập trực tiếp đến các thư mục uploads (không viết lại)
+    RewriteRule ^uploads/ - [L]
+    
+    # Định tuyến các API requests: /api/* → server/index.php?request=api/*
+    RewriteRule ^api/(.*)$ /IS207-UIT/server/index.php?request=api/$1 [QSA,L]
+    
+    # Cho phép các file và thư mục thực tế (CSS, JS, images, v.v.)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Định tuyến tất cả các request còn lại đến server/index.php
+    RewriteRule ^(.*)$ /IS207-UIT/server/index.php [QSA,L]
+</IfModule>

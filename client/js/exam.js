@@ -1,23 +1,19 @@
 // ==========================================
-// BIẾN TOÀN CỤC CHỨA DỮ LIỆU ĐỀ THI
-// ==========================================
-let currentQuestions = []; 
-
-// ==========================================
 // KHỞI CHẠY TẤT CẢ TÍNH NĂNG KHI WEB TẢI XONG
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. LUÔN LUÔN VẼ SIDEBAR TRƯỚC: Để đảm bảo giao diện không bị vỡ dù mạng chậm
+    // 1. LUÔN LUÔN VẼ SIDEBAR TRƯỚC
     renderSidebar();
 
-    // 2. Đi lấy dữ liệu từ PHP (API)
-    fetchExamData();
-
-    // 3. Khởi động đồng hồ đếm ngược (120 phút = 7200 giây)
+    // 2. ƯU TIÊN SỐ 1: BẬT ĐỒNG HỒ CHẠY NGAY LẬP TỨC 
+    // (Đưa lên trước fetchExamData để không bị lỗi Database chặn lại)
     startTimer(120 * 60);
 
-    // 4. Kích hoạt tính năng Audio chỉ cho nghe 1 lần
+    // 3. Kích hoạt tính năng Audio chỉ cho nghe 1 lần
     setupAudioOnce();
+
+    // 4. Mọi thứ giao diện đã ổn định, giờ mới đi lấy dữ liệu
+    fetchExamData();
 });
 
 
@@ -173,10 +169,15 @@ function setupAnswerTracking() {
 
 
 // ==========================================
-// 4. HÀM XỬ LÝ ĐỒNG HỒ ĐẾM NGƯỢC
+// 4. HÀM XỬ LÝ ĐỒNG HỒ ĐẾM NGƯỢC (ĐÃ FIX LỖI)
 // ==========================================
 function startTimer(totalSeconds) {
-    const timerDisplays = document.getElementByID('#timer-display');
+    // Sửa 1 & 2: Chữ 'd' viết thường và bỏ dấu '#'
+    const timerDisplay = document.getElementById('timer-display'); 
+    
+    // Check an toàn: Nếu không tìm thấy thẻ HTML đồng hồ thì thoát luôn để khỏi lỗi
+    if (!timerDisplay) return; 
+
     let time = totalSeconds;
     
     const timerInterval = setInterval(() => {
@@ -185,9 +186,8 @@ function startTimer(totalSeconds) {
         
         const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
-        timerDisplays.forEach(display => {
-            display.innerText = formattedTime;
-        });
+        // Sửa 3: Gán thẳng text vào thẻ luôn, KHÔNG dùng forEach
+        timerDisplay.innerText = formattedTime; 
         
         if (time <= 0) {
             clearInterval(timerInterval);
@@ -199,34 +199,92 @@ function startTimer(totalSeconds) {
     }, 1000);
 }
 
-
 // ==========================================
-// 5. HÀM XỬ LÝ AUDIO (KHÔNG TUA, NGHE 1 LẦN)
+// 5. HÀM XỬ LÝ AUDIO (NÚT BẤM CUSTOM - CHUẨN TOEIC)
 // ==========================================
 function setupAudioOnce() {
-    const audioEl = document.querySelector('audio');
+    const audioEl = document.getElementById('exam-audio');
+    const playBtn = document.getElementById('custom-play-btn');
+    const statusText = document.getElementById('audio-status');
     
-    if (audioEl) {
-        let previousTime = 0;
+    // Khai báo các thẻ của thanh Progress Bar
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('audio-progress-bar');
+    const currentTimeEl = document.getElementById('current-time');
+    const totalTimeEl = document.getElementById('total-time'); // Thẻ chứa tổng thời gian
+    
+    if (!audioEl || !playBtn) return;
 
-        audioEl.addEventListener('timeupdate', function() {
-            if (!this.seeking) {
-                previousTime = this.currentTime;
-            }
-        });
-
-        audioEl.addEventListener('seeking', function() {
-            this.currentTime = previousTime;
-        });
-
-        audioEl.addEventListener('ended', function() {
-            this.removeAttribute('controls'); 
-            this.style.pointerEvents = 'none'; 
-            
-            const notice = document.createElement('span');
-            notice.className = "badge bg-danger ms-3 mt-2";
-            notice.innerHTML = "<i class='fas fa-lock me-1'></i>Đã khóa Audio";
-            this.parentElement.appendChild(notice);
-        });
+    // Hàm chuyển đổi số giây thành format Phút:Giây (VD: 01:30)
+    function formatTime(seconds) {
+        if (isNaN(seconds) || !isFinite(seconds)) return "00:00";
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
     }
+
+    // ========================================================
+    // ĐOẠN CODE XỬ LÝ LẤY TỔNG THỜI GIAN VÀ IN RA NGAY LẬP TỨC
+    // ========================================================
+    function setTotalTime() {
+        if (audioEl.duration) {
+            totalTimeEl.innerText = formatTime(audioEl.duration);
+            // Hiện sẵn thanh tiến trình màu xám (tuỳ chọn cho đẹp)
+            progressContainer.style.display = 'block'; 
+        }
+    }
+
+    // Kiểm tra xem trình duyệt đã đọc xong file MP3 chưa
+    if (audioEl.readyState >= 1) {
+        setTotalTime(); // Nếu tải nhanh thì in ra luôn
+    } else {
+        // Nếu file nặng, chờ tải xong metadata thì mới in ra
+        audioEl.addEventListener('loadedmetadata', setTotalTime);
+    }
+    // ========================================================
+
+    // 1. Khi thí sinh bấm Play
+    playBtn.addEventListener('click', function() {
+        audioEl.play().catch(e => console.error("Lỗi phát audio:", e));
+        
+        playBtn.classList.replace('btn-primary', 'btn-warning');
+        playBtn.innerHTML = '<i class="fas fa-volume-up me-2 fa-beat"></i> Đang phát...';
+        playBtn.disabled = true; // Khóa nút
+        
+        statusText.classList.replace('text-muted', 'text-danger');
+    });
+
+    // 2. LIÊN TỤC CẬP NHẬT THANH CHẠY (Màu vàng) KHI NGHE
+    audioEl.addEventListener('timeupdate', function() {
+        const current = audioEl.currentTime;
+        const duration = audioEl.duration;
+        
+        if (duration) {
+            // Tính % để kéo dài thanh vàng
+            const percent = (current / duration) * 100;
+            progressBar.style.width = percent + '%';
+            // Cập nhật số giây đang chạy ở thẻ span current-time
+            currentTimeEl.innerText = formatTime(current);
+        }
+    });
+
+    // 3. Xử lý khi Audio nghe xong (Hết giờ)
+    audioEl.addEventListener('ended', function() {
+        playBtn.classList.replace('btn-warning', 'btn-secondary');
+        playBtn.innerHTML = '<i class="fas fa-lock me-2"></i> Đã khóa Audio';
+        
+        statusText.innerText = "Hoàn thành phần nghe.";
+        statusText.classList.replace('text-danger', 'text-success');
+
+        progressBar.classList.remove('progress-bar-animated', 'progress-bar-striped', 'bg-warning');
+        progressBar.classList.add('bg-secondary');
+    });
+    
+    // Chặn chuột phải
+    audioEl.addEventListener('contextmenu', e => e.preventDefault());
 }
+
+// Đừng quên gọi hàm này khi trang web tải xong nhé:
+document.addEventListener("DOMContentLoaded", function() {
+    setupAudioOnce();
+});

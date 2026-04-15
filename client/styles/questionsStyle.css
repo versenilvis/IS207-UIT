@@ -1,0 +1,379 @@
+/* ================= CƠ BẢN ================= */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f4f7f6;
+    margin: 0;
+}
+
+.header-actions {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    background: #f4f7f6;
+    padding: 10px 0;
+    z-index: 100;
+    border-bottom: 2px solid #ddd;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn-add {
+    background: #4CAF50;
+}
+
+.btn-add-group {
+    background: #2196F3;
+}
+
+.btn-delete-all {
+    background: #f44336;
+}
+
+.btn-submit {
+    background: #ff9800;
+    margin-left: auto;
+}
+
+.btn-remove {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+    font-size: 12px;
+}
+
+/* ================= BLOCK CÂU HỎI ================= */
+.question-block {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.single-type {
+    border-left: 5px solid #4CAF50;
+}
+
+.group-type {
+    border-left: 5px solid #2196F3;
+    background-color: #f0f7ff;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.badge.single {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge.group {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+/* ================= FORM ELEMENTS ================= */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 5px;
+    font-family: inherit;
+}
+
+textarea.form-control {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* ================= KHU VỰC MEDIA ================= */
+.media-upload-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px dashed #ccc;
+    margin-bottom: 15px;
+}
+
+.upload-item label {
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.preview-container {
+    margin-top: 10px;
+}
+
+.preview-container img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+.preview-container audio {
+    width: 100%;
+    outline: none;
+}
+
+/* ================= CÂU HỎI & ĐÁP ÁN (SINGLE) ================= */
+.options-container {
+    margin-top: 15px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.option-item span {
+    font-weight: bold;
+    width: 20px;
+}
+
+/* ================= CÂU HỎI CON (GROUP) ================= */
+.sub-question-item {
+    margin-left: 30px;
+    margin-top: 15px;
+    padding: 15px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    position: relative;
+}
+
+.sub-q-header strong {
+    font-size: 14px;
+    color: #555;
+}
+
+.sub-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.sub-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sub-option span {
+    font-weight: bold;
+}
+
+.btn-add-sub {
+    margin-top: 15px;
+    margin-left: 30px;
+    padding: 8px 15px;
+    background: #607d8b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-add-sub:hover {
+    background: #455a64;
+}
+
+.btn-remove-sub {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ccc;
+    color: #333;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.btn-remove-sub:hover {
+    background: #ff5252;
+    color: white;
+}
+
+.form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+}
+
+.form-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.test-config {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.config-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.config-row:last-child {
+    margin-bottom: 0;
+}
+
+.config-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.config-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 13px;
+}
+
+.config-group label .required {
+    color: red;
+    margin-left: 4px;
+}
+
+.config-group input,
+.config-group select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.config-group input:focus,
+.config-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.part-info {
+    background: #e7f3ff;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+    font-size: 13px;
+    color: #004085;
+    display: none;
+}
+
+.part-info.show {
+    display: block;
+}
+
+.part-info strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.message-box {
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: none;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.message-box.success {
+    display: block;
+    background: #d4edda;
+    border: 2px solid #28a745;
+    color: #155724;
+}
+
+.message-box.error {
+    display: block;
+    background: #f8d7da;
+    border: 2px solid #dc3545;
+    color: #721c24;
+}
+
+.message-box.warning {
+    display: block;
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    color: #856404;
+}
+
+.question-count {
+    text-align: center;
+    padding: 10px;
+    background: #e8f4f8;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #0c5460;
+}
+
+.container-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.bx {
+    font-size: 1.5rem;
+}

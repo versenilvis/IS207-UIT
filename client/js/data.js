@@ -1,11 +1,11 @@
 // 1. Danh mục sách (Dùng để hiển thị ở trang chủ)
 const bookData = [
-    { id: 1, title: "ETS 2019", description: "10 Bài Test tiêu chuẩn", colorClass: "bg-pastel-blue", icon: "fas fa-star" },
-    { id: 2, title: "ETS 2020", description: "10 Bài Test tiêu chuẩn", colorClass: "bg-pastel-amber", icon: "fas fa-book" },
-    { id: 3, title: "ETS 2021", description: "10 Bài Test tiêu chuẩn", colorClass: "bg-pastel-grey", icon: "fas fa-star" },
-    { id: 4, title: "ETS 2022", description: "10 Bài Test tiêu chuẩn", colorClass: "bg-pastel-blue", icon: "fas fa-book" },
-    { id: 5, title: "ETS 2023", description: "10 Bài Test tiêu chuẩn", colorClass: "bg-pastel-amber", icon: "fas fa-star" },
-    { id: 6, title: "ETS 2024", description: "10 Bài Test mới nhất", colorClass: "bg-pastel-grey", icon: "fas fa-book" },
+    { id: 1, title: "ETS 2019", description: "10 bài test tiêu chuẩn", colorClass: "bg-pastel-blue", icon: "fas fa-star" },
+    { id: 2, title: "ETS 2020", description: "10 bài test tiêu chuẩn", colorClass: "bg-pastel-amber", icon: "fas fa-book" },
+    { id: 3, title: "ETS 2021", description: "10 bài test tiêu chuẩn", colorClass: "bg-pastel-grey", icon: "fas fa-star" },
+    { id: 4, title: "ETS 2022", description: "10 bài test tiêu chuẩn", colorClass: "bg-pastel-blue", icon: "fas fa-book" },
+    { id: 5, title: "ETS 2023", description: "10 bài test tiêu chuẩn", colorClass: "bg-pastel-amber", icon: "fas fa-star" },
+    { id: 6, title: "ETS 2024", description: "10 bài test tiêu chuẩn", colorClass: "bg-pastel-grey", icon: "fas fa-book" },
 ];
 
 // 2. Danh sách đề thi (Bảng tests trong ERD)

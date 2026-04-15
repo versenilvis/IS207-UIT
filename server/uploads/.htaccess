@@ -1,0 +1,20 @@
+<IfModule mod_rewrite.c>
+    # Tắt công cụ viết lại URL để cho phép truy cập trực tiếp các file uploads
+    RewriteEngine Off
+</IfModule>
+
+# Cho phép truy cập trực tiếp đến các file media
+<FilesMatch "\.(jpg|jpeg|png|gif|mp3|wav|ogg|m4a)$">
+    Allow from all
+</FilesMatch>
+
+# Thiết lập MIME type chính xác cho các file ảnh
+AddType image/jpeg .jpg .jpeg
+AddType image/png .png
+AddType image/gif .gif
+
+# Thiết lập MIME type chính xác cho các file âm thanh
+AddType audio/mpeg .mp3
+AddType audio/wav .wav
+AddType audio/ogg .ogg
+AddType audio/mp4 .m4a
