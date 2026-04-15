@@ -1,0 +1,77 @@
+
+        .question-box {
+            width: 35px; height: 35px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; margin: 4px; font-weight: bold; font-size: 12px;
+            cursor: pointer; border: 1px solid #dee2e6; transition: all 0.2s;
+        }
+        .question-box:hover { transform: scale(1.15); box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 5; }
+        .correct { background-color: #2ecc71 !important; color: white !important; border: none; }
+        .wrong { background-color: #e74c3c !important; color: white !important; border: none; }
+        .unanswered { 
+            background-color: #f8f9fa !important; 
+            color: #adb5bd !important; 
+            border: 1px solid #dee2e6 !important; 
+        }
+
+        /* Hiệu ứng khi di chuột vào ô trống */
+        .unanswered:hover {
+            background-color: #e9ecef !important;
+            color: #495057 !important;
+            }
+        #wrong-questions-list { 
+            height: calc(100vh - 250px); 
+            overflow-y: auto; 
+            scroll-behavior: smooth; 
+        }
+        .question-item { scroll-margin-top: 20px; transition: background 0.5s; }
+        .bg-warning-light { background-color: #fff3cd !important; }
+        
+        .sticky-sidebar { position: sticky; top: 20px; }
+        
+        /* Custom scrollbar cho danh sách review */
+        #wrong-questions-list::-webkit-scrollbar { width: 6px; }
+        #wrong-questions-list::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+       .sticky-sidebar {
+        position: sticky;
+        top: 20px;
+        height: calc(100vh - 40px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    #answer-scroll-area {
+        overflow-y: auto;
+        padding-right: 10px;
+        flex-grow: 1;
+    }
+
+    #answer-scroll-area::-webkit-scrollbar { width: 5px; }
+    #answer-scroll-area::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+    .part-header {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin: 15px 0 10px 0;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #edf2f7;
+        color: #2d3748;
+    }
+
+    .question-box {
+        width: 32px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 4px; font-size: 11px; font-weight: 600;
+        cursor: pointer; border: 1px solid #e2e8f0; transition: 0.2s;
+    }
+    .correct { background-color: #2ecc71 !important; color: white !important; border: none; }
+    .wrong { background-color: #e74c3c !important; color: white !important; border: none; }
+
+    .btn-group .btn {
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+.btn-group .btn.active {
+    pointer-events: none; /* Ngăn bấm lại nút đang kích hoạt */
+}
+
