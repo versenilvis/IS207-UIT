@@ -3,49 +3,151 @@
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     // 1. LUÔN LUÔN VẼ SIDEBAR TRƯỚC
-    renderSidebar();
+    // Đã thêm vào hàm fetchExamData(), không cần vẽ trước đâu.
 
-    // 2. ƯU TIÊN SỐ 1: BẬT ĐỒNG HỒ CHẠY NGAY LẬP TỨC 
-    // (Đưa lên trước fetchExamData để không bị lỗi Database chặn lại)
-    startTimer(120 * 60);
-
-    // 3. Kích hoạt tính năng Audio chỉ cho nghe 1 lần
+    // 2. Kích hoạt tính năng Audio chỉ cho nghe 1 lần
     setupAudioOnce();
 
-    // 4. Mọi thứ giao diện đã ổn định, giờ mới đi lấy dữ liệu
+    // 3. Mọi thứ giao diện đã ổn định, giờ mới đi lấy dữ liệu
     fetchExamData();
 });
 
 
-// ==========================================
-// HÀM: GỌI DỮ LIỆU TỪ DB (API)
-// ==========================================
+//Gọi dữ liệu từ db
 async function fetchExamData() {
     try {
-        // Gọi file PHP (đường dẫn đã khớp với hình ảnh cây thư mục của bạn)
-        const response = await fetch('../api/get_question.php?test_id=1');
-        currentQuestions = await response.json();
-        
-        if (currentQuestions && currentQuestions.length > 0) {
-            // Có dữ liệu thì in ra màn hình và bật theo dõi click
-            renderQuestions(currentQuestions);
-            setupAnswerTracking(); 
-        } else {
-            console.error("Không có dữ liệu câu hỏi.");
-            document.getElementById('question-list-container').innerHTML = 
-                "<p class='text-danger fw-bold'>Không tìm thấy câu hỏi nào cho đề thi này.</p>";
+        const params = new URLSearchParams(window.location.search);
+        const uuid = params.get("uuid");
+
+        //Lấy đề thi bằng uuid
+        const response = await fetch(`../../api/tests/${uuid}`);
+        if (!response.ok) {
+            throw new Error("Could not fetch resource (function in exam.js)");
         }
+        const questions_lists = await response.json();
+        const questions = questions_lists.data.questions;
+        const testDuration = Number(questions_lists.data.duration);
+        setupExamAudio(questions);
+        renderQuestions(questions);
+        renderPartNav(questions);
+
+        //Đổi title thành title của đề thi
+        let title = document.getElementById("exam-title");
+        title.innerHTML = questions_lists.data.title;  
+        
+        //Render side bar dựa vào tổng số câu hỏi
+        renderSidebar(questions);
+        setupAnswerTracking();
+        startTimer(Number.isFinite(testDuration) && testDuration > 0 ? testDuration : 120 * 60);
+
     } catch (error) {
         console.error("Lỗi khi kết nối Database:", error);
         document.getElementById('question-list-container').innerHTML = 
-            "<p class='text-danger'>Không thể tải dữ liệu. Vui lòng bật XAMPP và kiểm tra lại.</p>";
+            "<p class='text-danger'>Lỗi tải dữ liệu ở exam.js</p>";
     }
 }
 
 
-// ==========================================
-// 1. HÀM TỰ ĐỘNG IN CÂU HỎI TỪ DATABASE (CỘT TRÁI)
-// ==========================================
+//Gán audio của đề thi từ dữ liệu DB
+function setupExamAudio(questions) {
+    const audioEl = document.getElementById('exam-audio');
+    const playBtn = document.getElementById('custom-play-btn');
+    const statusText = document.getElementById('audio-status');
+    if (!audioEl || !playBtn || !Array.isArray(questions)) return;
+
+    const firstAudioUrl = questions.reduce((foundUrl, q) => {
+        if (foundUrl) return foundUrl;
+        return q.passage_audio || q.audio_url || '';
+    }, '');
+
+    if (!firstAudioUrl) {
+        audioEl.removeAttribute('src');
+        audioEl.load();
+        playBtn.disabled = true;
+        playBtn.classList.replace('btn-primary', 'btn-secondary');
+        playBtn.innerHTML = '<i class="fas fa-volume-mute me-2"></i> Không có audio';
+        if (statusText) {
+            statusText.innerText = 'Đề thi này không có audio.';
+        }
+        return;
+    }
+
+    audioEl.src = firstAudioUrl;
+    audioEl.load();
+    playBtn.disabled = false;
+    playBtn.classList.remove('btn-secondary');
+    playBtn.classList.add('btn-primary');
+    playBtn.innerHTML = '<i class="fas fa-play me-2"></i> Start audio';
+    if (statusText) {
+        statusText.innerText = '';
+        statusText.classList.remove('text-danger', 'text-success');
+        statusText.classList.add('text-muted');
+    }
+}
+
+
+//Nếu click thi di chuyển đến câu hỏi cần tìm
+function scrollToQuestionTarget(targetEl) {
+    if (!targetEl) return;
+
+    const topHeader = document.querySelector('.top-header');
+    const stickyAudio = document.querySelector('.sticky-audio');
+    const headerHeight = topHeader ? topHeader.offsetHeight : 0;
+    const audioHeight = stickyAudio ? stickyAudio.offsetHeight : 0;
+    const extraOffset = 16;
+    const targetTop = window.scrollY + targetEl.getBoundingClientRect().top;
+
+    window.scrollTo({
+        top: Math.max(0, targetTop - headerHeight - audioHeight - extraOffset),
+        behavior: 'smooth'
+    });
+}
+
+
+//In nav link dựa trên số part
+function renderPartNav(questions) {
+    const partTabsContainer = document.getElementById('part-tabs-container');
+    if (!partTabsContainer || !Array.isArray(questions)) return;
+
+    const firstQuestionByPart = {};
+    questions.forEach(q => {
+        const part = Number(q.part);
+        if (!Number.isInteger(part) || firstQuestionByPart[part]) return;
+        firstQuestionByPart[part] = q.question_number;
+    });
+
+    const parts = Object.keys(firstQuestionByPart)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    partTabsContainer.innerHTML = parts.map((part, index) => `
+        <li class="nav-item">
+            <a class="nav-link${index === 0 ? ' active' : ''}" href="#question-${firstQuestionByPart[part]}">
+                Part ${part}
+            </a>
+        </li>
+    `).join('');
+
+    partTabsContainer.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            partTabsContainer.querySelectorAll('.nav-link').forEach(navLink => {
+                navLink.classList.remove('active');
+            });
+            this.classList.add('active');
+
+            const targetId = this.getAttribute('href').slice(1);
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                scrollToQuestionTarget(targetEl);
+            }
+        });
+    });
+}
+
+
+//In câu hỏi
 function renderQuestions(questions) {
     const container = document.getElementById('question-list-container');
     if (!container || !questions) return;
@@ -53,26 +155,22 @@ function renderQuestions(questions) {
     let htmlContent = '';
 
     questions.forEach(q => {
-        // 1. Ảnh Part 1
         let imageHtml = '';
         if (q.image_url) {
             imageHtml = `<img src="${q.image_url}" class="img-fluid mb-3 rounded shadow-sm" style="max-height: 250px;" alt="Question Image">`;
         }
 
-        // 2. Đoạn văn Part 6, 7
         let paragraphHtml = '';
         if (q.paragraph) {
             const formattedParagraph = q.paragraph.replace(/\n/g, '<br>');
             paragraphHtml = `<div class="p-3 bg-light border rounded mb-3" style="font-size: 0.95rem;">${formattedParagraph}</div>`;
         }
 
-        // 3. Ẩn chữ Part 2
         let displayContent = q.content;
         if (q.part === 2) {
             displayContent = "<i class='text-muted'>Listen to the audio to answer this question.</i>";
         }
 
-        // 4. Các đáp án
         let optionsHtml = '';
         if (q.options && q.options.length > 0) {
             q.options.forEach(opt => {
@@ -80,14 +178,13 @@ function renderQuestions(questions) {
                     <div class="form-check mb-1">
                         <input class="form-check-input" type="radio" name="q${q.question_number}" id="q${q.question_number}_${opt.label}" value="${opt.label}">
                         <label class="form-check-label" for="q${q.question_number}_${opt.label}">
-                            <span class="fw-bold">${opt.label}.</span> ${opt.text}
+                            <span class="fw-bold">${opt.label}.</span> ${opt.content}
                         </label>
                     </div>
                 `;
             });
         }
 
-        // 5. Gộp vào giao diện
         htmlContent += `
             <div class="d-flex mb-5" id="question-${q.question_number}">
                 <div class="q-number me-3">${q.question_number}</div>
@@ -105,37 +202,54 @@ function renderQuestions(questions) {
 }
 
 
-// ==========================================
-// 2. HÀM TỰ ĐỘNG IN 200 Ô VUÔNG (SIDEBAR)
-// ==========================================
-function renderSidebar() {
-    const partRanges = [
-        { part: 1, start: 1, end: 6 },
-        { part: 2, start: 7, end: 31 },
-        { part: 3, start: 32, end: 70 },
-        { part: 4, start: 71, end: 100 },
-        { part: 5, start: 101, end: 130 },
-        { part: 6, start: 131, end: 146 },
-        { part: 7, start: 147, end: 200 }
-    ];
+//In ra thanh đếm tổng số câu hỏi ở cột phải
+function renderSidebar(questions) {
+    const sidebarContainer = document.getElementById('sidebar-container');
+    if (!sidebarContainer || !Array.isArray(questions)) return;
 
-    partRanges.forEach(range => {
-        const container = document.getElementById(`sidebar-part-${range.part}`);
-        if (!container) return;
+    // Gom các câu hỏi lại theo part 
+    const partsMap = {};
 
-        let htmlContent = '';
-        for (let i = range.start; i <= range.end; i++) {
-            htmlContent += `<div class="q-box">${i}</div>`;
+    questions.forEach(q => {
+        if (!partsMap[q.part]) {
+            partsMap[q.part] = [];
         }
-
-        container.innerHTML = htmlContent;
+        partsMap[q.part].push(q.question_number);
     });
+
+    let htmlContent = '';
+
+    // Sort các part
+    const sortedParts = Object.keys(partsMap).sort((a, b) => Number(a) - Number(b));
+
+    //In ra số câu hỏi
+    sortedParts.forEach(part => {
+        let questionBoxes = '';
+        partsMap[part].sort((a, b) => a - b);
+
+        partsMap[part].forEach(questionNumber => {
+            questionBoxes += `
+                <div class="q-box" data-target="question-${questionNumber}">
+                    ${questionNumber}
+                </div>
+            `;
+        });
+
+        htmlContent += `
+            <div class="mb-3">
+                <p class="fw-bold mb-2">Part ${part}</p>
+                <div class="question-grid">
+                    ${questionBoxes}
+                </div>
+            </div>
+        `;
+    });
+
+    sidebarContainer.innerHTML = htmlContent;
 }
 
 
-// ==========================================
-// 3. HÀM TƯƠNG TÁC ĐÁP ÁN & SIDEBAR
-// ==========================================
+//Chọn đáp án
 function setupAnswerTracking() {
     const radioInputs = document.querySelectorAll('.form-check-input');
     const qBoxes = document.querySelectorAll('.q-box');
@@ -147,6 +261,7 @@ function setupAnswerTracking() {
             qBoxes.forEach(box => {
                 if (box.innerText.trim() === qNumber) {
                     box.classList.add('answered');
+                    box.classList.remove('active');
                 }
             });
         });
@@ -159,18 +274,20 @@ function setupAnswerTracking() {
             const targetQuestion = document.getElementById(`question-${qNum}`);
             
             if (targetQuestion) {
-                targetQuestion.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                scrollToQuestionTarget(targetQuestion);
                 qBoxes.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
+                window.setTimeout(() => {
+                    this.classList.remove('active');
+                }, 1200);
             }
         });
     });
 }
 
 
-// ==========================================
-// 4. HÀM XỬ LÝ ĐỒNG HỒ ĐẾM NGƯỢC (ĐÃ FIX LỖI)
-// ==========================================
+//Đếm ngược dựa trên test duration
+let timerInterval = null;
 function startTimer(totalSeconds) {
     // Sửa 1 & 2: Chữ 'd' viết thường và bỏ dấu '#'
     const timerDisplay = document.getElementById('timer-display'); 
@@ -178,9 +295,13 @@ function startTimer(totalSeconds) {
     // Check an toàn: Nếu không tìm thấy thẻ HTML đồng hồ thì thoát luôn để khỏi lỗi
     if (!timerDisplay) return; 
 
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
     let time = totalSeconds;
     
-    const timerInterval = setInterval(() => {
+    timerInterval = setInterval(() => {
         const minutes = Math.floor(time / 60);
         const seconds = time % 60;
         
@@ -200,7 +321,7 @@ function startTimer(totalSeconds) {
 }
 
 // ==========================================
-// 5. HÀM XỬ LÝ AUDIO (NÚT BẤM CUSTOM - CHUẨN TOEIC)
+// 7. HÀM XỬ LÝ AUDIO (NÚT BẤM CUSTOM - CHUẨN TOEIC)
 // ==========================================
 function setupAudioOnce() {
     const audioEl = document.getElementById('exam-audio');
