@@ -182,7 +182,7 @@ function getTestCore($uuid) {
         $internal_id = (int)$test['id']; 
 
         // check premium
-        /*
+        
         if ($test['is_premium']) {
             if (session_status() === PHP_SESSION_NONE) session_start();
             $user_id = $_SESSION['user_id'] ?? null;
@@ -196,7 +196,7 @@ function getTestCore($uuid) {
                 }
             }
         }
-        */
+        
 		// PDO nó luôn trả về string
 		// nếu không ép kiểu sang bool chẳng hạn mà check if (is_premium) trong JS thì "0" nó sẽ luôn là True
         $test['id'] = (int)$test['id'];
