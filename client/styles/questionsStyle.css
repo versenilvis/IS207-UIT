@@ -12,11 +12,14 @@ body {
     gap: 10px;
     flex-wrap: wrap;
     position: sticky;
-    top: 0;
+    top: 56px;
+    left: 0;
+    right: 0;
     background: #f4f7f6;
     padding: 10px 0;
-    z-index: 100;
+    z-index: 99;
     border-bottom: 2px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn {
@@ -376,4 +379,126 @@ textarea.form-control {
 
 .bx {
     font-size: 1.5rem;
+}
+
+:root {
+	--primary-color: #4f46e5;
+	--primary-hover: #4338ca;
+	--card-bg: #fff;
+	--text-main: #1f2937;
+	--border-color: #d1d5db;
+	--danger-color: #ef4444;
+}
+
+/* Form Section Styling */
+.form-section {
+	background-color: var(--card-bg);
+	padding: 20px 25px;
+	border-radius: 8px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	margin-bottom: 25px;
+	border-left: 5px solid #4caf50;
+}
+
+.form-section h3 {
+	border-bottom: 1px solid var(--border-color);
+	padding-bottom: 10px;
+	margin-bottom: 20px;
+}
+
+.form-grid {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	gap: 15px;
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 15px;
+}
+
+.full-width {
+	grid-column: 1 / -1;
+}
+
+.form-group label {
+	font-weight: 600;
+	margin-bottom: 6px;
+	font-size: 13px;
+}
+
+.required-mark {
+	color: var(--danger-color);
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+	width: 100%;
+	padding: 8px 12px;
+	border: 1px solid var(--border-color);
+	border-radius: 6px;
+	font-size: 14px;
+	box-sizing: border-box;
+	transition: 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+	outline: none;
+	border-color: var(--primary-color);
+	box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.form-group textarea {
+	resize: vertical;
+	min-height: 60px;
+}
+
+.form-actions {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px dashed var(--border-color);
+}
+
+.checkbox-group-wrapper {
+	display: flex;
+	gap: 20px;
+}
+
+.checkbox-group {
+	display: flex;
+	align-items: center;
+}
+
+.checkbox-group input[type="checkbox"] {
+	width: 16px;
+	height: 16px;
+	margin-right: 8px;
+	cursor: pointer;
+	accent-color: var(--primary-color);
+}
+
+.checkbox-group label {
+	cursor: pointer;
+	font-weight: normal;
+	margin-bottom: 0;
+}
+
+.form-section .btn-submit {
+	background-color: var(--primary-color);
+	color: #fff;
+	border: none;
+	padding: 10px 24px;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.form-section .btn-submit:hover {
+	background-color: var(--primary-hover);
 }

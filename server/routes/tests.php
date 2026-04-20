@@ -1,18 +1,27 @@
 <?php
 
-require_once __DIR__ . '/../controllers/question-controller.php';
-$controller = new QuestionController($db_connection);
+require_once __DIR__ . '/../controllers/test-controller.php';
 
-// GET /api/tests - Lấy tất cả các bài kiểm tra hoạt động (để chọn từ danh sách thả xuống)
-if ($path === '/api/tests' && $method === 'GET') {
-    $response = $controller->getTests();
-    http_response_code($response['success'] ? 200 : 400);
-    echo json_encode($response);
+// ở biến $method và $part, vì file api.php nó import file tests.php,
+// nên là tất cả các biến trong api.php đều có thể được sử dụng trong file tests.php
+
+if ($method === 'GET') {
+    // GET /api/tests/{uuid}
+	// ở frontend, chúng ta dùng UUID cho mọi ID, chỉ có trong nội bộ mới dùng ID thôi
+    if (!empty($parts[1])) {
+        // require_once __DIR__ . '/../middleware/auth.php';
+        // requireAuth(); // Yêu cầu đăng nhập mới được xem chi tiết câu hỏi
+        getTestCore($parts[1]);
+    } 
+    // GET /api/tests -> Lấy danh sách đề thi
+    else {
+        getTestList();
+    }
+} elseif ($method === 'POST') {
+    // POST /api/tests -> Tạo bài thi mới
+    // require_once __DIR__ . '/../middleware/auth.php';
+    // requireAuth(); 
+    createTest();
+} else {
+    sendError("Phương thức không được hỗ trợ cho Tests", 405);
 }
-// GET /api/tests/:id - Lấy một bài kiểm tra duy nhất
-elseif (preg_match('/\/api\/tests\/(\d+)$/', $path, $matches) && $method === 'GET') {
-    $response = $controller->getTest($matches[1]);
-    http_response_code($response['success'] ? 200 : 404);
-    echo json_encode($response);
-}
-?>
