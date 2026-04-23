@@ -34,7 +34,7 @@
           <li class="nav-item"><a id="nav-list" class="nav-link" href="home.php#book-list-section" onclick="handleNavClick(event)">Danh sách đề thi</a></li>
           <li class="nav-item"><a id="nav-premium" class="nav-link" href="premium.php">Premium</a></li>
           <li class="nav-item">
-            <a class="nav-link btn btn-outline-light ms-lg-3 px-4" href="../../server/controllers/log-out.php">
+            <a class="nav-link btn btn-outline-light ms-lg-3 px-4" href="/api/auth/logout">
               Đăng xuất <i class="fas fa-sign-in-alt ms-2"></i>
             </a>
           </li>

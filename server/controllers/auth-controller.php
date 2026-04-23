@@ -1,7 +1,6 @@
 <?php
 // xử lí logic api cho user: login, logout, register, ...
 session_start();
-require_once '../config/database.php';
 
 // cái này để auto complete cho code editor thôi
 // tức là cho editor biết $conn có kiểu PDO để gợi ý method nhanh hơn
@@ -9,13 +8,22 @@ require_once '../config/database.php';
  * @var PDO $conn
  */
 
-//Xử lý register
-if (isset($_POST['register'])) {
-	$first_name = $_POST['first_name'];
-	$last_name = $_POST['last_name'];
-	$email = $_POST['email'];
+if (session_status() === PHP_SESSION_NONE) {
+	session_start();
+}
+
+// Xử lý register
+function handleRegister()
+{
+	global $conn;
+
+	$first_name = $_POST['first_name'] ?? '';
+	$last_name = $_POST['last_name'] ?? '';
+	$email = $_POST['email'] ?? '';
+	$password_plain = $_POST['password'] ?? '';
+
 	$uuid = uniqid();
-	$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+	$password_hash = password_hash($password_plain, PASSWORD_DEFAULT);
 
 	try {
 		// Kiểm tra xem email có tồn tại hay chưa
@@ -34,45 +42,57 @@ if (isset($_POST['register'])) {
 				'first_name' => $first_name,
 				'last_name' => $last_name,
 				'email' => $email,
-				'password' => $password
+				'password' => $password_hash
 			]);
 			$_SESSION['register_success'] = 'Đăng ký thành công! Vui lòng đăng nhập.';
+			$_SESSION['active_form'] = 'login';
 		}
 	} catch (PDOException $e) {
 		die("Error: " . $e->getMessage());
 	}
 
-	header("Location: ../../client/pages/login.php");
+	header("Location: /client/pages/login.php");
 	exit();
 }
 
 // Xử lý login
-if (isset($_POST['login'])) {
-	$email = $_POST['email'];
-	$password = $_POST['password'];
+function handleLogin()
+{
+	global $conn;
+
+	$email = $_POST['email'] ?? '';
+	$password_plain = $_POST['password'] ?? '';
 
 	try {
 		$stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
 		$stmt->execute(['email' => $email]);
 		$user = $stmt->fetch();
 
-		if ($user) {
-			// Nếu nhập đúng mật khẩu thì chuyển tới trang user.php
-			if (password_verify($password, $user['password'])) {
-				$_SESSION['first_name'] = $user['first_name'];
-				$_SESSION['last_name'] = $user['last_name'];
-				$_SESSION['email'] = $user['email'];
-				header("Location: ../../client/pages/user.php");
-				exit();
-			}
+		// Nếu nhập đúng mật khẩu thì chuyển tới trang user.php
+		if ($user && password_verify($password_plain, $user['password'])) {
+			$_SESSION['user_id'] = $user['id'];
+			$_SESSION['role'] = $user['role'];
+			$_SESSION['first_name'] = $user['first_name'];
+			$_SESSION['last_name'] = $user['last_name'];
+			$_SESSION['email'] = $user['email'];
+			header("Location: /client/pages/user.php");
+			exit();
 		}
 	} catch (PDOException $e) {
 		die("Error: " . $e->getMessage());
 	}
 
-	// Nếu nhập sai mật khẩu thì chuyển tới home.php
 	$_SESSION['login_error'] = 'Email hoặc mật khẩu không chính xác';
 	$_SESSION['active_form'] = 'login';
-	header("Location: ../../client/pages/login.php");
+	header("Location: /client/pages/login.php");
+	exit();
+}
+
+// Xử lý đăng xuất
+function handleLogout()
+{
+	session_unset();
+	session_destroy();
+	header("Location: /client/pages/home.php");
 	exit();
 }

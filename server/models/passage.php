@@ -1,198 +1,160 @@
 <?php
 
-class PassageModel {
-    private $db;
+/**
+ * tạo passage (đoạn văn/audio dùng chung cho nhóm câu hỏi)
+ */
+function passageCreate(PDO $db, $data) {
+	try {
+		if (empty($data['test_id'])) {
+			throw new Exception("test_id là bắt buộc");
+		}
 
-    /**
-     * Khởi tạo model với kết nối PDO
-     */
-    public function __construct(PDO $dbConnection) {
-        $this->db = $dbConnection;
-    }
+		$sql = "INSERT INTO passages 
+				(test_id, content, audio_url, image_url) 
+				VALUES 
+				(:test_id, :content, :audio_url, :image_url)";
 
-    /**
-     * Tạo passage (đoạn văn/audio dùng chung cho nhóm câu hỏi)
-     * 
-     * @param array $data - Chứa: test_id (bắt buộc), content, audio_url, image_url
-     * @return int - ID của passage vừa tạo
-     * @throws Exception
-     */
-    public function create($data) {
-        try {
-            // Validate required fields
-            if (empty($data['test_id'])) {
-                throw new Exception("test_id là bắt buộc");
-            }
+		$stmt = $db->prepare($sql);
 
-            // Chuẩn bị câu lệnh SQL
-            $sql = "INSERT INTO passages 
-                    (test_id, content, audio_url, image_url) 
-                    VALUES 
-                    (:test_id, :content, :audio_url, :image_url)";
+		$result = $stmt->execute([
+			':test_id' => $data['test_id'] ?? null,
+			':content' => $data['content'] ?? null,
+			':audio_url' => $data['audio_url'] ?? null,
+			':image_url' => $data['image_url'] ?? null,
+		]);
 
-            $stmt = $this->db->prepare($sql);
+		if (!$result) {
+			throw new Exception("Lỗi khi lưu passage");
+		}
 
-            // Bind dữ liệu
-            $result = $stmt->execute([
-                ':test_id' => $data['test_id'] ?? null,
-                ':content' => $data['content'] ?? null,
-                ':audio_url' => $data['audio_url'] ?? null,
-                ':image_url' => $data['image_url'] ?? null,
-            ]);
+		return (int)$db->lastInsertId();
+	} catch (Exception $e) {
+		throw new Exception("Lỗi tạo passage: " . $e->getMessage());
+	}
+}
 
-            if (!$result) {
-                throw new Exception("Lỗi khi lưu passage");
-            }
+/**
+ * lấy passage theo id
+ */
+function passageGetById(PDO $db, $passageId) {
+	try {
+		$sql = "SELECT id, test_id, content, audio_url, image_url 
+				FROM passages 
+				WHERE id = :id";
 
-            return (int)$this->db->lastInsertId();
-        } catch (Exception $e) {
-            throw new Exception("Lỗi tạo passage: " . $e->getMessage());
-        }
-    }
+		$stmt = $db->prepare($sql);
+		$stmt->execute([':id' => $passageId]);
 
-    /**
-     * Lấy passage theo ID
-     * 
-     * @param int $passageId
-     * @return array|null - Thông tin passage hoặc null nếu không tìm thấy
-     */
-    public function getById($passageId) {
-        try {
-            $sql = "SELECT id, test_id, content, audio_url, image_url 
-                    FROM passages 
-                    WHERE id = :id";
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result ? $result : null;
+	} catch (Exception $e) {
+		throw new Exception("Lỗi khi lấy passage: " . $e->getMessage());
+	}
+}
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([':id' => $passageId]);
+/**
+ * lấy tất cả passages của một bài thi
+ */
+function passageGetByTestId(PDO $db, $testId) {
+	try {
+		$sql = "SELECT id, test_id, content, audio_url, image_url 
+				FROM passages 
+				WHERE test_id = :test_id 
+				ORDER BY id ASC";
 
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $result ? $result : null;
-        } catch (Exception $e) {
-            throw new Exception("Lỗi khi lấy passage: " . $e->getMessage());
-        }
-    }
+		$stmt = $db->prepare($sql);
+		$stmt->execute([':test_id' => $testId]);
 
-    /**
-     * Lấy tất cả passages của một test
-     * 
-     * @param int $testId
-     * @return array - Danh sách passages
-     */
-    public function getByTestId($testId) {
-        try {
-            $sql = "SELECT id, test_id, content, audio_url, image_url 
-                    FROM passages 
-                    WHERE test_id = :test_id 
-                    ORDER BY id ASC";
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	} catch (Exception $e) {
+		throw new Exception("Lỗi khi lấy passages: " . $e->getMessage());
+	}
+}
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([':test_id' => $testId]);
+/**
+ * cập nhật passage
+ */
+function passageUpdate(PDO $db, $passageId, $data) {
+	try {
+		$updates = [];
+		$params = [':id' => $passageId];
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            throw new Exception("Lỗi khi lấy passages: " . $e->getMessage());
-        }
-    }
+		if (isset($data['content'])) {
+			$updates[] = "content = :content";
+			$params[':content'] = $data['content'];
+		}
 
-    /**
-     * Cập nhật passage
-     * 
-     * @param int $passageId
-     * @param array $data - Chứa các field cần cập nhật
-     * @return bool
-     */
-    public function update($passageId, $data) {
-        try {
-            $updates = [];
-            $params = [':id' => $passageId];
+		if (isset($data['audio_url'])) {
+			$updates[] = "audio_url = :audio_url";
+			$params[':audio_url'] = $data['audio_url'];
+		}
 
-            if (isset($data['content'])) {
-                $updates[] = "content = :content";
-                $params[':content'] = $data['content'];
-            }
+		if (isset($data['image_url'])) {
+			$updates[] = "image_url = :image_url";
+			$params[':image_url'] = $data['image_url'];
+		}
 
-            if (isset($data['audio_url'])) {
-                $updates[] = "audio_url = :audio_url";
-                $params[':audio_url'] = $data['audio_url'];
-            }
+		if (empty($updates)) {
+			return true;
+		}
 
-            if (isset($data['image_url'])) {
-                $updates[] = "image_url = :image_url";
-                $params[':image_url'] = $data['image_url'];
-            }
+		$sql = "UPDATE passages SET " . implode(", ", $updates) . " WHERE id = :id";
+		$stmt = $db->prepare($sql);
+		
+		return $stmt->execute($params);
+	} catch (Exception $e) {
+		throw new Exception("Lỗi khi cập nhật passage: " . $e->getMessage());
+	}
+}
 
-            if (empty($updates)) {
-                return true;
-            }
+/**
+ * xóa passage
+ */
+function passageDelete(PDO $db, $passageId) {
+	try {
+		$sql = "DELETE FROM passages WHERE id = :id";
+		$stmt = $db->prepare($sql);
+		
+		return $stmt->execute([':id' => $passageId]);
+	} catch (Exception $e) {
+		throw new Exception("Lỗi khi xóa passage: " . $e->getMessage());
+	}
+}
 
-            $sql = "UPDATE passages SET " . implode(", ", $updates) . " WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-            
-            return $stmt->execute($params);
-        } catch (Exception $e) {
-            throw new Exception("Lỗi khi cập nhật passage: " . $e->getMessage());
-        }
-    }
+/**
+ * kiểm tra passage có tồn tại không
+ */
+function passageExists(PDO $db, $passageId, $testId = null) {
+	try {
+		if ($testId !== null) {
+			$sql = "SELECT 1 FROM passages WHERE id = :id AND test_id = :test_id LIMIT 1";
+			$params = [':id' => $passageId, ':test_id' => $testId];
+		} else {
+			$sql = "SELECT 1 FROM passages WHERE id = :id LIMIT 1";
+			$params = [':id' => $passageId];
+		}
 
-    /**
-     * Xóa passage
-     * 
-     * @param int $passageId
-     * @return bool
-     */
-    public function delete($passageId) {
-        try {
-            $sql = "DELETE FROM passages WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-            
-            return $stmt->execute([':id' => $passageId]);
-        } catch (Exception $e) {
-            throw new Exception("Lỗi khi xóa passage: " . $e->getMessage());
-        }
-    }
+		$stmt = $db->prepare($sql);
+		$stmt->execute($params);
 
-    /**
-     * Kiểm tra passage có tồn tại không
-     * 
-     * @param int $passageId
-     * @param int $testId (optional) - Kiểm tra passage có thuộc test này không
-     * @return bool
-     */
-    public function exists($passageId, $testId = null) {
-        try {
-            if ($testId !== null) {
-                $sql = "SELECT 1 FROM passages WHERE id = :id AND test_id = :test_id LIMIT 1";
-                $params = [':id' => $passageId, ':test_id' => $testId];
-            } else {
-                $sql = "SELECT 1 FROM passages WHERE id = :id LIMIT 1";
-                $params = [':id' => $passageId];
-            }
+		return $stmt->rowCount() > 0;
+	} catch (Exception $e) {
+		throw new Exception("Lỗi khi kiểm tra passage: " . $e->getMessage());
+	}
+}
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute($params);
+/**
+ * lấy số lượng passages của một bài thi
+ */
+function passageCountByTestId(PDO $db, $testId) {
+	try {
+		$sql = "SELECT COUNT(*) as count FROM passages WHERE test_id = :test_id";
+		$stmt = $db->prepare($sql);
+		$stmt->execute([':test_id' => $testId]);
 
-            return $stmt->rowCount() > 0;
-        } catch (Exception $e) {
-            throw new Exception("Lỗi khi kiểm tra passage: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Lấy số lượng passages của một test
-     * 
-     * @param int $testId
-     * @return int
-     */
-    public function countByTestId($testId) {
-        try {
-            $sql = "SELECT COUNT(*) as count FROM passages WHERE test_id = :test_id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([':test_id' => $testId]);
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return (int)$result['count'];
-        } catch (Exception $e) {
-            throw new Exception("Lỗi khi đếm passages: " . $e->getMessage());
-        }
-    }
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return (int)$result['count'];
+	} catch (Exception $e) {
+		throw new Exception("Lỗi khi đếm passages: " . $e->getMessage());
+	}
 }
