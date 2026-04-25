@@ -8,7 +8,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="..\styles\results.css">
+    <link rel="stylesheet" href="../styles/results.css">
 </head>
 <body class="bg-light">
 
@@ -40,9 +40,10 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
+    <div class="row d-flex align-items-stretch">
+        
+        <div class="col-lg-8 mb-3">
+            <div class="card shadow-sm border-0 left-review-card h-100">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-bold text-dark">Review chi tiết từng câu</h5>
                     <div class="btn-group btn-group-sm">
@@ -50,7 +51,8 @@
                         <button type="button" class="btn btn-outline-danger" id="filter-wrong" data-filter="wrong">Câu sai</button>
                     </div>
                 </div>
-                <div id="wrong-questions-list" class="card-body p-0">
+                
+                <div id="wrong-questions-list">
                     <div class="p-5 text-center text-muted">
                         <div class="spinner-border spinner-border-sm me-2"></div>
                         Đang tải dữ liệu bài làm...
@@ -59,17 +61,16 @@
             </div>
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-lg-4 mb-3">
             <div class="sticky-sidebar">
-                <div class="card shadow-sm border-0 mb-3">
-                    <div class="card-body">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body d-flex flex-column">
                         <h6 class="fw-bold mb-3 d-flex justify-content-between">
                             BẢNG ĐÁP ÁN
                             <small class="text-muted">1 - 200</small>
                         </h6>
-                            <div id="answer-grid">
-                                 </div>
-                    
+                        
+                        <div id="answer-grid" class="flex-grow-1"></div>
                         
                         <hr class="my-3">
                         
@@ -79,7 +80,7 @@
                             <span><i class="fas fa-square text-light border me-1"></i> Trống</span>
                         </div>
                         
-                        <div class="row g-2">
+                        <div class="row g-2 mt-auto">
                             <div class="col-6">
                                 <a href="test.php" class="btn btn-outline-primary btn-sm w-100">Làm lại bài</a>
                             </div>
