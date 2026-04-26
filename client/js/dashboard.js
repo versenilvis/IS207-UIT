@@ -2,11 +2,10 @@
 
 // Lấy ID người dùng (tạm thời hardcode là 1 giống bài trước, hoặc bạn có thể truyền qua session/URL)
 const USER_ID = 2; 
-const API_URL = `/prephub/IS207-UIT/api/dashboard/stats?user_id=${USER_ID}`;
-const DOMAIN = '/prephub/IS207-UIT';
+const API_URL = `/api/dashboard/stats?user_id=${USER_ID}`;
 
 $(document).ready(async function() {
-    try {
+    try {  
         // 1. Gọi API lấy dữ liệu tổng hợp
         const response = await fetch(API_URL);
         const json = await response.json();
