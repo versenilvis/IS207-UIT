@@ -288,42 +288,42 @@ function setupAudioOnce() {
 document.addEventListener("DOMContentLoaded", function() {
     setupAudioOnce();
 });
+
 // Hàm này sẽ được gọi khi bạn bấm nút "Đồng ý" trong Modal
 async function submitExam() {
-    // 1. (Tùy chọn) Ẩn modal sau khi bấm
-    // Nếu bạn muốn modal biến mất ngay lập tức khi đang gửi dữ liệu
+    // 1. Ẩn modal ngay lập tức để user không bấm 2 lần
     var modalElement = document.getElementById('confirmSubmitModal');
     var modalInstance = bootstrap.Modal.getInstance(modalElement);
     if (modalInstance) {
         modalInstance.hide();
     }
 
-    // 2. Thu thập đáp án của người dùng (Giả sử bạn đã lưu ở một biến nào đó)
-    // Ví dụ: const userAnswers = collectAnswers(); 
+    // 2. Thu thập đáp án của người dùng
+    // const userAnswers = collectAnswers(); 
 
-    // 3. Gửi dữ liệu lên API Backend
     try {
-        const response = await fetch('/prephub/IS207-UIT/api/exam/submit', { // Nhớ sửa đúng đường dẫn API của bạn
+        // 3. Gửi dữ liệu lên API Backend (Đã sửa chuẩn đường dẫn)
+        const response = await fetch('/api/exam/submit', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                user_id: 2, // Đang hardcode theo Database của bạn
-                test_id: 1, // Mã đề thi
+                user_id: 2, 
+                test_id: 1, 
                 // answers: userAnswers 
             })
         });
 
         const result = await response.json();
 
-        // 4. Nếu thành công, chuyển hướng trang
+        // 4. Nếu thành công, chuyển hướng sang trang KẾT QUẢ
         if (result.status === 'success') {
-            // Chuyển hướng về Dashboard
-            window.location.href = 'dashboard.php';
+            // Chuyển hướng và truyền attempt_id do Backend vừa tạo ra
+            // Lưu ý: Tùy Backend của bạn trả về ID nằm ở result.attempt_id hay result.data.attempt_id nhé
+            const newAttemptId = result.attempt_id || (result.data && result.data.attempt_id);
             
-            // Hoặc chuyển hướng sang trang Results (như dự định ban đầu)
-            // window.location.href = `results.php?attempt_id=${result.attempt_id}`;
+            window.location.href = `/client/pages/results.php?attempt_id=${newAttemptId}`;
         } else {
             alert('Có lỗi xảy ra: ' + result.message);
         }
