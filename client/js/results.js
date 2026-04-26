@@ -1,7 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 const ATTEMPT_ID = urlParams.get('attempt_id') || 1; 
-const API_URL = `/prephub/IS207-UIT/api/score/details?attempt_id=${ATTEMPT_ID}`;
-const DOMAIN = '/prephub/IS207-UIT';
+const API_URL = `/api/score/details?attempt_id=${ATTEMPT_ID}`;
 
 const TOEIC_CONVERSION = {
     listening: { 0: 5, 5: 25, 10: 55, 20: 110, 50: 245, 80: 395, 90: 450, 100: 495 },
