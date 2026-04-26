@@ -1,9 +1,8 @@
 <?php
 // xử lí logic api nộp bài, chấm điểm, thống kê
 // server/controllers/score-controller.php
-require_once '../db/mysql.php';
-require_once '../models/attempt.php';
-
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/attempt.php';
 // Cấp quyền CORS nếu client gọi từ port khác
 header('Content-Type: application/json; charset=utf-8');
 
@@ -17,8 +16,7 @@ try {
         exit;
     }
 
-    $db = getDatabaseConnection();
-    $attemptModel = new Attempt($db);
+    $attemptModel = new Attempt($conn);
     
     // Gọi hàm fetch data
     $results = $attemptModel->getReviewDetails($attempt_id);
