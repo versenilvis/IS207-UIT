@@ -1,6 +1,7 @@
-const ATTEMPT_ID = 1; 
-const API_URL = `http://localhost/prephub/IS207-UIT/server/controllers/score-controller.php?attempt_id=${ATTEMPT_ID}`;
-const DOMAIN = 'http://localhost/prephub/IS207-UIT';
+const urlParams = new URLSearchParams(window.location.search);
+const ATTEMPT_ID = urlParams.get('attempt_id') || 1; 
+const API_URL = `/prephub/IS207-UIT/api/score/details?attempt_id=${ATTEMPT_ID}`;
+const DOMAIN = '/prephub/IS207-UIT';
 
 const TOEIC_CONVERSION = {
     listening: { 0: 5, 5: 25, 10: 55, 20: 110, 50: 245, 80: 395, 90: 450, 100: 495 },
@@ -33,50 +34,23 @@ function calculateFinalScore(correctCount, section) {
     return Math.round(score / 5) * 5;
 }
 
-// HÀM TẠO DỮ LIỆU GIẢ LẬP (Phòng hờ khi Database chưa có data)
-function generateMockData() {
-    console.warn("⚠️ API không có dữ liệu! Chuyển sang dùng Mock Data 200 câu...");
-    const answers = ['A', 'B', 'C', 'D'];
-    const fakeData = [];
-    for (let i = 1; i <= 200; i++) {
-        const correctAns = answers[Math.floor(Math.random() * answers.length)];
-        let userAns = '';
-        const rand = Math.random();
-        if (rand > 0.15) userAns = answers[Math.floor(Math.random() * answers.length)];
-        
-        fakeData.push({
-            question_id: i,
-            user_choice: userAns,
-            correct_option: correctAns,
-            question_content: null,
-            image_url: null,
-            audio_url: null
-        });
-    }
-    return fakeData;
-}
-
 $(document).ready(async function() {
-    let questions = [];
-
     try {
         const response = await fetch(API_URL);
         const json = await response.json();
 
-        // Nếu API có dữ liệu thật
-        if (json.status === 'success' && json.data && json.data.length > 0) {
-            console.log("✅ Đã lấy dữ liệu THẬT từ Database!");
-            questions = json.data;
+        if (json.status === 'success' && json.data) {
+            processAndRender(json.data);
         } else {
-            // Nếu API chạy được nhưng Database rỗng
-            questions = generateMockData();
+            $('#wrong-questions-list').html('<div class="p-5 text-center text-muted">Không tìm thấy dữ liệu bài làm trong hệ thống.</div>');
         }
     } catch (error) {
-        // Nếu lỗi kết nối Backend
-        questions = generateMockData();
+        console.error("Lỗi API:", error);
+        $('#wrong-questions-list').html('<div class="p-5 text-center text-danger">Đã xảy ra lỗi khi kết nối với máy chủ. Vui lòng thử lại sau.</div>');
     }
+});
 
-    // XỬ LÝ DỮ LIỆU & TÍNH ĐIỂM (Chung cho cả Thật và Giả)
+function processAndRender(questions) {
     let lcCorrect = 0, rcCorrect = 0, totalCorrect = 0;
 
     questions.forEach(q => {
@@ -91,9 +65,9 @@ $(document).ready(async function() {
         }
     });
 
-    // Cập nhật UI điểm số
     const lcScore = calculateFinalScore(lcCorrect, 'listening');
     const rcScore = calculateFinalScore(rcCorrect, 'reading');
+    
     $('#total-points').text(lcScore + rcScore);
     $('#listening-points').text(`${lcScore}/495`);
     $('#reading-points').text(`${rcScore}/495`);
@@ -101,19 +75,18 @@ $(document).ready(async function() {
 
     renderReviewList(questions);
     renderAnswerGrid(questions);
-});
+}
 
-// Các hàm Render dùng chung chuẩn xác với giao diện của bạn
 function renderReviewList(questions) {
     let html = '';
     questions.forEach(item => {
         const part = TOEIC_PARTS.find(p => item.question_id >= p.range[0] && item.question_id <= p.range[1]) || { name: `Part ${item.part}` };
         
         let mediaHtml = '';
-        if (item.image_url) mediaHtml += `<img src="${DOMAIN}${item.image_url}" class="img-fluid rounded mt-2 mb-2" style="max-height:200px; display:block;">`;
+        if (item.image_url) mediaHtml += `<img src="${DOMAIN}${item.image_url}" class="img-fluid rounded mt-2 mb-2" style="max-height:300px; display:block;">`;
         if (item.audio_url) mediaHtml += `<audio controls src="${DOMAIN}${item.audio_url}" class="w-100 mt-2 mb-2"></audio>`;
         
-        const contentHtml = item.question_content ? item.question_content : (mediaHtml ? '' : '<i>Nội dung câu hỏi đang được tải từ hệ thống...</i>');
+        const contentHtml = item.question_content || (mediaHtml ? '' : '<i>Nội dung câu hỏi đang được tải từ hệ thống...</i>');
 
         html += `
             <div class="p-4 border-bottom question-item" id="question-target-${item.question_id}">
@@ -121,11 +94,10 @@ function renderReviewList(questions) {
                     <span class="badge ${item.status ? 'bg-success' : 'bg-danger'} rounded-pill px-3">Câu ${item.question_id}</span>
                     <small class="text-muted fw-bold text-uppercase">${part.name}</small>
                 </div>
-                
                 <div class="p-3 bg-light rounded border-start border-4 ${item.status ? 'border-success' : 'border-danger'} mb-3">
                     <p class="text-secondary small mb-0">${contentHtml}</p>
+                    ${mediaHtml}
                 </div>
-
                 <div class="row g-2 text-center">
                     <div class="col-6">
                         <div class="p-2 border rounded ${item.status ? 'bg-white' : 'bg-danger-subtle'}">
@@ -171,15 +143,9 @@ function renderAnswerGrid(questions) {
 
 function scrollToQuestion(qNo) {
     const target = $(`#question-target-${qNo}`);
-    
     if (target.length) {
         const scrollPos = target.offset().top - 40; 
-        
-        $('html, body').animate({ 
-            scrollTop: scrollPos 
-        }, 500);
-        
-        // Hiệu ứng chớp màu vàng (giữ nguyên của bạn)
+        $('html, body').animate({ scrollTop: scrollPos }, 500);
         $('.question-item').removeClass('bg-warning-light');
         target.addClass('bg-warning-light');
         setTimeout(() => target.removeClass('bg-warning-light'), 2000);
@@ -194,7 +160,6 @@ $('.btn-group button').on('click', function() {
         $('.question-item').each(function() {
             $(this).find('.badge.bg-danger').length === 0 ? $(this).hide() : $(this).show();
         });
-        
         if ($('.question-item:visible').length === 0 && !$('#no-wrong-msg').length) {
             $('#wrong-questions-list').append('<div id="no-wrong-msg" class="p-5 text-center text-success fw-bold">Tuyệt vời! Bạn không sai câu nào.</div>');
         }
@@ -202,5 +167,5 @@ $('.btn-group button').on('click', function() {
         $('.question-item').show();
         $('#no-wrong-msg').remove();
     }
-    $('#wrong-questions-list').animate({ scrollTop: 0 }, 300);
+    $('html, body').animate({ scrollTop: 0 }, 300);
 });
