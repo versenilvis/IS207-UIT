@@ -288,3 +288,48 @@ function setupAudioOnce() {
 document.addEventListener("DOMContentLoaded", function() {
     setupAudioOnce();
 });
+
+// Hàm này sẽ được gọi khi bạn bấm nút "Đồng ý" trong Modal
+async function submitExam() {
+    // 1. Ẩn modal ngay lập tức để user không bấm 2 lần
+    var modalElement = document.getElementById('confirmSubmitModal');
+    var modalInstance = bootstrap.Modal.getInstance(modalElement);
+    if (modalInstance) {
+        modalInstance.hide();
+    }
+
+    // 2. Thu thập đáp án của người dùng
+    // const userAnswers = collectAnswers(); 
+
+    try {
+        // 3. Gửi dữ liệu lên API Backend (Đã sửa chuẩn đường dẫn)
+        const response = await fetch('/api/exam/submit', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: 2, 
+                test_id: 1, 
+                // answers: userAnswers 
+            })
+        });
+
+        const result = await response.json();
+
+        // 4. Nếu thành công, chuyển hướng sang trang KẾT QUẢ
+        if (result.status === 'success') {
+            // Chuyển hướng và truyền attempt_id do Backend vừa tạo ra
+            // Lưu ý: Tùy Backend của bạn trả về ID nằm ở result.attempt_id hay result.data.attempt_id nhé
+            const newAttemptId = result.attempt_id || (result.data && result.data.attempt_id);
+            
+            window.location.href = `/client/pages/results.php?attempt_id=${newAttemptId}`;
+        } else {
+            alert('Có lỗi xảy ra: ' + result.message);
+        }
+
+    } catch (error) {
+        console.error('Lỗi khi nộp bài:', error);
+        alert('Không thể kết nối đến máy chủ. Vui lòng thử lại sau!');
+    }
+}
