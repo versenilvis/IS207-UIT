@@ -25,6 +25,14 @@ switch ($resource) {
 		require_once __DIR__ . '/passages.php';
 		break;
 
+	case 'dashboard':
+        require_once __DIR__ . '/dashboard.php';
+        break;
+
+	case 'score':
+         require_once __DIR__ . '/../controllers/score-controller.php';
+        break;
+
 	default:
 		http_response_code(404);
 		echo json_encode([
