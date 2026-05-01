@@ -7,7 +7,8 @@
  * @var PDO $conn
  */
 
-// lấy full list các đề thi dùng query trong database
+
+// GET /api/tests - lấy full list các đề thi dùng query trong database
 // NOTE: nó sẽ trả về data qua endpoint /api/tests, được điều khiển thông qua router (mở folder route để xem)
 // 	hàm này trả về data dạng như này:
 /* {
@@ -100,7 +101,7 @@ function getTestList() {
     }
 }
 
-// tạo một bài test mới
+// POST /api/tests/{uuid} - tạo một bài test mới
 // gửi 1 POST request qua api/tests để tạo đề thi
 // LƯU Ý: là tạo đề thi chứ không phải thêm câu hỏi và câu trả lời vào đề thi
 // hàm này chính là hàm trả xử lí cho handleCreateTestSubmit() ở file questions/api.js
@@ -159,8 +160,84 @@ function createTest() {
     }
 }
 
+// PUT /api/tests/{uuid} - cập nhật tiêu đề, mô tả, trạng thái đề thi
+/*
+ nhận title, is_premium, is_active từ body json
+ dùng coalesce để chỉ cập nhật những field nào được gửi lên,
+ field nào thiếu thì giữ nguyên giá trị cũ trong database
+ kiểm tra đề có tồn tại không trước khi UPDATE
 
-// lấy data 1 đề cụ thể, query trực tiếp vào database để lấy đề ra
+ Đọc thêm để hiểu: https://tableau.edu.vn/ham-coalesce-trong-mysql/
+ */
+function updateTest($uuid) {
+    global $conn;
+    try {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        $title      = trim($input['title'] ?? '');
+        $is_premium = isset($input['is_premium']) ? (int)$input['is_premium'] : null;
+        $is_active  = isset($input['is_active'])  ? (int)$input['is_active']  : null;
+
+        if (empty($title)) {
+            sendError("Tiêu đề không được để trống", 400);
+        }
+
+        // kiểm tra đề tồn tại
+        $stmt_check = $conn->prepare("SELECT id FROM tests WHERE uuid = :uuid LIMIT 1");
+        $stmt_check->execute([':uuid' => $uuid]);
+        $test = $stmt_check->fetch();
+        if (!$test) {
+            sendError("Không tìm thấy đề thi", 404);
+        }
+
+		// coalesce là chọn phần tử không null đầu tiên
+		// ví dụ trong body json, request gửi có is_premium = 1 thì biến is_premiumn = 1
+		// nhưng nếu không gửi, tức là null, coalesce sẽ bỏ qua các phần tử null
+		// cú pháp ":is_premium, is_premium" nghĩa là "giá trị trong body json, giá trị cũ"
+		// coalesce sẽ check nếu như is_premium thì cập nhật, nếu null thì skip
+		// ví dụ request có body json = 1, thì nó sẽ cập nhật cột is_premium thành 1
+		// nếu null thì lấy giá trị cũ
+        $stmt = $conn->prepare("
+            UPDATE tests SET
+                title      = :title,
+                is_premium = COALESCE(:is_premium, is_premium),
+                is_active  = COALESCE(:is_active,  is_active)
+            WHERE uuid = :uuid
+        ");
+        $stmt->execute([
+            'title'      => $title,
+            'is_premium' => $is_premium,
+            'is_active'  => $is_active,
+            'uuid'       => $uuid
+        ]);
+
+        sendJson(["success" => true, "message" => "Cập nhật đề thi thành công"]);
+    } catch (PDOException $e) {
+        sendError("Lỗi database: " . $e->getMessage(), 500);
+    }
+}
+
+// DELETE /api/tests/{uuid} - xóa đề thi và toàn bộ dữ liệu liên quan
+function deleteTest($uuid) {
+    global $conn;
+    try {
+        $stmt_check = $conn->prepare("SELECT id FROM tests WHERE uuid = :uuid LIMIT 1");
+        $stmt_check->execute([':uuid' => $uuid]);
+        if (!$stmt_check->fetch()) {
+            sendError("Không tìm thấy đề thi", 404);
+        }
+
+        $stmt = $conn->prepare("DELETE FROM tests WHERE uuid = :uuid");
+        $stmt->execute([':uuid' => $uuid]);
+
+        sendJson(["success" => true, "message" => "Đã xóa đề thi"]);
+    } catch (PDOException $e) {
+        sendError("Lỗi database: " . $e->getMessage(), 500);
+    }
+}
+
+
+// GET /api/tests/:uuid - lấy data 1 đề cụ thể, query trực tiếp vào database để lấy đề ra
 // NOTE: nó sẽ trả về data qua endpoint /api/tests/uuid, được điều khiển thông qua router (mở folder route để xem)
 function getTestCore($uuid) {
     global $conn;
