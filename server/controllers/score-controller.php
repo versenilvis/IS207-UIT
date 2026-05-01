@@ -1,7 +1,7 @@
 <?php
 // xử lí logic api nộp bài, chấm điểm, thống kê
 // server/controllers/score-controller.php
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../db/config.php';
 require_once __DIR__ . '/../models/attempt.php';
 // Cấp quyền CORS nếu client gọi từ port khác
 header('Content-Type: application/json; charset=utf-8');
