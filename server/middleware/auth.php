@@ -1,6 +1,7 @@
 <?php
-// kiểm tra vòng bảo mật token, phân quyền rbac
 
+
+// + requirAuth nếu cần check đã đăng nhập
 function requireAuth() {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -11,7 +12,7 @@ function requireAuth() {
         sendError("Unauthorized: Vui lòng đăng nhập để xem phần này", 401);
     }
 }
-
+// + requireAdmin: check chỉ có admin mới được làm
 function requireAdmin() {
     requireAuth();
     
