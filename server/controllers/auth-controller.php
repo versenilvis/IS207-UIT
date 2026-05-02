@@ -62,10 +62,27 @@ function handleRegister() {
 
     try {
 		// Kiểm tra xem email có tồn tại hay chưa
-		// NOTE: đọc post dưới đây để hiểu thêm về prepare statements
-		// https://thuedoan.vn/su-dung-prepared-statements-trong-pdo-de-chong-sql-injection.html
-        $stmt = $conn->prepare("SELECT email FROM users WHERE email = :email");
-        $stmt->execute(['email' => $data['email']]);
+		$stmt = $conn->prepare("SELECT email FROM users WHERE email = :email");
+		$stmt->execute(['email' => $email]);
+
+		if ($stmt->fetch()) {
+			$_SESSION['register_error'] = 'Email này đã được đăng ký!';
+			$_SESSION['active_form'] = 'register';
+		} else {
+			$insert = $conn->prepare("INSERT INTO users (uuid, first_name, last_name, email, password) VALUES (:uuid, :first_name, :last_name, :email, :password)");
+			$insert->execute([
+				'uuid' => $uuid,
+				'first_name' => $first_name,
+				'last_name' => $last_name,
+				'email' => $email,
+				'password' => $password_hash
+			]);
+			$_SESSION['register_success'] = 'Đăng ký thành công! Vui lòng đăng nhập.';
+			$_SESSION['active_form'] = 'login';
+		}
+	} catch (PDOException $e) {
+		die("Error: " . $e->getMessage());
+	}
 
         if ($stmt->fetch()) {
             authResponse(false, "Email này đã được đăng ký!", "/client/pages/login.php", "register_error");

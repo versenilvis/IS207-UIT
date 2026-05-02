@@ -12,33 +12,32 @@
 // NOTE: nó sẽ trả về data qua endpoint /api/tests, được điều khiển thông qua router (mở folder route để xem)
 // 	hàm này trả về data dạng như này:
 /* {
-  "success": true,
-  "data": [
-    {
-      "id": "ac15f725-3647-11f1-8a60-5e73694bac0c",
-      "title": "asdas",
-      "is_premium": false,
-      "is_active": 1,
-      "created_at": "2026-04-12 08:14:48",
-      "is_unlocked": true
-    },
-    {
-      "id": "9364db42-3646-11f1-8a60-5e73694bac0c",
-      "title": "asdasd",
-      "is_premium": false,
-      "is_active": 1,
-      "created_at": "2026-04-12 08:06:57",
-      "is_unlocked": true
-    },
-    {
-      "id": "583029e9-3642-11f1-8a60-5e73694bac0c",
-      "title": "asdasd",
-      "is_premium": false,
-      "is_active": 1,
-      "created_at": "2026-04-12 07:36:40",
-      "is_unlocked": true
-    }
-  ]
+{
+    "data": [
+        {
+            "created_at": "2026-04-19 08:30:37",
+            "description": "Listening section practice test with 100 questions",
+            "duration": 2700,
+            "id": "0adf09c9-3bca-11f1-af63-3eb4cc0b50c0",
+            "is_active": 1,
+            "is_premium": false,
+            "is_unlocked": true,
+            "title": "TOEIC Listening Mock Test 1",
+            "total_questions": 100
+        },
+        {
+            "created_at": "2026-04-19 08:29:37",
+            "description": "Another full practice test",
+            "duration": 7200,
+            "id": "e6ce9c58-3bc9-11f1-af63-3eb4cc0b50c0",
+            "is_active": 1,
+            "is_premium": false,
+            "is_unlocked": true,
+            "title": "TOEIC Practice Test 2",
+            "total_questions": 200
+        }
+    ],
+    "success": true
 }
 */
 function getTestList() {
@@ -48,9 +47,8 @@ function getTestList() {
         $user_id = $_SESSION['user_id'] ?? null;
         $role = $_SESSION['role'] ?? 'user';
 
-
         // Lấy tất cả (cả ẩn và hiện) để admin quản lý
-        $stmt = $conn->prepare("SELECT id, uuid, title, is_premium, is_active, total_questions, created_at FROM tests ORDER BY id DESC");
+        $stmt = $conn->prepare("SELECT id, uuid, title, is_premium, is_active, total_questions, created_at, duration, description FROM tests ORDER BY id DESC");
         $stmt->execute();
         $tests = $stmt->fetchAll();
 
@@ -83,8 +81,12 @@ function getTestList() {
             $is_unlocked = ($role === 'admin') || !$is_premium || isset($paid_map[$test_id]);
 
             $formatted_tests[] = [
-                'id' => $test['uuid'], // Trả về UUID làm định danh công khai
+                //Sửa id thành uuid
+                'uuid' => $test['uuid'], // Trả về UUID làm định danh công khai
                 'title' => $test['title'],
+                'description' => $test['description'],
+                'duration' => $test['duration'],
+                'total_questions' => $test['total_questions'],
                 'is_premium' => $is_premium,
                 'is_active' => (int)$test['is_active'],
                 'created_at' => $test['created_at'],
@@ -256,6 +258,7 @@ function getTestCore($uuid) {
         $internal_id = (int)$test['id']; 
 
         // check premium
+        /*
         if ($test['is_premium']) {
             if (session_status() === PHP_SESSION_NONE) session_start();
             $user_id = $_SESSION['user_id'] ?? null;
@@ -269,8 +272,7 @@ function getTestCore($uuid) {
                 }
             }
         }
-
-        // JS có 1 vấn đề như sau
+        */
 		// PDO nó luôn trả về string
 		// nếu không ép kiểu sang bool chẳng hạn mà check if (is_premium) trong JS thì "0" nó sẽ luôn là True
         $test['id'] = (int)$test['id'];
