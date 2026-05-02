@@ -27,8 +27,6 @@ function handleRegister()
 
 	try {
 		// Kiểm tra xem email có tồn tại hay chưa
-		// NOTE: đọc post dưới đây để hiểu thêm về prepare statements
-		// https://thuedoan.vn/su-dung-prepared-statements-trong-pdo-de-chong-sql-injection.html
 		$stmt = $conn->prepare("SELECT email FROM users WHERE email = :email");
 		$stmt->execute(['email' => $email]);
 

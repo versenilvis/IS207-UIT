@@ -1,0 +1,70 @@
+/* =========================================
+   1. CỘT TRÁI: KHÓA CHIỀU CAO VÀ CUỘN BÊN TRONG
+   ========================================= */
+.left-review-card {
+    height: 100%; /* Bắt buộc card trái cao bằng đúng card phải */
+    display: flex;
+    flex-direction: column;
+}
+
+#wrong-questions-list { 
+    flex: 1 1 auto; 
+    overflow-y: auto; /* Bật thanh cuộn cho danh sách câu hỏi */
+    min-height: 0; /* Mẹo cực kỳ quan trọng của Flexbox để không bị tràn */
+    padding-right: 5px;
+}
+
+/* Thanh cuộn cho cột trái */
+#wrong-questions-list::-webkit-scrollbar { width: 6px; }
+#wrong-questions-list::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+
+.question-item { 
+    scroll-margin-top: 20px; 
+    transition: background 0.5s ease; 
+}
+.bg-warning-light { 
+    background-color: #fff3cd !important; 
+    border-left: 5px solid #fcc419 !important; 
+}
+
+
+/* =========================================
+   2. CỘT PHẢI: CHIỀU CAO TỰ NHIÊN (QUYẾT ĐỊNH ĐỘ DÀI TRANG)
+   ========================================= */
+.sticky-sidebar, .sticky-sidebar .card {
+    height: auto; /* Tự động giãn theo 200 ô vuông, không giới hạn */
+    display: flex;
+    flex-direction: column;
+}
+
+#answer-scroll-area {
+    height: auto; /* Không cuộn nội bộ nữa, để 200 ô bung tự do */
+}
+
+.part-header {
+    font-size: 0.95rem; font-weight: 700; margin: 15px 0 10px 0;
+    padding-bottom: 5px; border-bottom: 1px solid #edf2f7; color: #2d3748;
+}
+
+
+/* =========================================
+   3. Ô VUÔNG ĐÁP ÁN & MÀU SẮC TRẠNG THÁI
+   ========================================= */
+.question-box {
+    width: 35px; height: 35px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; margin: 4px; font-weight: bold; font-size: 12px;
+    cursor: pointer; border: 1px solid #dee2e6; transition: all 0.2s ease;
+}
+.question-box:hover { transform: translateY(-2px) scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 5; }
+.correct { background-color: #2ecc71 !important; color: white !important; border: none; }
+.wrong { background-color: #e74c3c !important; color: white !important; border: none; }
+.unanswered { background-color: #f8f9fa !important; color: #adb5bd !important; border: 1px solid #dee2e6 !important; }
+.unanswered:hover { background-color: #e9ecef !important; color: #495057 !important; }
+
+
+/* =========================================
+   4. NÚT BẤM (FILTER)
+   ========================================= */
+.btn-group .btn { transition: all 0.3s ease; font-weight: 600; }
+.btn-group .btn.active { pointer-events: none; }

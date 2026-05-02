@@ -12,8 +12,6 @@
     color: white;
   }
 </style>
-<!--http://localhost:81/Web/PrepHub/IS207-UIT/client/page/home.php-->
-
 <body>
 
   <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
@@ -46,28 +44,11 @@
   <main class="container mb-5">
 
     <section id="book-list-section">
-      <h2 class="fw-bold mb-4">Chọn bộ sách ôn tập</h2>
+      <h2 class="fw-bold mb-4">Banner quảng cáo</h2>
       <div class="row row-cols-1 row-cols-lg-3 g-4" id="book-container"></div>
     </section>
 
-    <section id="test-list-section" style="display: none">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="#" onclick="showBooks()">Sách</a></li>
-          <li class="breadcrumb-item active" id="current-book-name">Tên sách</li>
-        </ol>
-      </nav>
-
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Danh sách đề thi</h2>
-        <button class="btn btn-sm btn-secondary" onclick="showBooks()">
-          <i class="fas fa-arrow-left"></i> Quay lại
-        </button>
-      </div>
-
-      <div class="row row-cols-1 row-cols-md-2 g-3" id="test-container"></div>
-    </section>
-
+    
   </main>
 
   <!-- INCLUDE FOOTER FILE -->

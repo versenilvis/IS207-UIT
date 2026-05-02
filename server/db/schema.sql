@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS `passages` (
     `content` TEXT DEFAULT NULL,
     `audio_url` VARCHAR(255) DEFAULT NULL,
     `image_url` VARCHAR(255) DEFAULT NULL,
-    CONSTRAINT `fk_passage_test` FOREIGN KEY (`test_id`) REFERENCES `tests` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_passage_test` FOREIGN KEY (`test_id`) REFERENCES `tests` (`id`) ON DELETE CASCADE,
+	INDEX `idx_test` (`test_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `questions` (
@@ -92,7 +93,8 @@ CREATE TABLE IF NOT EXISTS `attempts` (
     CONSTRAINT `fk_attempt_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_attempt_test` FOREIGN KEY (`test_id`) REFERENCES `tests` (`id`) ON DELETE CASCADE,
     INDEX `idx_uuid` (`uuid`),
-    INDEX `idx_user_created` (`user_id`, `created_at` DESC)
+    INDEX `idx_user_created` (`user_id`, `created_at` DESC),
+	INDEX `idx_test` (`test_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `attempt_answers` (
@@ -113,7 +115,8 @@ CREATE TABLE IF NOT EXISTS `payments` (
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT `fk_payment_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_payment_test` FOREIGN KEY (`test_id`) REFERENCES `tests` (`id`) ON DELETE CASCADE,
-    UNIQUE KEY `uq_user_test` (`user_id`, `test_id`)
+    UNIQUE KEY `uq_user_test` (`user_id`, `test_id`),
+	INDEX `idx_test` (`test_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -1,0 +1,146 @@
+.back-btn {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fefefe;
+    text-decoration: none;
+    z-index: 1; 
+}
+.back-btn svg {
+    width: 24px;  
+    height: 24px; 
+}
+.pricing-hero {
+    background: linear-gradient(120deg, #172b59, #1f4778, #21617d);
+    color: white;
+    text-align: center;
+    padding: 60px 20px 50px;
+}
+
+.pricing-hero h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0 0 10px;
+}
+
+.pricing-hero p {
+    font-size: 17px;
+    color: rgba(255,255,255,0.65);
+    margin: 0;
+}
+
+.pricing-section {
+    background-color: #f8f9fa;
+    padding: 60px 20px;
+}
+.pricing-container {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+.pricing-card{
+    width: 300px;
+    background: #fff;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.popular-tag {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background-color: #e1ddef;
+    color: #7c3aed;
+    padding: 4px 12px;
+    border-radius: 50px;
+}
+.card-pro {
+    border: 2px solid #3498db;
+    box-shadow: 0 8px 32px rgba(52, 152, 219, 0.2);
+    background: linear-gradient(160deg, #f0f7ff, #daeeff);
+}
+.plan-name {
+    font-size: 26px;
+    font-weight: 800;
+    color: #2c3e50;
+    margin: 0;
+}
+.plan-price {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+.plan-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+.btn-free {
+    background: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+}
+.btn-pro {
+    background: linear-gradient(120deg, #1f4778, #3498db);
+    color: white;
+}
+.btn-pro:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 28px;
+    flex: 1;
+}
+.feature-item {
+    font-size: 14px;
+    color: #444;
+    padding: 7px 0;
+    padding-left: 26px;
+    position: relative;
+}
+
+.feature-item.yes::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #27ae60;
+    font-weight: 700;
+}
+
+.feature-item.no { color: #bbb; }
+
+.feature-item.no::before {
+    content: '✕';
+    position: absolute;
+    left: 0;
+    color: #ddd;
+    font-weight: 700;
+}
