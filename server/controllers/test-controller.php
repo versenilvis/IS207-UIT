@@ -46,9 +46,8 @@ function getTestList() {
         $user_id = $_SESSION['user_id'] ?? null;
         $role = $_SESSION['role'] ?? 'user';
 
-
         // Lấy tất cả (cả ẩn và hiện) để admin quản lý
-        $stmt = $conn->prepare("SELECT * FROM tests ORDER BY id DESC");
+        $stmt = $conn->prepare("SELECT id, uuid, title, is_premium, is_active, total_questions, created_at, duration, description FROM tests ORDER BY id DESC");
         $stmt->execute();
         $tests = $stmt->fetchAll();
 
