@@ -41,7 +41,6 @@
                             </div>
                         </div>
                     </div>
-                    </div>
 
                     <div class="p-4">
                         <!--Nav link để hiển thị các part trong đề thi-->
