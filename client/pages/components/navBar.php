@@ -19,7 +19,7 @@
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
 		<div class="container">
-			<a class="navbar-brand fw-bold d-flex align-items-center" href="./home.php">
+			<a class="navbar-brand fw-bold d-flex align-items-center" href="./user.php">
 				<i class="bx bx-education me-1" style="font-size: 30px;"></i>
 				<span>PREPHUB</span>
 			</a>
