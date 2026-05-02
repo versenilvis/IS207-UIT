@@ -47,9 +47,10 @@ function authResponse($success, $message, $redirectPath, $errorSessionKey = null
 function handleRegister() {
     global $conn;
     $data = getAuthInput();
-    
+
     if (empty($data['email']) || empty($data['password'])) {
         authResponse(false, "Vui lòng nhập đầy đủ thông tin", "/client/pages/login.php", "register_error");
+        return;
     }
 
     $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -57,43 +58,24 @@ function handleRegister() {
         mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000,
         mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
     );
-    
+
     $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
 
     try {
-		// Kiểm tra xem email có tồn tại hay chưa
-		$stmt = $conn->prepare("SELECT email FROM users WHERE email = :email");
-		$stmt->execute(['email' => $email]);
-
-		if ($stmt->fetch()) {
-			$_SESSION['register_error'] = 'Email này đã được đăng ký!';
-			$_SESSION['active_form'] = 'register';
-		} else {
-			$insert = $conn->prepare("INSERT INTO users (uuid, first_name, last_name, email, password) VALUES (:uuid, :first_name, :last_name, :email, :password)");
-			$insert->execute([
-				'uuid' => $uuid,
-				'first_name' => $first_name,
-				'last_name' => $last_name,
-				'email' => $email,
-				'password' => $password_hash
-			]);
-			$_SESSION['register_success'] = 'Đăng ký thành công! Vui lòng đăng nhập.';
-			$_SESSION['active_form'] = 'login';
-		}
-	} catch (PDOException $e) {
-		die("Error: " . $e->getMessage());
-	}
+        // kiểm tra email đã tồn tại chưa
+        $stmt = $conn->prepare("SELECT email FROM users WHERE email = :email");
+        $stmt->execute(['email' => $data['email']]);
 
         if ($stmt->fetch()) {
             authResponse(false, "Email này đã được đăng ký!", "/client/pages/login.php", "register_error");
         } else {
             $insert = $conn->prepare("INSERT INTO users (uuid, first_name, last_name, email, password) VALUES (:uuid, :first_name, :last_name, :email, :password)");
             $insert->execute([
-                'uuid' => $uuid,
+                'uuid'       => $uuid,
                 'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'],
-                'email' => $data['email'],
-                'password' => $password_hash
+                'last_name'  => $data['last_name'],
+                'email'      => $data['email'],
+                'password'   => $password_hash
             ]);
             $_SESSION['active_form'] = 'login';
             authResponse(true, "Đăng ký thành công!", "/client/pages/login.php");
