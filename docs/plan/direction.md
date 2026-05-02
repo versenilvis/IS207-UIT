@@ -1,3 +1,7 @@
+# Định hướng
+> [!WARNING]
+> Lưu ý là các thiết kế chỉ tham khảo chứ chưa chính thức, dựa vào đó tưởng tượng ra trước
+
 ## 1. Trang Chủ (home.php)
 
 > [!NOTE]
