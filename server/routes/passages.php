@@ -1,6 +1,10 @@
 <?php
 
 require_once __DIR__ . '/../controllers/question-controller.php';
+require_once __DIR__ . '/../middleware/auth.php';
+
+// toàn bộ /api/passages có admin được truy cập
+requireAdmin();
 
 // POST /api/passages - tạo một đoạn văn mới
 if ($path === '/api/passages' && $method === 'POST') {

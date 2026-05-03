@@ -32,7 +32,7 @@ set_exception_handler(function ($exception) {
 });
 
 try {
-	require_once __DIR__ . '/config/database.php';
+	require_once __DIR__ . '/db/config.php';
 	require_once __DIR__ . '/utils/response.php';
 
 	// đầu tiên ta vẫn lấy phần param mà ta cần thông qua .htaccess. 

@@ -1,17 +1,25 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-// 1. Nhúng file kết nối Database 
-// Vui lòng sửa lại đường dẫn/tên biến $conn cho đúng với project của bạn nhé.
-require_once __DIR__ . '/../config/database.php'; 
-// Giả sử biến kết nối của bạn là $conn (mysqli) hoặc $conn
+require_once __DIR__ . '/../middleware/auth.php';
+require_once __DIR__ . '/../db/config.php';
 
-$user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 2; // Tạm để 2 theo đúng data của bạn
+// chỉ user đã đăng nhập mới được xem dashboard
+// nếu chưa đăng nhập, requireAuth() sẽ trả về 401 và dừng luôn
+requireAuth(); // NOTE: hàm này trong auth
+
+// $user_id lấy từ session phía server, không phải từ URL hay body
+// điều này đảm bảo user này không thể xem dashboard của user khác
+// bằng cách truyền ?user_id=<another_user_id> vào request
+//
+// IMPORTANT: kể cả admin cũng không thể xem được dashboard của người dùng
+// lí do là vì nó lấy id từ session user đăng nhập, kể cả admin, lấy id từ session đó chính là lấy của chính admin
+// thì chỉ có hiện dashboard cho admin đó thôi, và cũng như đã nói ở trên, ta không thể truyền tham số để xem theo
+// user_id được, nếu muốn phải viết thêm code check if admin
+$user_id = $_SESSION['user_id'];
 
 try {
-    // Nếu bạn dùng PDO, code sẽ như thế này (Nếu dùng mysqli thì đổi lại cú pháp fetch nhé):
-    
-    // --- LẤY THỐNG KÊ TỔNG QUAN ---
+    // lấy điểm cao nhất, số lần thi, thời gian làm bài trung bình của user này
     $stmtOverview = $conn->prepare("SELECT 
         MAX(total_score) as maxScore, 
         COUNT(*) as totalTests, 
@@ -20,7 +28,8 @@ try {
     $stmtOverview->execute([$user_id]);
     $overview = $stmtOverview->fetch(PDO::FETCH_ASSOC);
 
-    // --- LẤY DỮ LIỆU BIỂU ĐỒ (Sắp xếp từ cũ tới mới) ---
+    // lấy dữ liệu cho biểu đồ điểm theo thời gian (10 lần thi gần nhất, sắp xếp cũ -> mới)
+    // frontend sẽ dùng mảng này để vẽ line chart
     $stmtChart = $conn->prepare("SELECT 
         DATE_FORMAT(created_at, '%d/%m') as date, 
         total_score, 
@@ -31,8 +40,8 @@ try {
     $stmtChart->execute([$user_id]);
     $chartData = $stmtChart->fetchAll(PDO::FETCH_ASSOC);
 
-    // --- LẤY LỊCH SỬ LÀM BÀI GẦN ĐÂY (Sắp xếp từ mới nhất xuống) ---
-    // Giả sử bạn có bảng `tests` để lấy tên đề thi
+    // lấy 5 lần làm bài gần nhất để hiển thị trong bảng lịch sử
+    // LEFT JOIN tests để lấy tên đề thi (nếu đề đã bị xóa thì fallback về 'Đề thi TOEIC')
     $stmtHistory = $conn->prepare("SELECT 
         a.id as attempt_id, 
         a.created_at, 
@@ -48,7 +57,6 @@ try {
     $stmtHistory->execute([$user_id]);
     $history = $stmtHistory->fetchAll(PDO::FETCH_ASSOC);
 
-    // --- TRẢ VỀ JSON ---
     echo json_encode([
         "status" => "success",
         "data" => [
