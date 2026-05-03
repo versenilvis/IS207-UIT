@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function(){
 /*Lấy danh sách đề thi và hiển thị lên trang user*/
 async function load_tests() {
     try {
-        const response = await fetch('http://localhost:3000/api/tests/');
+        const response = await fetch('/api/tests/');
         if (!response.ok) {
             throw new Error("Lỗi không hiển thị được đề thi. Có thể do database trống hoặc lỗi server. Tải lại trang để thử lại.");
         }
