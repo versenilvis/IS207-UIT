@@ -15,7 +15,6 @@
 <body>
 
 <div class="container">
-
     <div style="margin-top: 25px; margin-bottom: 20px; display: flex; justify-content: flex-end;">
         <a href="./questions.php" class="btn-submit" style="text-decoration: none; display: inline-block; background-color: var(--primary-color); color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; transition: 0.2s;">Tạo Bài Thi</a>
     </div>

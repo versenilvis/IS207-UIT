@@ -4,47 +4,42 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-	<title>Document</title>
-	<link rel="stylesheet" href="./components/componentsStyle.css">
+	<link rel="stylesheet" href="../styles/navBar.css">
 </head>
-<style>
-	.nav-link.btn.btn-outline-light.ms-lg-3.px-4:hover:hover {
-		background-color: #14b8a6;
-		color: white;
-	}
-</style>
 
 <body>
-	<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-		<div class="container">
-			<a class="navbar-brand fw-bold d-flex align-items-center" href="./user.php">
-				<i class="bx bx-education me-1" style="font-size: 30px;"></i>
-				<span>PREPHUB</span>
-			</a>
-
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a id="nav-home" class="nav-link" href="user.php">Trang chủ</a></li>
-          <li class="nav-item"><a id="nav-list" class="nav-link" href="">Danh sách đề thi</a></li>
-          <li class="nav-item"><a id="nav-premium" class="nav-link" href="">Dashboard</a></li>
-		  <li class="nav-item"><a id="nav-premium" class="nav-link" href="premium.php">Premium</a></li>
-          <li class="nav-item">
-            <a class="nav-link btn btn-outline-light ms-lg-3 px-4" href="/api/auth/logout">
-              Đăng xuất <i class="fas fa-sign-in-alt ms-2"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/main/main.js"></script>
+	<nav class="ph-nav">
+		<a class="ph-brand" href="#">
+			<i class="fas fa-graduation-cap"></i>
+			<!--LOGO-->
+			PREPHUB
+		</a>
+		<ul class="ph-nav-links">
+			<!--Nav link-->
+			<li><a href="user.php">Trang chủ</a></li>
+			<li><a href="tests.php">Danh sách đề thi</a></li>
+			<li><a href="dashboard.php">Dashboard</a></li>
+			<div class="ph-divider"></div>
+			<li><a href="premium.php" class="ph-premium"><span class="ph-premium-dot"></span>Premium</a></li>
+		</ul>
+		<div class="ph-avatar-wrap" id="avatarWrap">
+			<div class="ph-avatar" id="avatarBtn">TU</div>
+			<div class="ph-dropdown" id="dropdown">
+				<div class="ph-dropdown-header">
+					<p>Test User</p>
+					<span>user@email.com</span>
+				</div>
+				<!--Drop down menu-->
+				<a href="#"><i class="fas fa-user"></i> Hồ sơ</a>
+				<a href="#"><i class="fas fa-bell"></i> Thông báo</a>
+				<a href="#"><i class="fas fa-keyboard"></i> Phím tắt</a>
+				<a href="#"><i class="fas fa-gift"></i> Có gì mới</a>
+				<a href="#"><i class="fas fa-circle-question"></i> Hỗ trợ</a>
+				<a href="#" class="logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+			</div>
+		</div>
+	</nav>
+    <script src="../js/navBar.js"></script>
 </body>
+
 </html>
