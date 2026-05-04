@@ -14,15 +14,22 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchExamData() {
     try {
         const params = new URLSearchParams(window.location.search);
-        const uuid = params.get("uuid");
+        const uuid = params.get("uuid") || params.get("test_id");
 
         //Lấy đề thi bằng uuid
-        const response = await fetch(`../../api/tests/${uuid}`);
+        const response = await fetch(`/api/tests/${uuid}`);
         if (!response.ok) {
             throw new Error("Could not fetch resource (function in exam.js)");
         }
         const questions_lists = await response.json();
         const questions = questions_lists.data.questions;
+        const examData = questions_lists.data;
+        // Giả sử API trả về cờ is_premium và has_purchased
+        if (examData.is_premium === 1 && !examData.has_purchased) {
+            alert("Đây là đề thi Premium. Bạn cần nâng cấp tài khoản hoặc mua bộ đề này để làm bài!");
+            window.location.href = "/client/pages/premium.php"; // Redirect
+            return; // Chặn không cho chạy code bên dưới
+        }
         const testDuration = Number(questions_lists.data.duration);
 
         setupExamAudio(questions); //Fetch link audio
@@ -35,8 +42,9 @@ async function fetchExamData() {
         
         
         renderSidebar(questions); //Render side bar dựa vào tổng số câu hỏi
-        setupAnswerTracking(); //Để chọn các options a,b,c,d
-        startTimer(Number.isFinite(testDuration) && testDuration > 0 ? testDuration : 120 * 60); //Lấy test duration trong database và đếm ngược
+        // Truyền uuid vào để làm khóa lưu trữ riêng biệt cho từng đề thi
+        setupAnswerTracking(uuid); //Để chọn các options a,b,c,d
+        startTimer(Number.isFinite(testDuration) && testDuration > 0 ? testDuration : 120 * 60, uuid); //Lấy test duration trong database và đếm ngược
 
     } catch (error) {
         console.error("Lỗi khi kết nối Database:", error);
@@ -248,14 +256,31 @@ function renderSidebar(questions) {
 
 
 //Chọn đáp án
-function setupAnswerTracking() {
+function setupAnswerTracking(examUuid) {
     const radioInputs = document.querySelectorAll('.form-check-input');
     const qBoxes = document.querySelectorAll('.q-box');
-
-    // A. Tô màu xanh khi chọn đáp án
+// --- TÍNH NĂNG MỚI: Khôi phục đáp án nếu lỡ F5 ---
+    const storageKey = `exam_answers_${examUuid}`;
+    let savedAnswers = JSON.parse(localStorage.getItem(storageKey)) || {};
     radioInputs.forEach(input => {
+        const qNumber = input.name.replace('q', '');
+        
+        // 1. Kiểm tra xem câu này lúc trước đã chọn chưa, nếu có thì tích lại
+        if (savedAnswers[qNumber] === input.value) {
+            input.checked = true;
+            qBoxes.forEach(box => {
+                if (box.innerText.trim() === qNumber) {
+                    box.classList.add('answered');
+                }
+            });
+        }
+
+        // 2. Lắng nghe hành động user chọn đáp án mới
         input.addEventListener('change', function() {
-            const qNumber = this.name.replace('q', '');
+            // Lưu vào localStorage ngay lập tức
+            savedAnswers[qNumber] = this.value;
+            localStorage.setItem(storageKey, JSON.stringify(savedAnswers));
+
             qBoxes.forEach(box => {
                 if (box.innerText.trim() === qNumber) {
                     box.classList.add('answered');
@@ -265,19 +290,16 @@ function setupAnswerTracking() {
         });
     });
 
-    //Click ô vuông cuộn tới câu hỏi
+    // Phần click cuộn trang giữ nguyên
     qBoxes.forEach(box => {
         box.addEventListener('click', function() {
             const qNum = this.innerText.trim();
             const targetQuestion = document.getElementById(`question-${qNum}`);
-            
             if (targetQuestion) {
                 scrollToQuestionTarget(targetQuestion);
                 qBoxes.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                window.setTimeout(() => {
-                    this.classList.remove('active');
-                }, 1200);
+                window.setTimeout(() => { this.classList.remove('active'); }, 1200);
             }
         });
     });
@@ -286,34 +308,39 @@ function setupAnswerTracking() {
 
 //Đếm ngược dựa trên test duration
 let timerInterval = null;
-function startTimer(totalSeconds) {
-    // Sửa 1 & 2: Chữ 'd' viết thường và bỏ dấu '#'
+function startTimer(totalSeconds, examUuid) {
     const timerDisplay = document.getElementById('timer-display'); 
-    
-    // Check an toàn: Nếu không tìm thấy thẻ HTML đồng hồ thì thoát luôn để khỏi lỗi
     if (!timerDisplay) return; 
 
-    if (timerInterval) {
-        clearInterval(timerInterval);
-    }
+    if (timerInterval) clearInterval(timerInterval);
 
-    let time = totalSeconds;
+    // --- TÍNH NĂNG MỚI: Logic chống hack giờ bằng LocalStorage ---
+    const storageKey = `exam_endTime_${examUuid}`;
+    let endTime = localStorage.getItem(storageKey);
+
+    if (!endTime) {
+        // Nếu user mới vào lần đầu, lấy Giờ hiện tại + Tổng số giây làm bài
+        endTime = Date.now() + (totalSeconds * 1000);
+        localStorage.setItem(storageKey, endTime);
+    } else {
+        // Nếu user F5, lấy lại cái mốc giờ đã lưu
+        endTime = parseInt(endTime, 10);
+    }
     
     timerInterval = setInterval(() => {
-        const minutes = Math.floor(time / 60);
-        const seconds = time % 60;
+        const now = Date.now();
+        // Tính thời gian còn lại (đổi từ mili-giây ra giây)
+        const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
         
-        const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`; 
         
-        // Sửa 3: Gán thẳng text vào thẻ luôn, KHÔNG dùng forEach
-        timerDisplay.innerText = formattedTime; 
-        
-        if (time <= 0) {
+        if (timeLeft <= 0) {
             clearInterval(timerInterval);
+            localStorage.removeItem(storageKey); // Xóa bộ nhớ giờ
             alert('Đã hết thời gian làm bài! Hệ thống tự động nộp bài.');
-            // TODO: Bổ sung code tự động bấm nút nộp bài ở đây
-        } else {
-            time--;
+            submitExam(); // Tự động gọi hàm nộp bài
         }
     }, 1000);
 }
@@ -403,53 +430,59 @@ function setupAudioOnce() {
     audioEl.addEventListener('contextmenu', e => e.preventDefault());
 }
 
-// Đừng quên gọi hàm này khi trang web tải xong nhé:
-document.addEventListener("DOMContentLoaded", function() {
-    setupAudioOnce();
-});
-
-
 // Hàm này sẽ được gọi khi bạn bấm nút "Đồng ý" trong Modal
 async function submitExam() {
-    // 1. Ẩn modal ngay lập tức để user không bấm 2 lần
     var modalElement = document.getElementById('confirmSubmitModal');
-    var modalInstance = bootstrap.Modal.getInstance(modalElement);
-    if (modalInstance) {
+    if (modalElement) {
+        var modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
         modalInstance.hide();
     }
 
-    // 2. Thu thập đáp án của người dùng
-    // const userAnswers = collectAnswers(); 
+    const params = new URLSearchParams(window.location.search);
+    const uuid = params.get("uuid") || params.get("test_id");
+
+    // Lấy nguyên cục đáp án từ bộ nhớ mà lúc nãy mình lưu
+    const storageKey = `exam_answers_${uuid}`;
+    const userAnswers = JSON.parse(localStorage.getItem(storageKey)) || {};
+
+    // Gom dữ liệu chuẩn bị gửi
+    const payload = {
+        test_uuid: uuid, 
+        answers: userAnswers 
+    };
 
     try {
-        // 3. Gửi dữ liệu lên API Backend (Đã sửa chuẩn đường dẫn)
-        const response = await fetch('/api/exam/submit', { 
+        // ---  POST tới /api/score ---
+        const response = await fetch('/api/score', { 
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                user_id: 2, 
-                test_id: 1, 
-                // answers: userAnswers 
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
 
         const result = await response.json();
 
-        // 4. Nếu thành công, chuyển hướng sang trang KẾT QUẢ
-        if (result.status === 'success') {
-            // Chuyển hướng và truyền attempt_id do Backend vừa tạo ra
-            // Lưu ý: Tùy Backend của bạn trả về ID nằm ở result.attempt_id hay result.data.attempt_id nhé
-            const newAttemptId = result.attempt_id || (result.data && result.data.attempt_id);
-            
-            window.location.href = `/client/pages/results.php?attempt_id=${newAttemptId}`;
+        if (result.status === 'success' || response.ok) {
+            // Xóa sạch dữ liệu bài làm cũ
+            localStorage.removeItem(`exam_endTime_${uuid}`);
+            localStorage.removeItem(storageKey);
+
+            // ---  redirect sang results.php?attempt_id={uuid} ---
+            const attemptId = result.attempt_id || uuid;
+            window.location.href = `/client/pages/results.php?attempt_id=${attemptId}`;
         } else {
-            alert('Có lỗi xảy ra: ' + result.message);
+            alert('Có lỗi xảy ra: ' + (result.message || 'Lưu bài thất bại'));
         }
 
     } catch (error) {
         console.error('Lỗi khi nộp bài:', error);
         alert('Không thể kết nối đến máy chủ. Vui lòng thử lại sau!');
+    }
+}
+function clearExamData() {
+    const params = new URLSearchParams(window.location.search);
+    const uuid = params.get("uuid") || params.get("test_id");
+    if (uuid) {
+        localStorage.removeItem(`exam_endTime_${uuid}`);
+        localStorage.removeItem(`exam_answers_${uuid}`);
     }
 }
