@@ -15,7 +15,6 @@ $fullName = trim($lastName . ' ' . $firstName);
 </head>
 
 <body>
-
     <!-- INCLUDE NAVBAR FILE -->
     <?php include './components/navBar.php'; ?>
     <main class="container mb-5">
