@@ -54,7 +54,6 @@
   <!-- INCLUDE FOOTER FILE -->
   <?php include './components/footer.php'; ?>
 
-  <script src="../js/data.js"></script>
   <script src="../js/main.js"></script>
 </body>
 
