@@ -1,50 +1,60 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. LUÔN LUÔN VẼ SIDEBAR TRƯỚC
-    // Đã thêm vào hàm fetchExamData(), không cần vẽ trước đâu.
+    // --- TÍNH NĂNG MỚI: Phân biệt F5  và Vào mới ---
+    // Kiểm tra xem user nhấn F5 hay là mới đi từ trang ngoài vào
+    const navEntries = performance.getEntriesByType("navigation");
+    const isReload = navEntries.length > 0 
+        ? navEntries[0].type === "reload" 
+        : (window.performance && performance.navigation.type === 1);
+    if (!isReload) {
+        clearExamData(); 
+    }
 
-    // 2. Kích hoạt tính năng Audio chỉ cho nghe 1 lần
+    // Kích hoạt tính năng Audio chỉ cho nghe 1 lần
     setupAudioOnce();
 
-    // 3. Mọi thứ giao diện đã ổn định, giờ mới đi lấy dữ liệu
+    // Mọi thứ giao diện đã ổn định, giờ mới đi lấy dữ liệu
     fetchExamData();
 });
-
 
 //Gọi dữ liệu từ db
 async function fetchExamData() {
     try {
         const params = new URLSearchParams(window.location.search);
         const uuid = params.get("uuid") || params.get("test_id");
-
-        //Lấy đề thi bằng uuid
+       // Lấy đề thi bằng uuid
         const response = await fetch(`/api/tests/${uuid}`);
+        // 1. CHẶN NGAY TỪ CỬA NẾU BACKEND BÁO LỖI 403 (CHƯA MUA ĐỀ)
+        if (response.status === 403) {
+            alert("Đề thi này dành riêng cho tài khoản đã mua!");
+            window.location.href = "/client/pages/premium.php"; 
+            return; // Dừng tại đây, không tải dữ liệu nữa
+        }
+
+        // 2. Bắt các lỗi khác (ví dụ 404 không tìm thấy đề, 500 lỗi server...)
         if (!response.ok) {
             throw new Error("Could not fetch resource (function in exam.js)");
         }
+
+        // 3. Nếu mọi thứ ok (response 200) thì mới lôi data ra 
         const questions_lists = await response.json();
         const questions = questions_lists.data.questions;
         const examData = questions_lists.data;
-        // Giả sử API trả về cờ is_premium và has_purchased
-        if (examData.is_premium === 1 && !examData.has_purchased) {
-            alert("Đây là đề thi Premium. Bạn cần nâng cấp tài khoản hoặc mua bộ đề này để làm bài!");
-            window.location.href = "/client/pages/premium.php"; // Redirect
-            return; // Chặn không cho chạy code bên dưới
-        }
         const testDuration = Number(questions_lists.data.duration);
 
-        setupExamAudio(questions); //Fetch link audio
-        renderQuestions(questions); //In ra question và passage dựa trên test uuid
-        renderPartNav(questions); //In ra thanh navBar ở dưới thanh audio
+        setupExamAudio(questions); // Fetch link audio
+        renderQuestions(questions); // In ra question và passage
+        renderPartNav(questions); // In ra thanh navBar ở dưới thanh audio
 
-        //Đổi title thành title của đề thi
+        // Đổi title thành title của đề thi
         let title = document.getElementById("exam-title");
         title.innerHTML = questions_lists.data.title;  
         
+        renderSidebar(questions); // Render side bar dựa vào tổng số câu hỏi
         
-        renderSidebar(questions); //Render side bar dựa vào tổng số câu hỏi
-        // Truyền uuid vào để làm khóa lưu trữ riêng biệt cho từng đề thi
-        setupAnswerTracking(uuid); //Để chọn các options a,b,c,d
-        startTimer(Number.isFinite(testDuration) && testDuration > 0 ? testDuration : 120 * 60, uuid); //Lấy test duration trong database và đếm ngược
+        // Truyền uuid vào để làm khóa lưu trữ riêng biệt
+        setupAnswerTracking(uuid); 
+        // Lấy test duration trong database và đếm ngược
+        startTimer(Number.isFinite(testDuration) && testDuration > 0 ? testDuration : 120 * 60, uuid); 
 
     } catch (error) {
         console.error("Lỗi khi kết nối Database:", error);
