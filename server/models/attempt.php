@@ -147,3 +147,35 @@ function submitAndGrade($conn, $user_id, $test_uuid, $user_answers, $time_spent)
 		throw $e;
 	}
 }
+/**
+ * Lấy danh sách lịch sử làm bài của user
+ */
+function getAttemptHistory(PDO $conn, int $user_id): array{
+    $stmt = $conn->prepare("
+        SELECT 
+            a.id,
+            a.uuid,
+            DATE_FORMAT(a.created_at, '%d/%m/%Y') as date,
+            DATE_FORMAT(a.created_at, '%H:%i') as time,
+            t.title as exam_name,
+            IF(t.is_premium = 1, 'Premium', 'Miễn phí') as exam_type, 
+            a.listening_score as listening,
+            a.reading_score as reading,
+            a.total_score as total,
+            a.time_spent
+        FROM attempts a
+        JOIN tests t ON a.test_id = t.id
+        WHERE a.user_id = ?
+        ORDER BY a.created_at DESC
+    ");
+    $stmt->execute([$user_id]);
+    $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Format lại định dạng hiển thị thời lượng (VD: 02:05:34)
+    foreach ($history as &$row) {
+        $m = (int)$row['time_spent'];
+        $row['duration'] = sprintf("%02d:%02d:00", floor($m/60), $m%60); 
+    }
+
+    return $history;
+}
