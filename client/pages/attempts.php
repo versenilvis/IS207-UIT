@@ -1,79 +1,79 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-   <?php include './components/metadata.php'; ?>
+    <?php include './components/metadata.php'; ?>
     <title>Lịch sử làm bài - TOEIC Project</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/attempts.css">
 </head>
-<body class="bg-light">
 
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold">Lịch sử làm bài chi tiết</h2>
-            <p class="text-muted">Danh sách tất cả các bộ đề bạn đã hoàn thành</p>
+<body>
+
+    <?php include './components/navBar.php'; ?>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 page-header">
+            <div>
+                <h2 class="fw-bold fs-3 mb-1">Lịch sử làm bài chi tiết</h2>
+                <p class="text-muted mb-0">Danh sách tất cả các bộ đề bạn đã hoàn thành</p>
+            </div>
         </div>
-        <a href="dashboard.php" class="btn btn-outline-primary">
-            <i class="fa-solid fa-house me-1"></i> Về Dashboard
-        </a>
-    </div>
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
+        <div class="filter-card bg-white p-3 mb-4">
             <div class="row g-3">
-                <div class="col-md-5">
-                    <input type="text" class="form-control" placeholder="Tìm kiếm bộ đề...">
-                </div>
-                <div class="col-md-4">
-                    <select class="form-select">
-                        <option>Tất cả thời gian</option>
-                        <option>7 ngày qua</option>
-                        <option>Tháng này</option>
-                    </select>
+                <div class="col-md-7 search-input-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm bộ đề...">
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-dark w-100 text-white">Lọc kết quả</button>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="far fa-calendar-alt"></i></span>
+                        <select id="timeFilter" class="form-select border-start-0 ps-0">
+                            <option value="all">Tất cả thời gian</option>
+                            <option value="this_month">Tháng này</option>
+                            <option value="7_days">7 ngày qua</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button id="filterBtn" class="btn btn-filter w-100"><i class="fas fa-sort-amount-down me-2"></i>Sắp xếp điểm</button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
+        <div class="table-card shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
+                    <thead class="bg-white border-bottom">
                         <tr>
-                            <th class="ps-4">Ngày thi</th>
-                            <th>Tên đề thi</th>
-                            <th class="text-center">Listening</th>
-                            <th class="text-center">Reading</th>
-                            <th class="text-center">Tổng điểm</th>
-                            <th class="text-center">Thời gian</th>
-                            <th class="text-end pe-4">Hành động</th>
+                            <th class="text-center py-3 fw-medium text-muted" style="width: 15%;">Ngày thi</th>
+                            <th class="text-center py-3 fw-medium text-muted" style="width: 25%;">Tên đề thi</th>
+                            <th class="text-center py-3 fw-medium text-muted" style="width: 12%;">Listening</th>
+                            <th class="text-center py-3 fw-medium text-muted" style="width: 12%;">Reading</th>
+                            <th class="text-center py-3 fw-medium text-muted" style="width: 12%;">Tổng điểm</th>
+                            <th class="text-center py-3 fw-medium text-muted" style="width: 10%;">Thời gian</th>
+                            <th class="text-center pe-4 py-3 fw-medium text-muted text-nowrap" style="width: 14%;">Hành động</th>
                         </tr>
                     </thead>
-                    <tbody id="history-body">
-                        </tbody>
+                    <tbody id="historyTableBody">
+                    </tbody>
                 </table>
             </div>
-        </div>
-        <div class="card-footer bg-white py-3">
-            <nav>
-                <ul class="pagination justify-content-center mb-0">
-                    <li class="page-item disabled"><span class="page-link">Trước</span></li>
-                    <li class="page-item active"><span class="page-link">1</span></li>
-                    <li class="page-item"><span class="page-link">Sau</span></li>
-                </ul>
-            </nav>
+
+            <div class="bg-white py-3 border-top d-flex justify-content-center">
+                <nav>
+                    <ul class="pagination mb-0 gap-1" id="paginationContainer">
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="..\js\data_sample.js"></script>
-<script src="..\js\scoring.js"></script>
+    <?php include './components/footer.php'; ?>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/attempts.js"></script>
 </body>
-</html> 
+
+</html>
