@@ -1,5 +1,5 @@
-<?php
-
+<?php require_once '../../server/middleware/auth.php';
+homeRedirect();
 /**
  * Nhận số câu đúng -> Áp dụng bảng quy đổi TOEIC chuẩn -> Trả về điểm số (max 495)
  * TOEIC listening + reading = 495 + 495 = 990
