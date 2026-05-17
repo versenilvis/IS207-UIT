@@ -3,7 +3,7 @@ let historyData = [];
 let filteredData = [];
 let currentAttemptPage = 1;
 let rowsPerPage = 5;
-
+let isSortedByScore = false;
 function getScoreColor(score, isTotal = false) {
 	let thresholdGreen = isTotal ? 800 : 400;
 	let thresholdOrange = isTotal ? 600 : 300;
@@ -12,28 +12,28 @@ function getScoreColor(score, isTotal = false) {
 	return "text-red";
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    fetch('../../server/controllers/attempts-controller.php') 
-        .then(res => res.json())
-        .then(response => {
-            if(response.status === 'success') {
-                historyData = response.data.history; 
-                filteredData = [...historyData]; 
-                displayTablePage(currentAttemptPage);
+document.addEventListener("DOMContentLoaded", function () {
+	fetch("../../server/controllers/attempts-controller.php")
+		.then((res) => res.json())
+		.then((response) => {
+			if (response.status === "success") {
+				historyData = response.data.history;
+				filteredData = [...historyData];
+				displayTablePage(currentAttemptPage);
 
-                // --- GẮN SỰ KIỆN LỌC TỰ ĐỘNG ---
-                // 1. Khi chọn dropdown thời gian -> Tự động Lọc
-                document.getElementById('timeFilter').addEventListener('change', applyFilters);
+				// --- GẮN SỰ KIỆN LỌC TỰ ĐỘNG ---
+				// 1. Khi chọn dropdown thời gian -> Tự động Lọc
+				document.getElementById("timeFilter").addEventListener("change", applyFilters);
 
-                // 2. Khi gõ vào ô tìm kiếm -> Tự động Lọc (dùng sự kiện 'input' để lọc ngay khi đang gõ)
-                document.getElementById('searchInput').addEventListener('input', applyFilters);
+				// 2. Khi gõ vào ô tìm kiếm -> Tự động Lọc (dùng sự kiện 'input' để lọc ngay khi đang gõ)
+				document.getElementById("searchInput").addEventListener("input", applyFilters);
 
-                // --- GẮN SỰ KIỆN CHO NÚT BẤM ---
-                // 3. Nút bấm bây giờ CHỈ GỌI HÀM SORT
-                document.getElementById('filterBtn').addEventListener('click', sortData);
-            }
-        })
-        .catch(error => console.error('Lỗi khi fetch data:', error));
+				// --- GẮN SỰ KIỆN CHO NÚT BẤM ---
+				// 3. Nút bấm bây giờ CHỈ GỌI HÀM SORT
+				document.getElementById("filterBtn").addEventListener("click", sortData);
+			}
+		})
+		.catch((error) => console.error("Lỗi khi fetch data:", error));
 });
 
 // --- HÀM XỬ LÝ LỌC DỮ LIỆU ĐÃ ĐƯỢC TỐI ƯU ---
@@ -85,6 +85,9 @@ function applyFilters() {
 
 		return matchSearch && matchTime;
 	});
+	if (isSortedByScore) {
+		filteredData.sort((a, b) => b.total - a.total);
+	}
 	currentAttemptPage = 1;
 	displayTablePage(currentAttemptPage);
 }
@@ -117,7 +120,6 @@ function displayTablePage(page) {
             <tr>
                 <td class="ps-4">
     <div class="text-dark mb-1">${row.date}</div>
-    <div class="text-muted small">${row.time || ""}</div>
 </td>
 <td>
     <div class="exam-title">${row.exam_name || "Đề thi"}</div>
@@ -133,13 +135,13 @@ function displayTablePage(page) {
                     <span class="${tColor} fw-bold">${row.total}</span><span class="text-muted small">/990</span>
                 </td>
                 <td class="text-center text-dark fw-medium">${row.duration || "--"}</td>
-                <td class="text-center">
-                    <div class="d-flex justify-content-center align-items-center gap-1">
-                        <a href="results.php?id=${row.id}" class="btn btn-view rounded-2 text-nowrap">
-                            <i class="fas fa-external-link-alt me-1"></i>Xem chi tiết
-                        </a>
-                    </div>
-                </td>
+<td class="text-center">
+    <div class="d-flex justify-content-center align-items-center gap-1">
+        <a href="results.php?uuid=${row.uuid}" class="btn btn-view rounded-2 text-nowrap">
+            <i class="fas fa-external-link-alt me-1"></i>Xem chi tiết
+        </a>
+    </div>
+</td>
             </tr>
         `;
 	});
@@ -192,7 +194,20 @@ function changePage(page) {
 	displayTablePage(currentAttemptPage);
 }
 function sortData() {
-    filteredData.sort((a, b) => b.total - a.total);
-    currentAttemptPage = 1;
-    displayTablePage(currentAttemptPage);
+	isSortedByScore = !isSortedByScore;
+	const sortBtn = document.getElementById("filterBtn");
+
+	if (isSortedByScore) {
+		filteredData.sort((a, b) => b.total - a.total);
+		sortBtn.innerHTML = '<i class="fas fa-times me-2"></i>Hủy sắp xếp';
+		sortBtn.classList.add("text-danger");
+	} else {
+		applyFilters();
+		sortBtn.innerHTML = '<i class="fas fa-sort-amount-down me-2"></i>Sắp xếp điểm';
+		sortBtn.classList.remove("text-danger");
+		return;
+	}
+
+	currentAttemptPage = 1;
+	displayTablePage(currentAttemptPage);
 }
