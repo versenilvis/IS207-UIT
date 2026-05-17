@@ -1,6 +1,10 @@
 <?php
 require_once '../../server/middleware/auth.php';
+require_once '../../server/controllers/profile-controller.php';
+require_once '../../server/controllers/dashboard-controller.php';
+//Chặn gõ thẳng lên URL
 homeRedirect();
+
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -38,22 +42,7 @@ homeRedirect();
                 </div>
             </div>
 
-            <div class="hero-right">
-                <div class="hero-stat">
-                    <div class="hero-stat-val" id="hero-max-score">0</div>
-                    <div class="hero-stat-label">Điểm cao nhất</div>
-                </div>
-
-                <div class="hero-stat">
-                    <div class="hero-stat-val" id="hero-total-tests">0</div>
-                    <div class="hero-stat-label">Bài đã làm</div>
-                </div>
-
-                <div class="hero-stat">
-                    <div class="hero-stat-val" id="hero-avg-time">0m</div>
-                    <div class="hero-stat-label">Thời gian TB</div>
-                </div>
-            </div>
+            
         </section>
 
         <!-- STAT CARDS -->
@@ -125,23 +114,6 @@ homeRedirect();
 
             <!-- SIDE PANEL -->
             <aside class="dashboard-side">
-                <div class="dashboard-card goal-card">
-                    <div class="goal-icon">
-                        <i class="fas fa-bullseye"></i>
-                    </div>
-
-                    <h3>Mục tiêu hiện tại</h3>
-                    <p>Cố gắng duy trì luyện tập đều đặn để cải thiện điểm số từng tuần.</p>
-
-                    <div class="goal-row">
-                        <span>Tiến độ</span>
-                        <strong>77%</strong>
-                    </div>
-
-                    <div class="goal-bar">
-                        <div class="goal-fill"></div>
-                    </div>
-                </div>
 
                 <div class="dashboard-card tip-card">
                     <div class="tip-head">
@@ -211,8 +183,6 @@ homeRedirect();
     </div>
     <!-- INCLUDE FOOTER FILE -->
     <?php include './components/footer.php'; ?>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/dashboard.js"></script>
 </body>
 
