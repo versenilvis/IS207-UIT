@@ -5,6 +5,12 @@ require_once '../../server/controllers/dashboard-controller.php';
 //Chặn gõ thẳng lên URL
 homeRedirect();
 
+//Điểm cao nhất, điểm tb, tổng số bài đã làm và 5 đề thi gần đây nhất
+$maxScore = getMaxScore();
+$avgScore = getAvgScore();
+$pastTests = getPastTests(5); //array được bỏ vào history body. Lấy 5 test thôi
+$total_number_of_tests = getNumTestDone();
+$avgTime = getAvgTime();
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -42,7 +48,7 @@ homeRedirect();
                 </div>
             </div>
 
-            
+
         </section>
 
         <!-- STAT CARDS -->
@@ -54,7 +60,7 @@ homeRedirect();
 
                 <div class="stat-content">
                     <div class="stat-label">Điểm cao nhất</div>
-                    <div class="stat-value" id="max-score">0</div>
+                    <div class="stat-value" id="max-score"><?= $maxScore ?> / 990</div>
                     <div class="stat-sub">Tổng điểm tốt nhất bạn đạt được</div>
                 </div>
             </div>
@@ -66,7 +72,7 @@ homeRedirect();
 
                 <div class="stat-content">
                     <div class="stat-label">Số bài đã làm</div>
-                    <div class="stat-value" id="total-tests">0</div>
+                    <div class="stat-value" id="total-tests"><?= $total_number_of_tests ?></div>
                     <div class="stat-sub">Tổng số đề đã hoàn thành</div>
                 </div>
             </div>
@@ -78,7 +84,7 @@ homeRedirect();
 
                 <div class="stat-content">
                     <div class="stat-label">Thời gian trung bình</div>
-                    <div class="stat-value" id="avg-time">0m</div>
+                    <div class="stat-value" id="avg-time"><?= $avgTime ?>m</div>
                     <div class="stat-sub">Thời gian làm bài trung bình</div>
                 </div>
             </div>
@@ -106,6 +112,13 @@ homeRedirect();
                         Score progress
                     </span>
                 </div>
+                <!--Vẽ biểu đồ hiển thị điểm số của ng dùng. Line chart đấy.-->
+                <div class="chart-tabs" aria-label="Chọn loại điểm hiển thị">
+                    <button type="button" class="chart-tab active">Tổng điểm</button>
+                    <button type="button" class="chart-tab">Listening</button>
+                    <button type="button" class="chart-tab">Reading</button>
+                    <button type="button" class="chart-tab">Tất cả</button>
+                </div>
 
                 <div class="chart-wrapper">
                     <canvas id="scoreChart"></canvas>
@@ -123,24 +136,24 @@ homeRedirect();
 
                     <div class="tip-item">
                         <span>01</span>
-                        <p>Làm lại các đề có điểm Reading thấp để cải thiện tốc độ đọc.</p>
+                        <p>Làm nhiều đề hơn nữa.</p>
                     </div>
 
                     <div class="tip-item">
                         <span>02</span>
-                        <p>Ôn lại Part 3 và Part 4 nếu điểm Listening chưa ổn định.</p>
+                        <p>Ôn lại các phần mình đã làm sai.</p>
                     </div>
 
                     <div class="tip-item">
                         <span>03</span>
-                        <p>Đặt mục tiêu tăng 20–30 điểm sau mỗi 3 bài luyện tập.</p>
+                        <p>Cố gắng luyện tập mỗi ngày.</p>
                     </div>
                 </div>
             </aside>
 
         </section>
 
-        <!-- HISTORY TABLE -->
+        <!-- Lịch sử -->
         <section class="dashboard-card history-card">
             <div class="card-head">
                 <div class="card-title-wrap">
@@ -159,7 +172,7 @@ homeRedirect();
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
-
+            <!--Ô hiển thị danh sách đề thi đã làm. Hiển thị 5 đề thi gần nhất  -->
             <div class="table-wrap">
                 <table class="history-table">
                     <thead>
@@ -170,11 +183,26 @@ homeRedirect();
                             <th>Reading</th>
                             <th>Tổng điểm</th>
                             <th>Thời gian</th>
-                            <th>Hành động</th>
+                            <th>Xem lại bài</th>
                         </tr>
                     </thead>
 
                     <tbody id="history-body">
+                        <?php foreach ($pastTests as $test): ?>
+                            <tr> <!--Chống xss thì phải-->
+                                <td><?= htmlspecialchars(date('d/m/Y', strtotime($test['created_at']))) ?></td>
+                                <td><?= htmlspecialchars($test['title']) ?></td>
+                                <td><?= htmlspecialchars($test['listening_score']) ?></td>
+                                <td><?= htmlspecialchars($test['reading_score']) ?></td>
+                                <td><?= htmlspecialchars($test['total_score']) ?></td>
+                                <td><?= htmlspecialchars($test['time_spent']) ?> phút</td>
+                                <td>
+                                    <a href="results.php?attempt_id=<?= urlencode($test['uuid']) ?>">
+                                        Xem
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>

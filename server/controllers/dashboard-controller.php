@@ -9,15 +9,15 @@ require_once __DIR__ . '/../db/config.php';
 require_once __DIR__ . '/../utils/response.php';
 
 // Lấy 5 đề thi gần đây nhất để hiển thị ở trang dashboard.php
-function getPastTest(){
+function getPastTests(int $limit){
     global $conn;
     try{
-        $sql = "SELECT t.title, a.listening_score, a.reading_score, a.total_score, a.time_spent
+        $sql = "SELECT t.title, a.listening_score, a.reading_score, a.total_score, a.time_spent, a.created_at, a.uuid
                 FROM tests t
                 JOIN attempts a ON a.test_id = t.id
                 WHERE a.user_id = :id
                 ORDER BY a.created_at DESC
-                LIMIT 5";
+                LIMIT $limit";
         $stmt = $conn->prepare($sql);
         $id = $_SESSION['user_id'];
         $stmt->execute([
