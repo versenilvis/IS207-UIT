@@ -1,7 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
-const ATTEMPT_ID = urlParams.get('attempt_id');
-const API_URL = `/api/score?attempt_id=${ATTEMPT_ID}`;
-
+const ATTEMPT_UUID = urlParams.get('uuid') || urlParams.get('id');
+const API_URL = `../../server/controllers/score-controller.php?uuid=${ATTEMPT_UUID}`;
 // Định nghĩa các Part của TOEIC để hiển thị trên Sidebar và Review
 const TOEIC_PARTS = [
     { name: "Part 1: Ảnh", range: [1, 6] },
@@ -14,8 +13,8 @@ const TOEIC_PARTS = [
 ];
 
 $(document).ready(async function() {
-    if (!ATTEMPT_ID) {
-        alert("Không tìm thấy ID bài làm!");
+    if (!ATTEMPT_UUID) {
+        alert("Không tìm thấy UUID bài làm!");
         return;
     }
 
