@@ -47,11 +47,11 @@ try {
 		]);
 		exit;
 	} else if ($method === 'GET') {
-		$attempt_id = $_GET['attempt_id'] ?? '';
+		$attempt_id = $_GET['attempt_id'] ?? $_GET['uuid'] ?? '';
 
 		if (empty($attempt_id)) {
 			http_response_code(400);
-			echo json_encode(['error' => 'Thiếu attempt_id']);
+			echo json_encode(['error' => 'Thiếu mã bài làm (attempt_id hoặc uuid)']);
 			exit;
 		}
 
