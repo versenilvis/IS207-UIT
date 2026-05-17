@@ -35,6 +35,7 @@
 				<a href="#"><i class="fas fa-keyboard"></i> Phím tắt</a>
 				<a href="#"><i class="fas fa-gift"></i> Có gì mới</a>
 				<a href="#"><i class="fas fa-circle-question"></i> Hỗ trợ</a>
+				<a href="attempts.php"><i class="fas fa-history me-2"></i> Lịch sử làm bài</a>
 				<a href="../../server/controllers/log-out.php" class="logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
 			</div>
 		</div>
