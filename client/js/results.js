@@ -13,11 +13,13 @@ const TOEIC_PARTS = [
 ];
 
 $(document).ready(async function() {
+    const params = new URLSearchParams(window.location.search);
+    const ATTEMPT_UUID = params.get("attempt_id") || params.get("uuid");
     if (!ATTEMPT_UUID) {
-        alert("Không tìm thấy UUID bài làm!");
+        alert("Không tìm thấy mã bài làm!");
         return;
     }
-
+    
     try {
         const response = await fetch(API_URL);
         const json = await response.json();
