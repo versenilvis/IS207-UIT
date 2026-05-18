@@ -1,4 +1,4 @@
-<?php require_once '../../server/middleware/auth.php';
+<?php require_once __DIR__ . '/../middleware/auth.php';
 homeRedirect();
 /**
  * Nhận số câu đúng -> Áp dụng bảng quy đổi TOEIC chuẩn -> Trả về điểm số (max 495)
