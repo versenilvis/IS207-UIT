@@ -18,7 +18,7 @@ homeRedirect();
 
 <body>
     <!-- INCLUDE NAVBAR FILE -->
-    <?php include './components/navBar.php'; ?>
+    <?php include './components/navbar.php'; ?>
     <div class="page">
         <div class="hero">
             <h1>Danh sách đề thi</h1>
