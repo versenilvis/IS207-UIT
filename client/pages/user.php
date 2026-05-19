@@ -10,6 +10,7 @@ homeRedirect();
 $firstName = $_SESSION['first_name'] ?? '';
 $lastName = $_SESSION['last_name'] ?? '';
 $fullName = trim($lastName . ' ' . $firstName);
+
 ?>
 <!doctype html>
 <html lang="vi">
@@ -160,3 +161,4 @@ $fullName = trim($lastName . ' ' . $firstName);
 </body>
 
 </html>
+

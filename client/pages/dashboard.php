@@ -11,6 +11,21 @@ $avgScore = getAvgScore();
 $pastTests = getPastTests(5); //array được bỏ vào history body. Lấy 5 test thôi
 $total_number_of_tests = getNumTestDone();
 $avgTime = getAvgTime();
+
+// Lấy tên người dùng để hiển thị lời chào
+$firstName = $_SESSION['first_name'] ?? '';
+$lastName = $_SESSION['last_name'] ?? '';
+$userName = trim($lastName . ' ' . $firstName) ?: 'bạn';
+
+// Xác định lời chào theo giờ
+$hour = (int)date('G');
+if ($hour >= 5 && $hour < 12) {
+    $greeting = 'CHÀO BUỔI SÁNG ☀️';
+} elseif ($hour >= 12 && $hour < 18) {
+    $greeting = 'CHÀO BUỔI CHIỀU 🌤️';
+} else {
+    $greeting = 'CHÀO BUỔI TỐI 🌙';
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -31,24 +46,40 @@ $avgTime = getAvgTime();
         <!-- DASHBOARD HERO -->
         <section class="dashboard-hero">
             <div class="hero-left">
-                <div class="hero-eyebrow">Dashboard cá nhân</div>
-                <h1>Kết quả luyện tập TOEIC</h1>
-                <p>Theo dõi điểm số, số bài đã làm và tiến độ luyện tập của bạn theo từng lần thi.</p>
+                <div class="hero-eyebrow"><?= htmlspecialchars($greeting) ?></div>
+                <h1>Xin chào, <?= htmlspecialchars($userName) ?>!</h1>
+                <p>Tiếp tục luyện thi để đạt mục tiêu TOEIC của bạn. Bạn đang làm rất tốt!</p>
 
                 <div class="hero-actions">
                     <a href="tests.php" class="hero-btn primary-btn">
                         <i class="fas fa-play"></i>
-                        Làm bài mới
+                        Làm bài ngay
                     </a>
 
-                    <a href="attempts.php" class="hero-btn secondary-btn">
-                        <i class="fas fa-clock-rotate-left"></i>
-                        Xem lịch sử
+                    <a href="profile.php" class="hero-btn secondary-btn">
+                        <i class="fas fa-gear"></i>
+                        Cài đặt
                     </a>
                 </div>
             </div>
 
+            <!-- Hero stats (top-right) -->
+            <div class="hero-right">
+                <div class="hero-stat">
+                    <div class="hero-stat-val"><?= $total_number_of_tests ?: '0' ?></div>
+                    <div class="hero-stat-label">Bài đã làm</div>
+                </div>
 
+                <div class="hero-stat">
+                    <div class="hero-stat-val"><?= $maxScore ?: '-' ?></div>
+                    <div class="hero-stat-label">Điểm cao nhất</div>
+                </div>
+
+                <div class="hero-stat">
+                    <div class="hero-stat-val"><?= $avgScore ?: '-' ?></div>
+                    <div class="hero-stat-label">Điểm trung bình</div>
+                </div>
+            </div>
         </section>
 
         <!-- STAT CARDS -->
@@ -60,8 +91,8 @@ $avgTime = getAvgTime();
 
                 <div class="stat-content">
                     <div class="stat-label">Điểm cao nhất</div>
-                    <div class="stat-value" id="max-score"><?= $maxScore ?> / 990</div>
-                    <div class="stat-sub">Tổng điểm tốt nhất bạn đạt được</div>
+                    <div class="stat-value" id="max-score"><?= $maxScore ?: '0' ?></div>
+                    <div class="stat-sub">Tổng điểm tốt nhất</div>
                 </div>
             </div>
 
@@ -79,13 +110,13 @@ $avgTime = getAvgTime();
 
             <div class="stat-card">
                 <div class="stat-icon orange">
-                    <i class="fas fa-stopwatch"></i>
+                    <i class="fas fa-chart-line"></i>
                 </div>
 
                 <div class="stat-content">
-                    <div class="stat-label">Thời gian trung bình</div>
-                    <div class="stat-value" id="avg-time"><?= $avgTime ?>m</div>
-                    <div class="stat-sub">Thời gian làm bài trung bình</div>
+                    <div class="stat-label">Điểm trung bình</div>
+                    <div class="stat-value" id="avg-score"><?= $avgScore ?: '0' ?></div>
+                    <div class="stat-sub">Trên tất cả các bài thi</div>
                 </div>
             </div>
         </section>
@@ -102,22 +133,17 @@ $avgTime = getAvgTime();
                         </div>
 
                         <div>
-                            <h2>Biểu đồ tiến độ điểm số</h2>
-                            <p>Dữ liệu được tính theo từng lần thi gần đây.</p>
+                            <h2>Tiến độ điểm số</h2>
+                            <p>Dữ liệu các lần thi gần đây.</p>
                         </div>
                     </div>
-
-                    <span class="soft-badge">
-                        <i class="fas fa-arrow-trend-up"></i>
-                        Score progress
-                    </span>
                 </div>
-                <!--Vẽ biểu đồ hiển thị điểm số của ng dùng. Line chart đấy.-->
-                <div class="chart-tabs" aria-label="Chọn loại điểm hiển thị">
-                    <button type="button" class="chart-tab active">Tổng điểm</button>
-                    <button type="button" class="chart-tab">Listening</button>
-                    <button type="button" class="chart-tab">Reading</button>
-                    <button type="button" class="chart-tab">Tất cả</button>
+
+                <!-- tab hiển thị thông tin ng dùng -->
+                <div class="chart-legend-row">
+                    <span class="legend-dot tong"></span><span class="legend-label">Tổng điểm</span>
+                    <span class="legend-dot listening"></span><span class="legend-label">Listening</span>
+                    <span class="legend-dot reading"></span><span class="legend-label">Reading</span>
                 </div>
 
                 <div class="chart-wrapper">
@@ -136,17 +162,17 @@ $avgTime = getAvgTime();
 
                     <div class="tip-item">
                         <span>01</span>
-                        <p>Làm nhiều đề hơn nữa.</p>
+                        <p>Làm lại các đề có điểm Reading thấp để cải thiện tốc độ đọc.</p>
                     </div>
 
                     <div class="tip-item">
                         <span>02</span>
-                        <p>Ôn lại các phần mình đã làm sai.</p>
+                        <p>Ôn lại Part 3 và Part 4 nếu điểm Listening chưa ổn định.</p>
                     </div>
 
                     <div class="tip-item">
                         <span>03</span>
-                        <p>Cố gắng luyện tập mỗi ngày.</p>
+                        <p>Làm full test mỗi 2 tuần để theo dõi tiến độ tổng thể.</p>
                     </div>
                 </div>
             </aside>
@@ -162,14 +188,14 @@ $avgTime = getAvgTime();
                     </div>
 
                     <div>
-                        <h2>Lịch sử làm bài gần đây</h2>
-                        <p>Xem lại kết quả các bài thi bạn đã hoàn thành.</p>
+                        <h2>Lịch sử làm bài</h2>
+                        <p>Kết quả các bài thi gần đây.</p>
                     </div>
                 </div>
 
                 <a href="attempts.php" class="view-all">
                     Xem tất cả
-                    <i class="fas fa-arrow-right"></i>
+                    <i class="fas fa-chevron-right"></i>
                 </a>
             </div>
             <!--Ô hiển thị danh sách đề thi đã làm. Hiển thị 5 đề thi gần nhất  -->
@@ -183,22 +209,22 @@ $avgTime = getAvgTime();
                             <th>Reading</th>
                             <th>Tổng điểm</th>
                             <th>Thời gian</th>
-                            <th>Xem lại bài</th>
+                            <th>Chi tiết</th>
                         </tr>
                     </thead>
 
                     <tbody id="history-body">
                         <?php foreach ($pastTests as $test): ?>
-                            <tr> <!--Chống xss thì phải-->
+                            <tr>
                                 <td><?= htmlspecialchars(date('d/m/Y', strtotime($test['created_at']))) ?></td>
                                 <td><?= htmlspecialchars($test['title']) ?></td>
-                                <td><?= htmlspecialchars($test['listening_score']) ?></td>
-                                <td><?= htmlspecialchars($test['reading_score']) ?></td>
-                                <td><?= htmlspecialchars($test['total_score']) ?></td>
+                                <td class="score-listening"><?= htmlspecialchars($test['listening_score']) ?></td>
+                                <td class="score-reading"><?= htmlspecialchars($test['reading_score']) ?></td>
+                                <td class="score-total"><?= htmlspecialchars($test['total_score']) ?></td>
                                 <td><?= htmlspecialchars($test['time_spent']) ?> phút</td>
                                 <td>
-                                    <a href="results.php?attempt_id=<?= urlencode($test['uuid']) ?>">
-                                        Xem
+                                    <a href="results.php?attempt_id=<?= urlencode($test['uuid']) ?>" class="btn-view">
+                                        Xem <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </td>
                             </tr>
