@@ -20,8 +20,8 @@ async function drawCharts() {
                     backgroundColor: 'rgba(29, 158, 117, 0.05)',
                     pointBackgroundColor: '#1d9e75',
                     pointBorderColor: '#1d9e75',
-                    pointRadius: 4,
-                    borderWidth: 2.5,
+                    pointRadius: 3,
+                    borderWidth: 2,
                     tension: 0.35,
                     fill: false,
                 },
@@ -32,8 +32,8 @@ async function drawCharts() {
                     backgroundColor: 'rgba(2, 132, 199, 0.05)',
                     pointBackgroundColor: '#0284c7',
                     pointBorderColor: '#0284c7',
-                    pointRadius: 3,
-                    borderWidth: 2,
+                    pointRadius: 2.5,
+                    borderWidth: 1.8,
                     tension: 0.35,
                     fill: false,
                 },
@@ -44,8 +44,8 @@ async function drawCharts() {
                     backgroundColor: 'rgba(245, 158, 11, 0.05)',
                     pointBackgroundColor: '#f59e0b',
                     pointBorderColor: '#f59e0b',
-                    pointRadius: 3,
-                    borderWidth: 2,
+                    pointRadius: 2.5,
+                    borderWidth: 1.8,
                     tension: 0.35,
                     fill: false,
                 }
@@ -62,11 +62,15 @@ async function drawCharts() {
                 y: {
                     beginAtZero: true,
                     max: 990,
+                    afterBuildTicks: (scale) => {
+                        scale.ticks = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 990]
+                            .map((value) => ({ value }));
+                    },
                     ticks: {
                         stepSize: 100,
                         color: '#6b7280',
                         font: {
-                            size: 12,
+                            size: 10,
                         },
                     },
                     grid: {
@@ -80,7 +84,7 @@ async function drawCharts() {
                     ticks: {
                         color: '#6b7280',
                         font: {
-                            size: 12,
+                            size: 10,
                         },
                     },
                     grid: {
@@ -102,12 +106,12 @@ async function drawCharts() {
                     labels: {
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        boxWidth: 7,
-                        boxHeight: 7,
-                        padding: 18,
+                        boxWidth: 6,
+                        boxHeight: 6,
+                        padding: 14,
                         color: '#334155',
                         font: {
-                            size: 12,
+                            size: 10,
                             weight: '600',
                         },
                     },
