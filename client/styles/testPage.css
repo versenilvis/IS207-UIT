@@ -159,6 +159,7 @@
 .test-card:hover {
 	border-color: #b0b8c4;
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+	transform: translateY(-2px);
 }
 /* Tiêu đề và badge đề thi */
 .card-top {
@@ -231,14 +232,17 @@
 	margin-top: 4px;
 	padding-top: 10px;
 	border-top: 0.5px solid #f0f0f0;
-	gap: 8px;
+	gap: 14px;
 }
-.card-stats {
+.page .test-card .card-stats {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 8px;
+	flex: 1;
+	justify-content: flex-start;
+	min-width: 0;
 }
-.stat-item {
+.page .test-card .stat-item {
 	display: flex;
 	align-items: center;
 	gap: 4px;
@@ -246,14 +250,16 @@
 	color: #888;
 	white-space: nowrap;
 }
-.stat-item i {
+.page .test-card .stat-item i {
 	font-size: 13px;
 	color: #8a8f98;
 }
-.stat-divider {
+.page .test-card .stat-divider {
 	width: 1px;
 	height: 12px;
 	background: #e0e0e0;
+	margin: 0;
+	flex-shrink: 0;
 }
 /* Điểm trung bình */
 .score {
@@ -264,22 +270,45 @@
 	color: #1a6e3c;
 }
 /* Nút làm bài */
-.btn-start {
-	padding: 3px 8px !important;
+.page .test-card .btn-start {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-width: 92px;
+	height: 36px;
+	padding: 0 14px;
 	border-radius: 8px;
 	border: 1px solid #1a3a5c;
 	background: transparent;
 	color: #1a3a5c;
 	font-size: 12.5px;
 	font-weight: 600;
-	text-decoration: none;
 	cursor: pointer;
-	transition: all 0.15s;
+	text-decoration: none;
+	box-shadow: none;
+	transform: none;
+	transition: background 0.15s, color 0.15s, border-color 0.15s;
 	white-space: nowrap;
 }
-.btn-start:hover {
+.page .test-card .btn-start:hover {
 	background: #1a3a5c;
 	color: #fff;
+	border-color: #1a3a5c;
+	box-shadow: none;
+	transform: none;
+}
+.page .test-card .btn-start i {
+	font-size: 11px;
+	transition: none;
+	transform: none;
+}
+.page .test-card .btn-start:hover i {
+	transform: none;
+}
+.page .test-card .btn-lock:hover i {
+	transform: rotate(360deg);
+	transition: transform 0.45s ease;
 }
 /* Premium card */
 .test-card.premium {
@@ -293,13 +322,13 @@
 }
 
 /* Premium badge */
-.badge-premium {
+.page .test-card .badge-premium {
     font-size: 11px;
     font-weight: 600;
     padding: 3px 9px;
     border-radius: 12px;
     background: #fff3dc;
-    color: #a0620a;
+    color: #8a4f00;
     border: 0.5px solid #f5c45a;
     white-space: nowrap;
     flex-shrink: 0;

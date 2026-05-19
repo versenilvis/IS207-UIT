@@ -1,8 +1,9 @@
 <?php
+session_start();
 //Kiểm tra xem user có đăng nhập hay chưa
 //Tránh việc lên URL gõ tests.php là ra trang này
-require_once '../../server/middleware/auth.php';
-homeRedirect();
+require_once '../../server/middleware/auth.php'; 
+requireAuth();
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +19,7 @@ homeRedirect();
 
 <body>
     <!-- INCLUDE NAVBAR FILE -->
-    <?php include './components/navbar.php'; ?>
+    <?php include './components/navBar.php'; ?>
     <div class="page">
         <div class="hero">
             <h1>Danh sách đề thi</h1>
