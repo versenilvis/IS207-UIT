@@ -137,4 +137,8 @@ CREATE TABLE IF NOT EXISTS `transaction_history` (
     INDEX `idx_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+<<<<<<< HEAD
 SET FOREIGN_KEY_CHECKS = 1;
+=======
+SET FOREIGN_KEY_CHECKS = 1;
+>>>>>>> 404a8ab9cf94f9753e090ad4fe9eee6b1323c4fe
