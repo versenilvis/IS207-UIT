@@ -102,7 +102,28 @@ function handleLogin() {
             $_SESSION['last_name'] = $user['last_name'];
             $_SESSION['email'] = $user['email'];
             
-            authResponse(true, "Đăng nhập thành công", "/client/pages/user.php");
+            $_SESSION['is_premium'] = !empty($user['is_premium']);
+            $_SESSION['has_course'] = !empty($user['has_course']);
+            if (!empty($user['premium_plan'])) {
+                $_SESSION['premium_plan'] = $user['premium_plan'];
+                $_SESSION['premium_until'] = $user['premium_until'];
+                $plans = require __DIR__ . '/../config/premiumPlan.php';
+                if (isset($plans[$user['premium_plan']])) {
+                    $_SESSION['premium_name'] = $plans[$user['premium_plan']]['name'];
+                    $_SESSION['premium_period'] = $plans[$user['premium_plan']]['period'];
+                }
+            }
+            
+            $_SESSION['payment_history'] = [];
+            $txStmt = $conn->prepare("SELECT tx_id as id, plan_id, plan_name, price, period, status, created_at FROM transaction_history WHERE user_id = :user_id ORDER BY created_at ASC");
+            $txStmt->execute(['user_id' => $user['id']]);
+            $history = $txStmt->fetchAll();
+            if ($history) {
+                $_SESSION['payment_history'] = $history;
+                $_SESSION['last_payment'] = end($_SESSION['payment_history']);
+            }
+            
+            authResponse(true, "Đăng nhập thành công", "/client/pages/home.php");
         } else {
             authResponse(false, "Email hoặc mật khẩu không chính xác", "/client/pages/home.php", "login_error");
         }

@@ -62,16 +62,27 @@ async function load_tests() {
         if (grid_premium) {
             grid_premium.innerHTML = "";
             premiumTests.forEach(test => {
+<<<<<<< HEAD
                 // Kiểm tra nếu đã mở khóa thì hiện "Làm bài", nếu chưa thì hiện "Đăng ký"
                 const actionButton = test.is_unlocked 
                     ? `<a href="./exam.php?uuid=${test.uuid}" class="btn-start btn-lock"><i class="fas fa-lock"></i> Làm bài</a>`
                     : `<a href="./premium.php" class="btn-start btn-lock"><i class="fas fa-lock"></i> Làm bài</a>`;
+=======
+                // LOGIC QUAN TRỌNG: Kiểm tra nếu đã mở khóa thì hiện "Làm bài", nếu chưa thì hiện "Đăng ký"
+                const actionButton = test.is_unlocked 
+                    ? `<a href="./exam.php?uuid=${test.uuid}" class="btn-start">Làm bài ✦</a>`
+                    : `<a href="./pricing.php" class="btn-start btn-lock"><i class="fas fa-lock"></i> Mua ngay</a>`;
+>>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 
                 grid_premium.innerHTML += `
                     <div class="test-card premium">
                         <div class="card-top">
                             <div class="card-title">${test.title}</div>
+<<<<<<< HEAD
                             <span class="badge-premium">Premium</span>
+=======
+                            <span class="badge badge-premium">✦ Premium</span>
+>>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
                         </div>
                         <div class="card-meta">
                             <span class="meta-item"><i class="fa-regular fa-clock"></i> ${test.duration / 60} phút</span>

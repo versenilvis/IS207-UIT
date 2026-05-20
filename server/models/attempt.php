@@ -26,6 +26,7 @@ function getReviewDetails($conn, $attempt_id)
 	$sqlQuestions = "
         SELECT 
             q.id AS question_id, 
+            q.question_number,
             q.part, 
             q.content AS question_content, 
             q.image_url, 

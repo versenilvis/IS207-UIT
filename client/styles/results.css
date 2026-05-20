@@ -1,70 +1,261 @@
-/* =========================================
-   1. CỘT TRÁI: KHÓA CHIỀU CAO VÀ CUỘN BÊN TRONG
-   ========================================= */
-.left-review-card {
-    height: 100%; /* Bắt buộc card trái cao bằng đúng card phải */
+* { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: #f8fafc; }
+
+/* ---- page wrapper ---- */
+.results-page {
     display: flex;
     flex-direction: column;
+    height: 100vh;
+    padding-top: 70px;
 }
-
-#wrong-questions-list { 
-    flex: 1 1 auto; 
-    overflow-y: auto; /* Bật thanh cuộn cho danh sách câu hỏi */
-    min-height: 0; /* Mẹo cực kỳ quan trọng của Flexbox để không bị tràn */
-    padding-right: 5px;
-}
-
-/* Thanh cuộn cho cột trái */
-#wrong-questions-list::-webkit-scrollbar { width: 6px; }
-#wrong-questions-list::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
-
-.question-item { 
-    scroll-margin-top: 20px; 
-    transition: background 0.5s ease; 
-}
-.bg-warning-light { 
-    background-color: #fff3cd !important; 
-    border-left: 5px solid #fcc419 !important; 
-}
-
-
-/* =========================================
-   2. CỘT PHẢI: CHIỀU CAO TỰ NHIÊN (QUYẾT ĐỊNH ĐỘ DÀI TRANG)
-   ========================================= */
-.sticky-sidebar, .sticky-sidebar .card {
-    height: auto; /* Tự động giãn theo 200 ô vuông, không giới hạn */
+.results-container {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 12px 28px;
+    gap: 12px;
 }
 
-#answer-scroll-area {
-    height: auto; /* Không cuộn nội bộ nữa, để 200 ô bung tự do */
+/* ---- stat row ---- */
+.stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    flex-shrink: 0;
 }
 
-.part-header {
-    font-size: 0.95rem; font-weight: 700; margin: 15px 0 10px 0;
-    padding-bottom: 5px; border-bottom: 1px solid #edf2f7; color: #2d3748;
+/* ---- main split layout ---- */
+.split-layout {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+}
+.split-left  { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.split-right { width: 360px; flex-shrink: 0; display: flex; flex-direction: column; }
+
+/* fill parent height */
+.h-100-flex { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+/* left review area scrolls internally */
+.review-scroll-area { flex: 1; overflow-y: auto; min-height: 0; }
+.review-scroll-area::-webkit-scrollbar { width: 4px; }
+.review-scroll-area::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+/* ---- stat cards (Premium Redesign) ---- */
+.stat-card {
+    border-radius: 16px;
+    border: none;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    text-align: left;
 }
 
+.stat-content { z-index: 2; }
+.stat-label {
+    font-size: 0.7rem; font-weight: 800;
+    letter-spacing: 1px; text-transform: uppercase;
+    display: block; margin-bottom: 6px;
+    color: #64748b;
+}
+.stat-value { font-size: 2.2rem; font-weight: 800; line-height: 1; display: block; color: #0f172a; }
+.stat-sub   { font-size: 1rem; font-weight: 600; opacity: 0.4; }
 
-/* =========================================
-   3. Ô VUÔNG ĐÁP ÁN & MÀU SẮC TRẠNG THÁI
-   ========================================= */
+/* Huge Background Icon */
+.stat-bg-icon {
+    position: absolute;
+    right: -15px;
+    bottom: -15px;
+    font-size: 7rem;
+    line-height: 1;
+    z-index: 1;
+    opacity: 0.08;
+    transform: rotate(-15deg);
+}
+
+/* Card Themes */
+.stat-card.premium-gradient { 
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
+}
+.stat-card.premium-gradient .stat-label { color: rgba(255,255,255,0.7); }
+.stat-card.premium-gradient .stat-value { color: white; }
+.stat-card.premium-gradient .stat-sub { color: white; }
+.stat-card.premium-gradient .stat-bg-icon { color: white; opacity: 0.1; }
+
+.stat-card.soft-green { background: #f0fdf4; border: 1px solid #dcfce7; }
+.stat-card.soft-green .stat-bg-icon { color: #16a34a; }
+
+.stat-card.soft-blue { background: #eff6ff; border: 1px solid #dbeafe; }
+.stat-card.soft-blue .stat-bg-icon { color: #2563eb; }
+
+.stat-card.soft-orange { background: #fffbeb; border: 1px solid #fef3c7; }
+.stat-card.soft-orange .stat-bg-icon { color: #d97706; }
+
+/* ---- content cards ---- */
+.content-card {
+    background: white;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+.content-card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.content-card-title { font-size: 0.875rem; font-weight: 700; color: #05102b; margin: 0; }
+
+/* part heading in review list */
+.part-section-header {
+    padding: 10px 20px 9px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    color: #1e293b;
+    background: white;
+    border-bottom: 1px solid #f1f5f9;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* ---- filter toggle ---- */
+.filter-toggle {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+}
+.ft-btn {
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.78rem; font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.ft-btn.active {
+    background: white;
+    color: #05102b;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.ft-btn.ft-wrong.active { background: #ef4444; color: white; }
+
+/* ---- question item (left column) ---- */
+.question-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f8fafc;
+    transition: background 0.25s ease;
+    scroll-margin-top: 20px;
+}
+.question-item:last-child { border-bottom: none; }
+.highlight-flash { background: #fffbeb !important; }
+
+.q-num-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.75rem; font-weight: 700;
+    border-radius: 20px; padding: 2px 10px;
+}
+.q-num-badge.correct { background: #f0fdf4; color: #15803d; }
+.q-num-badge.wrong   { background: #fef2f2; color: #dc2626; }
+
+.q-part-label { font-size: 0.68rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.q-content {
+    background: #f8fafc;
+    border-left: 3px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.85rem; color: #334155;
+    margin: 10px 0;
+}
+.q-content.wrong   { border-left-color: #fca5a5; background: #fff5f5; }
+.q-content.correct { border-left-color: #86efac; }
+
+/* ---- options list UI ---- */
+.options-list { margin-top: 14px; padding-left: 8px; }
+.ans-text {
+    font-size: 0.95rem;
+    color: #334155;
+    line-height: 1.5;
+}
+.ans-text.text-success { color: #16a34a !important; }
+.ans-text.text-danger { color: #ef4444 !important; }
+
+/* ---- right sidebar (fixed, no sticky needed) ---- */
+.sidebar-wrapper { display: flex; flex-direction: column; height: 100%; }
+.sidebar-grid-area {
+    flex: 1 1 0;
+    overflow-y: auto;
+    min-height: 0;
+    padding: 10px 14px 4px;
+}
+.sidebar-grid-area::-webkit-scrollbar { width: 3px; }
+.sidebar-grid-area::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+.sidebar-footer {
+    flex-shrink: 0;
+    padding: 10px 14px 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* ---- part label in sidebar ---- */
+.part-label {
+    font-size: 0.6rem; font-weight: 700; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.7px;
+    margin: 10px 0 4px;
+}
+.part-label:first-child { margin-top: 0; }
+
+/* ---- answer grid boxes ---- */
 .question-box {
-    width: 35px; height: 35px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 6px; margin: 4px; font-weight: bold; font-size: 12px;
-    cursor: pointer; border: 1px solid #dee2e6; transition: all 0.2s ease;
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.12s ease;
+    margin: 2px;
 }
-.question-box:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 5; }
-.correct { background-color: #2ecc71 !important; color: white !important; border: none; }
-.wrong { background-color: #e74c3c !important; color: white !important; border: none; }
-.unanswered { background-color: #f8f9fa !important; color: #adb5bd !important; border: 1px solid #dee2e6 !important; }
-.unanswered:hover { background-color: #e9ecef !important; color: #495057 !important; }
+.question-box:hover { transform: scale(1.2); }
+.question-box.correct   { background: #dcfce7; color: #15803d; }
+.question-box.wrong     { background: #fee2e2; color: #dc2626; }
+.question-box.unanswered { background: #f1f5f9; color: #94a3b8; }
 
+/* ---- legend ---- */
+.legend-row { display: flex; justify-content: center; gap: 14px; padding: 8px 0; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; color: #475569; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.legend-dot.correct   { background: #dcfce7; border: 1.5px solid #86efac; }
+.legend-dot.wrong     { background: #fee2e2; border: 1.5px solid #fca5a5; }
+.legend-dot.unanswered { background: #f1f5f9; border: 1.5px solid #cbd5e1; }
 
-/* =========================================
-   4. NÚT BẤM (FILTER)
-   ========================================= */
-.btn-group .btn { transition: all 0.3s ease; font-weight: 600; }
-.btn-group .btn.active { pointer-events: none; }
+/* ---- action buttons ---- */
+.btn-retake {
+    display: block; text-align: center; text-decoration: none;
+    background: #f1f5f9; color: #05102b; border: none;
+    border-radius: 10px; padding: 9px 0;
+    font-weight: 700; font-size: 0.82rem;
+    transition: background 0.2s;
+    width: 100%;
+}
+.btn-retake:hover { background: #e2e8f0; }
+.btn-home {
+    display: block; text-align: center; text-decoration: none;
+    background: #05102b; color: white; border: none;
+    border-radius: 10px; padding: 9px 0;
+    font-weight: 700; font-size: 0.82rem;
+    transition: background 0.2s;
+    width: 100%;
+}
+.btn-home:hover { background: #0e2050; color: white; }

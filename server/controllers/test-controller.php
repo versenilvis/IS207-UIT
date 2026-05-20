@@ -70,15 +70,19 @@ function getTestList() {
             $paid_map = array_flip($paid_map);
         }
 
+        // gói subscription (pro, ultra...) unlock hết đề premium
+        // course-only không được, chỉ dùng cho khoá học
+        $sub_plans    = ['pro', 'pro_year', 'ultra', 'ultra_year'];
+        $has_sub_plan = isset($_SESSION['is_premium']) && $_SESSION['is_premium']
+            && in_array($_SESSION['premium_plan'] ?? '', $sub_plans);
+
         $formatted_tests = [];
         foreach ($tests as $test) {
-            $test_id = (int)$test['id'];
+            $test_id    = (int)$test['id'];
             $is_premium = (bool)$test['is_premium'];
-            
-            // hiện unlock full nếu là admin
-            // hiện unlock một vài đề free nếu là đề free
-            // hiện unlock cho các đề đã mua nếu là đề premium nhưng user đã mua (có trong paid_map)
-            $is_unlocked = ($role === 'admin') || !$is_premium || isset($paid_map[$test_id]);
+
+            // unlock nếu: admin | đề free | có gói sub | đã mua lẻ
+            $is_unlocked = ($role === 'admin') || !$is_premium || $has_sub_plan || isset($paid_map[$test_id]);
 
             $formatted_tests[] = [
                 //Sửa id thành uuid

@@ -5,13 +5,21 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Form Nhập Câu Hỏi TOEIC</title>
+<<<<<<< HEAD
+=======
+	<?php include('./components/metadata.php'); ?>
+>>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 	<link href="../styles/questionsStyle.css" rel="stylesheet">
 </head>
 
 <body>
+<<<<<<< HEAD
 	<?php include('./components/metadata.php'); ?>
 	<?php include('./components/navBar.php'); ?>
 	<?php include('./components/header.php'); ?>
+=======
+	<?php include('./components/navbar.php'); ?>
+>>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 
 	<div class="container-wrapper">
 		<!-- Test Creation Form -->

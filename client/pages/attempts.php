@@ -14,8 +14,8 @@
             <h2 class="fw-bold">Lịch sử làm bài chi tiết</h2>
             <p class="text-muted">Danh sách tất cả các bộ đề bạn đã hoàn thành</p>
         </div>
-        <a href="dashboard.php" class="btn btn-outline-primary">
-            <i class="fa-solid fa-house me-1"></i> Về Dashboard
+        <a href="user.php" class="btn btn-outline-primary">
+            <i class="fa-solid fa-house me-1"></i> Về trang hồ sơ
         </a>
     </div>
 

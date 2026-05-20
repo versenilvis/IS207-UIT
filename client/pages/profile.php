@@ -1,10 +1,10 @@
 <?php
-//Tránh việc người dùng gõ địa chỉ vào URL nhưng chưa đăng nhập
+// tránh việc người dùng gõ địa chỉ vào url nhưng chưa đăng nhập
 require_once '../../server/middleware/auth.php';
 require_once '../../server/controllers/profile-controller.php';
 homeRedirect();
 
-//Hiển thị tên và gmail
+// hiển thị tên và email
 $firstName = $_SESSION['first_name'] ?? 'Người';
 $lastName = $_SESSION['last_name'] ?? 'dùng';
 $email = $_SESSION['email'] ?? 'user@email.com';
@@ -15,53 +15,51 @@ $getInitial = function ($value) {
 };
 $initials = strtoupper($getInitial($firstName) . $getInitial($lastName));
 
-//Thong báo nếu đã đổi tên thành công
+// kiểm tra trạng thái thành viên premium
+$isPremium = $_SESSION['is_premium'] ?? false;
+$premiumName = $_SESSION['premium_name'] ?? 'Premium';
+
+// thông báo đổi tên thành công
 $changeNameResult = $_SESSION['changeNameResult'] ?? null;
 unset($_SESSION['changeNameResult']);
 
-//Thong báo nếu đã đổi mật khẩu thành công
+// thông báo đổi mật khẩu thành công
 $changePassResult = $_SESSION['changePassResult'] ?? null;
 $changePassType = $_SESSION['changePassType'] ?? 'success';
 $isChangePassError = $changePassType === 'error' || $changePassResult === "Hãy kiểm tra xem bạn đã nhập đúng mật khẩu hay chưa.";
 unset($_SESSION['changePassResult']);
 unset($_SESSION['changePassType']);
 
-//Thông báo xem là đã nhập đúng mật khẩu để xóa tài khoản hay chưa
+// thông báo kiểm tra mật khẩu để xóa tài khoản
 $deletePasswordResult = $_SESSION['password_confirmation_result'] ?? null;
 unset($_SESSION['password_confirmation_result']);
 
-//Điểm cao nhất, điểm tb và tổng số bài đã làm
+// lấy điểm cao nhất, điểm trung bình và số đề đã làm
 $maxScore = getMaxScore();
 $avgScore = getAvgScore();
 $total_number_of_tests = getNumTestDone();
-
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hồ sơ tài khoản</title>
-
+    <title>Hồ sơ cá nhân - Prephub</title>
     <?php include './components/metadata.php'; ?>
-
     <link rel="stylesheet" href="../styles/profile.css">
 </head>
 
 <body>
-    <!-- GIỮ NGUYÊN NAVBAR -->
-    <?php include './components/navBar.php'; ?>
+	<?php $navbarMode = 'light'; include './components/navbar.php'; ?>
 
     <div class="page">
-        <!-- Thông báo nếu chuyển tên đã thành công hay chưa -->
+        <!-- thông báo flash từ hệ thống -->
         <?php if ($changeNameResult): ?>
             <div class="success-message">
                 <?= htmlspecialchars($changeNameResult) ?>
             </div>
         <?php endif; ?>
-        <!-- Thông báo nếu đổi mật khẩu đã thành công hay chưa -->
         <?php if ($changePassResult): ?>
             <div class="success-message <?= $isChangePassError ? 'error-message' : '' ?>">
                 <?= htmlspecialchars($changePassResult) ?>
@@ -73,55 +71,53 @@ $total_number_of_tests = getNumTestDone();
             </div>
         <?php endif; ?>
 
-        <!-- Tiêu đề của trang -->
+        <!-- phần tiêu đề hero trang hồ sơ -->
         <div class="profile-hero">
             <div class="hero-left">
                 <div class="hero-eyebrow">Tài khoản cá nhân</div>
                 <h1>Hồ sơ của tôi</h1>
-                <p>Quản lý thông tin tài khoản, bảo mật và trạng thái thành viên của bạn.</p>
+                <p>Quản lý thông tin tài khoản cá nhân, cài đặt bảo mật và cập nhật trạng thái thành viên của bạn</p>
 
                 <div class="hero-actions">
                     <a href="tests.php" class="hero-btn primary-btn">
                         <i class="fas fa-play"></i>
                         Làm bài ngay
                     </a>
-
-                    <a href="premium.php" class="hero-btn secondary-btn">
-                        <i class="fas fa-crown"></i>
-                        Nâng cấp Premium
-                    </a>
+                    <?php if ($isPremium): ?>
+                        <a href="billing.php" class="hero-btn secondary-btn">
+                            <i class="fas fa-receipt"></i>
+                            Quản lý hóa đơn
+                        </a>
+                    <?php else: ?>
+                        <a href="pricing.php" class="hero-btn secondary-btn">
+                            <i class="fas fa-crown"></i>
+                            Nâng cấp Premium
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
 
             <div class="hero-right">
                 <div class="hero-stat">
-                     <!-- Hiển thị tổng số bài đã làm -->
                     <div class="hero-stat-val"><?= $total_number_of_tests ?></div>
                     <div class="hero-stat-label">Bài đã làm</div>
                 </div>
-
                 <div class="hero-stat">
-                     <!-- Hiển thị điểm cao nhất -->
                     <div class="hero-stat-val"><?= $maxScore ?></div>
                     <div class="hero-stat-label">Điểm cao nhất</div>
                 </div>
-
-                
             </div>
         </div>
 
-        <!-- Phần ND -->
+        <!-- bố cục hai cột hồ sơ -->
         <div class="profile-layout">
-
-            <!-- Cột trái -->
+            <!-- cột trái hiển thị thông tin tóm tắt -->
             <aside class="left-col">
-
                 <div class="profile-card user-card">
                     <div class="avatar-wrap">
                         <div class="avatar-circle">
                             <?= htmlspecialchars($initials) ?>
                         </div>
-
                         <button class="avatar-edit" type="button" aria-label="Chỉnh sửa ảnh đại diện">
                             <i class="fas fa-pen"></i>
                         </button>
@@ -130,10 +126,17 @@ $total_number_of_tests = getNumTestDone();
                     <div class="user-name"><?= htmlspecialchars($fullName) ?></div>
                     <div class="user-email"><?= htmlspecialchars($email) ?></div>
 
-                    <div class="plan-pill">
-                        <i class="fas fa-bolt"></i>
-                        Gói miễn phí
-                    </div>
+                    <?php if ($isPremium): ?>
+                        <div class="plan-pill" style="background:#e1f5ee; border-color:#d3f9d8; color:#1d9e75;">
+                            <i class="fas fa-crown"></i>
+                            <?= htmlspecialchars($premiumName) ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="plan-pill">
+                            <i class="fas fa-bolt"></i>
+                            Tài khoản miễn phí
+                        </div>
+                    <?php endif; ?>
 
                     <div class="user-divider"></div>
 
@@ -143,7 +146,6 @@ $total_number_of_tests = getNumTestDone();
                                 <i class="fas fa-file-alt"></i>
                             </div>
                             <div>
-                                 <!-- Hiển thị tổng số bài đã làm -->
                                 <div class="quick-val"><?= $total_number_of_tests ?></div>
                                 <div class="quick-label">Bài đã làm</div>
                             </div>
@@ -154,47 +156,26 @@ $total_number_of_tests = getNumTestDone();
                                 <i class="fas fa-chart-line"></i>
                             </div>
                             <div>
-                                 <!-- Hiển thị điểm tb -->
                                 <div class="quick-val"><?= $avgScore ?></div>
-                                <div class="quick-label">Điểm TB</div>
+                                <div class="quick-label">Điểm trung bình</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="profile-card premium-card">
-                    <div class="premium-icon">
-                        <i class="fas fa-crown"></i>
-                    </div>
-
-                    <div>
-                        <h3>Mở khóa đề Premium</h3>
-                        <p>Truy cập thêm nhiều bộ đề TOEIC chất lượng cao và theo dõi tiến độ chi tiết hơn.</p>
-                    </div>
-
-                    <a href="premium.php" class="premium-link">
-                        Xem gói Premium
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
             </aside>
 
-            <!-- Cột phải -->
+            <!-- cột phải hiển thị các form cài đặt chính -->
             <section class="right-col">
-
-                <!-- INFO ng dùng -->
-
+                <!-- form chỉnh sửa thông tin cá nhân -->
                 <form class="profile-card section-card" method="POST" action="../../server/controllers/profile-controller.php">
                     <div class="section-head">
                         <div class="section-title-wrap">
                             <div class="section-icon">
                                 <i class="fas fa-user"></i>
                             </div>
-
                             <div>
                                 <h2>Thông tin cá nhân</h2>
-                                <p>Cập nhật thông tin cơ bản dùng cho tài khoản của bạn.</p>
+                                <p>Cập nhật thông tin cơ bản được hiển thị trên tài khoản của bạn</p>
                             </div>
                         </div>
                     </div>
@@ -211,36 +192,34 @@ $total_number_of_tests = getNumTestDone();
                         </div>
 
                         <div class="form-group full">
-                            <label for="i-email">Email</label>
+                            <label for="i-email">Email đăng ký</label>
                             <input id="i-email" type="email" value="<?= htmlspecialchars($email) ?>" readonly>
                         </div>
                     </div>
                     <input type="hidden" name="changeName" value="changeUsername"> 
-                    <!-- nút cập nhật tên -->
                     <div class="card-actions">
                         <button class="save-btn" type="submit">
                             <i class="fas fa-floppy-disk"></i>
-                            Cập nhật tên
+                            Cập nhật thông tin
                         </button>
                     </div>
                 </form>
 
-                <!-- PASSWORD -->
+                <!-- form đổi mật khẩu bảo mật -->
                 <form class="profile-card section-card" method="POST" action="../../server/controllers/profile-controller.php">
                     <div class="section-head">
                         <div class="section-title-wrap">
                             <div class="section-icon">
                                 <i class="fas fa-lock"></i>
                             </div>
-
                             <div>
-                                <h2>Đổi mật khẩu</h2>
-                                <p>Sử dụng mật khẩu mạnh để bảo vệ tài khoản luyện thi.</p>
+                                <h2>Cài đặt bảo mật</h2>
+                                <p>Đổi mật khẩu định kỳ để nâng cao tính an toàn cho tài khoản</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-grid password-grid">
+                    <div class="form-grid">
                         <div class="form-group full">
                             <label for="current-password">Mật khẩu hiện tại</label>
                             <div class="password-box">
@@ -264,7 +243,7 @@ $total_number_of_tests = getNumTestDone();
                         <div class="form-group">
                             <label for="confirm-password">Xác nhận mật khẩu</label>
                             <div class="password-box">
-                                <input id="confirm-password" name="confirm_password" type="password" placeholder="Nhập lại mật khẩu">
+                                <input id="confirm-password" name="confirm_password" type="password" placeholder="Xác nhận lại mật khẩu">
                                 <button type="button" class="eye-toggle" aria-label="Hiển thị mật khẩu" onclick="togglePassword(this)">
                                     <img src="../img/eye_close.png" alt="" class="eye-icon">
                                 </button>
@@ -272,7 +251,6 @@ $total_number_of_tests = getNumTestDone();
                         </div>
                     </div>
                     <input type="hidden" name="changePassword" value="changePassword">
-                    <!--Nút đặt lại mật khaauir-->
                     <div class="card-actions">
                         <button class="save-btn" type="submit">
                             <i class="fas fa-shield-halved"></i>
@@ -280,49 +258,44 @@ $total_number_of_tests = getNumTestDone();
                         </button>
                     </div>
                 </form>
-                <!-- CONNECT gg -->
+
+                <!-- khối tài khoản liên kết mạng xã hội -->
                 <div class="profile-card connected-card">
                     <div class="connected-left">
                         <div class="connected-icon google-icon">
                             <i class="fab fa-google"></i>
                         </div>
-
                         <div class="connected-text">
-                            <h2>Tài khoản kết nối</h2>
-                            <p>Chưa liên kết với Google</p>
+                            <h2>Tài khoản liên kết</h2>
+                            <p>Đăng nhập nhanh chóng và bảo mật thông qua tài khoản Google</p>
                         </div>
                     </div>
-
                     <a href="#" class="connect-google-btn">
-                        Kết nối
+                        Liên kết ngay
                     </a>
                 </div>
-                <!-- NÚT xóa tài khoản -->
+
+                <!-- khối khu vực nguy hiểm quản lý tài khoản -->
                 <div class="profile-card danger-card">
                     <div class="danger-left">
                         <div class="danger-icon">
                             <i class="fas fa-triangle-exclamation"></i>
                         </div>
-
                         <div>
-                            <h2>Khu vực nguy hiểm</h2>
-                            <p>Xóa tài khoản sẽ xóa toàn bộ dữ liệu luyện thi và không thể hoàn tác.</p>
+                            <h2>Xóa tài khoản vĩnh viễn</h2>
+                            <p>Hành động này sẽ xóa toàn bộ dữ liệu luyện thi và kết quả làm bài của bạn</p>
                         </div>
                     </div>
-
                     <button class="danger-btn" id="open-delete-popup" type="button">
                         <i class="fas fa-trash-can"></i>
-                        <!-- NÚT xóa tài khoản 1 -->
                         Xóa tài khoản
                     </button>
                 </div>
-
             </section>
-
         </div>
-
     </div>
 
+    <!-- modal popup xác nhận xóa tài khoản -->
     <div class="delete-popup-overlay" id="delete-popup">
         <div class="delete-popup" role="dialog" aria-modal="true" aria-labelledby="delete-popup-title">
             <button class="delete-popup-close" id="close-delete-popup" type="button" aria-label="Đóng">
@@ -332,16 +305,14 @@ $total_number_of_tests = getNumTestDone();
             <div class="delete-popup-icon">
                 <i class="fas fa-triangle-exclamation"></i>
             </div>
-            <!--Cửa sổ pop up nếu bấm nút xóa tài khoản-->
-            <h2 id="delete-popup-title">Bạn có chắc chắn chưa?</h2>
-            <p>Tài khoản và dữ liệu luyện thi của bạn sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.</p>
+            <h2 id="delete-popup-title">Bạn chắc chắn muốn xóa?</h2>
+            <p>Hành động này không thể hoàn tác. Toàn bộ lịch sử làm bài và điểm số sẽ biến mất vĩnh viễn</p>
 
             <form method="POST" action="../../server/controllers/profile-controller.php">
                 <div class="delete-password-field">
-                    <label for="delete-account-password">Nhập mật khẩu để xác nhận</label>
+                    <label for="delete-account-password">Nhập mật khẩu của bạn để xác nhận</label>
                     <div class="password-box">
-                <!--Nút nhập lại mật khẩu để xác nhận là có cho xóa hay không-->
-                        <input id="delete-account-password" name="password_confirmation_delete" type="password" placeholder="Nhập lại mật khẩu">
+                        <input id="delete-account-password" name="password_confirmation_delete" type="password" placeholder="Mật khẩu tài khoản">
                         <button type="button" class="eye-toggle" aria-label="Hiển thị mật khẩu" onclick="togglePassword(this)">
                             <img src="../img/eye_close.png" alt="" class="eye-icon">
                         </button>
@@ -349,10 +320,9 @@ $total_number_of_tests = getNumTestDone();
                 </div>
 
                 <div class="delete-popup-actions">
-                    <button class="delete-cancel-btn" id="cancel-delete-popup" type="button">Hủy</button>
-                    <!-- NÚT xóa tài khoản 2 -->
+                    <button class="delete-cancel-btn" id="cancel-delete-popup" type="button">Hủy bỏ</button>
                     <input type="hidden" name="deleteAccount" value="deleteAccount">
-                    <button class="delete-confirm-btn" type="submit">Xóa tài khoản</button>
+                    <button class="delete-confirm-btn" type="submit">Xác nhận xóa</button>
                 </div>
             </form>
         </div>

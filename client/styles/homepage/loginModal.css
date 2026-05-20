@@ -342,6 +342,7 @@
   opacity: 0.7;
 }
 
+<<<<<<< HEAD
 .btn-close-auth {
   position: absolute;
   top: 20px;
@@ -367,6 +368,8 @@
   color: #0f172a;
 }
 
+=======
+>>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 .testimonial-stack {
   display: flex;
   flex-direction: column;

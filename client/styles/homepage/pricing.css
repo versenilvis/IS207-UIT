@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .pricing-section {
   background-color: var(--primary);
   color: white;
@@ -208,3 +209,8 @@
   color: #94a3b8;
   opacity: 0.7;
 }
+=======
+/* pricing section styles đã được chuyển sang dùng
+   client/styles/pricing.css trực tiếp trong component.
+   File này được giữ để tránh lỗi @import trong main.css */
+>>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8

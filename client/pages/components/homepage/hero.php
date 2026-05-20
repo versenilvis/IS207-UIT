@@ -16,7 +16,11 @@
 							<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" alt="user">
 							<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Midnight" alt="user">
 						</div>
+<<<<<<< HEAD
 						<span class="trust-text">1000+ thí sinh tin dùng...</span>
+=======
+						<span class="trust-text">15000+ thí sinh tin dùng...</span>
+>>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 					</div>
 				</div>
 			</div>
@@ -54,4 +58,8 @@
 		</div>
 	</section>
 
+<<<<<<< HEAD
 </div><!-- end hero-banner-wrapper -->
+=======
+</div><!-- end hero-banner-wrapper -->
+>>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
