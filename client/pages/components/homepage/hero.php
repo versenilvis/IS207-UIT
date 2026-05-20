@@ -53,8 +53,4 @@
 		</div>
 	</section>
 
-<<<<<<< HEAD
 </div><!-- end hero-banner-wrapper -->
-=======
-</div><!-- end hero-banner-wrapper -->
->>>>>>> 404a8ab9cf94f9753e090ad4fe9eee6b1323c4fe

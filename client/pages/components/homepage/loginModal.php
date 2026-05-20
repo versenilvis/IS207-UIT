@@ -161,12 +161,9 @@
                             </div>
                         </div>
                     </div>
-<<<<<<< HEAD
                     <button type="button" class="btn-close-auth" data-bs-dismiss="modal">
                         <i class='bx bx-x'></i>
                     </button>
-=======
->>>>>>> 404a8ab9cf94f9753e090ad4fe9eee6b1323c4fe
                 </div>
             </div>
         </div>

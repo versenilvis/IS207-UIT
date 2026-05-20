@@ -116,8 +116,4 @@
 			if (e.target.tagName === 'A') { e.preventDefault(); loadTests(); }
 		});
 	})();
-<<<<<<< HEAD
 </script>
-=======
-</script>
->>>>>>> 404a8ab9cf94f9753e090ad4fe9eee6b1323c4fe

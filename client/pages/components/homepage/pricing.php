@@ -266,8 +266,4 @@ $svgTick = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="
 
 		</div><!-- /.pricing-container -->
 	</div><!-- /.hp-inner -->
-<<<<<<< HEAD
 </section>
-=======
-</section>
->>>>>>> 404a8ab9cf94f9753e090ad4fe9eee6b1323c4fe
