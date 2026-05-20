@@ -1,9 +1,4 @@
-.navbar {
-<<<<<<< HEAD
-  background-color: transparent !important;
-  transition: all 0.3s ease;
-  padding: 24px 0;
-=======
+﻿.navbar {
   --nav-text: white;
   --nav-indicator: white;
   --nav-logo: white;
@@ -21,20 +16,12 @@
   background-color: transparent !important;
   transition: all 0.3s ease;
   padding: 16px 0;
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   position: fixed;
   width: 100%;
   top: 0;
   z-index: 1000;
 }
 
-<<<<<<< HEAD
-.navbar.scrolled {
-  background-color: rgba(250, 250, 250, 0.98) !important;
-  backdrop-filter: blur(12px);
-  padding: 12px 0;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
-=======
 .navbar[data-navbar-bg="light"] {
   --nav-text: #05102b;
   --nav-indicator: #05102b;
@@ -56,7 +43,6 @@
   backdrop-filter: var(--scrolled-blur);
   padding: 8px 0;
   box-shadow: var(--scrolled-shadow);
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 }
 
 .navbar .container-fluid {
@@ -75,11 +61,7 @@
 }
 
 .navbar-brand svg {
-<<<<<<< HEAD
-  height: 2rem;
-=======
   height: 1.5rem;
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   width: auto;
 }
 
@@ -105,20 +87,12 @@
 }
 
 .navbar-brand svg path {
-<<<<<<< HEAD
-  fill: white;
-=======
   fill: var(--nav-logo);
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   transition: fill 0.3s ease;
 }
 
 .navbar.scrolled .navbar-brand svg path {
-<<<<<<< HEAD
-  fill: var(--primary);
-=======
   fill: var(--scrolled-logo);
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 }
 
 .logo-container {
@@ -129,58 +103,31 @@
 
 .brand-text {
   font-weight: 700;
-<<<<<<< HEAD
-  font-size: clamp(1.4rem, 2vw, 1.8rem);
-  color: white;
-=======
   font-size: clamp(1.1rem, 1.5vw, 1.4rem);
   color: var(--nav-text);
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   letter-spacing: -0.4px;
   transition: color 0.3s ease;
 }
 
 .navbar.scrolled .brand-text {
-<<<<<<< HEAD
-  color: var(--primary);
-=======
   color: var(--scrolled-text);
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 }
 
 .brand-subtext {
   font-weight: 300;
-<<<<<<< HEAD
-  font-size: 0.75rem;
-  color: white;
-=======
   font-size: 0.6rem;
   color: var(--nav-text);
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   opacity: 0.8;
   transition: all 0.3s ease;
   margin-top: 4px;
 }
 
 .navbar.scrolled .brand-subtext {
-<<<<<<< HEAD
-  color: var(--primary);
-=======
   color: var(--scrolled-text);
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   opacity: 0.7;
 }
 
 .nav-link {
-<<<<<<< HEAD
-  color: white !important;
-  opacity: 0.65;
-  font-weight: 500;
-  font-size: 0.95rem;
-  position: relative;
-  transition: all 0.3s ease;
-  padding: 8px 16px !important;
-=======
   color: var(--nav-text) !important;
   opacity: 0.65;
   font-weight: 500;
@@ -188,7 +135,6 @@
   position: relative;
   transition: all 0.3s ease;
   padding: 6px 12px !important;
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 }
 
 .nav-link:hover,
@@ -197,11 +143,7 @@
 }
 
 .navbar.scrolled .nav-link {
-<<<<<<< HEAD
-  color: var(--primary) !important;
-=======
   color: var(--scrolled-text) !important;
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   opacity: 0.65;
 }
 
@@ -214,11 +156,7 @@
   position: absolute;
   bottom: 0;
   height: 2px;
-<<<<<<< HEAD
-  background-color: white;
-=======
   background-color: var(--nav-indicator);
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 2px;
   pointer-events: none;
@@ -226,18 +164,6 @@
 }
 
 .navbar.scrolled .nav-indicator {
-<<<<<<< HEAD
-  background-color: var(--primary);
-}
-
-.btn-login {
-  background-color: var(--white) !important;
-  color: var(--primary) !important;
-  border-radius: 8px !important;
-  padding: 10px 24px !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-=======
   background-color: var(--scrolled-indicator);
 }
 
@@ -248,7 +174,6 @@
   padding: 8px 18px !important;
   font-weight: 600 !important;
   font-size: 0.8rem !important;
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   transition: all 0.3s ease;
   opacity: 1 !important;
   text-decoration: none;
@@ -256,13 +181,8 @@
 }
 
 .navbar.scrolled .btn-login {
-<<<<<<< HEAD
-  background-color: var(--primary) !important;
-  color: white !important;
-=======
   background-color: var(--scrolled-btn-bg) !important;
   color: var(--scrolled-btn-text) !important;
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 }
 
 .btn-login:hover {
@@ -270,18 +190,10 @@
 }
 
 .user-avatar {
-<<<<<<< HEAD
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--primary);
-=======
   width: 32px;
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
   border: none;
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
   cursor: pointer;
 }

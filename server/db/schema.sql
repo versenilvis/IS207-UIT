@@ -1,4 +1,4 @@
--- mysql 8.0
+﻿-- mysql 8.0
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -13,13 +13,10 @@ CREATE TABLE IF NOT EXISTS `users` (
     `avatar` VARCHAR(255) DEFAULT NULL,
     `role` ENUM('user', 'admin') DEFAULT 'user',
     `is_banned` TINYINT(1) DEFAULT 0,
-<<<<<<< HEAD
-=======
     `is_premium` TINYINT(1) DEFAULT 0,
     `has_course` TINYINT(1) DEFAULT 0,
     `premium_plan` VARCHAR(50) DEFAULT NULL,
     `premium_until` DATETIME DEFAULT NULL,
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX `idx_uuid` (`uuid`),
@@ -126,8 +123,6 @@ CREATE TABLE IF NOT EXISTS `payments` (
 	INDEX `idx_test` (`test_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-<<<<<<< HEAD
-=======
 CREATE TABLE IF NOT EXISTS `transaction_history` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `tx_id` VARCHAR(20) UNIQUE NOT NULL,
@@ -142,5 +137,4 @@ CREATE TABLE IF NOT EXISTS `transaction_history` (
     INDEX `idx_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
 SET FOREIGN_KEY_CHECKS = 1;

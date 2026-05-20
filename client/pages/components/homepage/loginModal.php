@@ -10,10 +10,6 @@
                             <div class="auth-header">
                                 <h1>Chào mừng</h1>
                                 <p>Đăng nhập để tiếp tục lộ trình học TOEIC của bạn</p>
-<<<<<<< HEAD
-                                <?= showSuccess($errors['success']); ?>
-                                <?= showError($errors['login']); ?>
-=======
                                 <?php 
                                 if (function_exists('showSuccess')) {
                                     echo showSuccess($errors['success'] ?? ''); 
@@ -22,7 +18,6 @@
                                     echo showError($errors['login'] ?? ''); 
                                 }
                                 ?>
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
                             </div>
                             
                             <form id="loginForm" class="auth-form" action="/api/auth/login" method="POST">
@@ -81,15 +76,11 @@
                             <div class="auth-header">
                                 <h1>Tạo tài khoản mới</h1>
                                 <p>Bắt đầu hành trình chinh phục TOEIC cùng PrepHub</p>
-<<<<<<< HEAD
-                                <?= showError($errors['register']); ?>
-=======
                                 <?php 
                                 if (function_exists('showError')) {
                                     echo showError($errors['register'] ?? ''); 
                                 }
                                 ?>
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
                             </div>
                             
                             <form id="signupForm" class="auth-form" action="/api/auth/register" method="POST">
@@ -170,20 +161,14 @@
                             </div>
                         </div>
                     </div>
-<<<<<<< HEAD
-
                     <button type="button" class="btn-close-auth" data-bs-dismiss="modal">
                         <i class='bx bx-x'></i>
                     </button>
-=======
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
                 </div>
             </div>
         </div>
     </div>
 </div>
-<<<<<<< HEAD
-=======
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -239,4 +224,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
->>>>>>> 6883b1c77eff62933e9c743ae90c545facc14fe8
