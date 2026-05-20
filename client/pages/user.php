@@ -215,7 +215,7 @@ $initials = strtoupper(($firstInitial($lastName) ?: 'H') . ($firstInitial($first
     </main>
     <!-- INCLUDE FOOTER FILE -->
     <?php include './components/footer.php'; ?>
-    <script src="../js/dashboard.js"></script>
+    <script src="../js/user.js"></script>
 </body>
 
 </html>
