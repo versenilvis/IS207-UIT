@@ -215,6 +215,7 @@ $initials = strtoupper(($firstInitial($lastName) ?: 'H') . ($firstInitial($first
     </main>
     <!-- INCLUDE FOOTER FILE -->
     <?php include './components/footer.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/user.js"></script>
 </body>
 

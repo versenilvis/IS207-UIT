@@ -11,6 +11,10 @@ require_once __DIR__ . '/../utils/response.php';
 // Lấy 5 đề thi gần đây nhất để hiển thị ở trang dashboard.php
 function getPastTests(int $limit){
     global $conn;
+    if (empty($_SESSION['user_id'])) {
+        return [];
+    }
+
     try{
         $sql = "SELECT t.title, a.listening_score, a.reading_score, a.total_score, a.time_spent, a.created_at, a.uuid
                 FROM tests t
