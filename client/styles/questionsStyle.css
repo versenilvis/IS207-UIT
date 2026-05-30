@@ -3,7 +3,16 @@
     font-family: Arial, sans-serif;
     padding: 20px;
     background: #f4f7f6;
-    margin: 0;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --card-bg: #fff;
+    --text-main: #1f2937;
+    --border-color: #d1d5db;
+    --danger-color: #ef4444;
 }
 
 .header-actions {
@@ -371,23 +380,8 @@ textarea.form-control {
     color: #0c5460;
 }
 
-.container-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
 .container-wrapper .bx {
     font-size: 1.5rem;
-}
-
-.container-wrapper {
-	--primary-color: #4f46e5;
-	--primary-hover: #4338ca;
-	--card-bg: #fff;
-	--text-main: #1f2937;
-	--border-color: #d1d5db;
-	--danger-color: #ef4444;
 }
 
 /* form section styling */
