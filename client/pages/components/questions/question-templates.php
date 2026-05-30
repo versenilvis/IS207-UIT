@@ -37,7 +37,7 @@
 			<div class="option-item"><input type="radio" class="correct-radio" value="A"><span>A.</span><input type="text" class="form-control option-content" placeholder="Đáp án A" required></div>
 			<div class="option-item"><input type="radio" class="correct-radio" value="B"><span>B.</span><input type="text" class="form-control option-content" placeholder="Đáp án B" required></div>
 			<div class="option-item"><input type="radio" class="correct-radio" value="C"><span>C.</span><input type="text" class="form-control option-content" placeholder="Đáp án C" required></div>
-			<div class="option-item"><input type="radio" class="correct-radio" value="D"><span>D.</span><input type="text" class="form-control option-content" placeholder="Đáp án D" required></div>
+			<div class="option-item option-item-d"><input type="radio" class="correct-radio" value="D"><span>D.</span><input type="text" class="form-control option-content" placeholder="Đáp án D"></div>
 			<small style="color: #666; display: block; margin-top: 8px;">Chọn đáp án đúng</small>
 		</div>
 
@@ -101,7 +101,7 @@
 			<div class="sub-option"><input type="radio" class="correct-radio" value="A" required><span>A.</span><input type="text" class="form-control option-content" placeholder="Đáp án A" required></div>
 			<div class="sub-option"><input type="radio" class="correct-radio" value="B" required><span>B.</span><input type="text" class="form-control option-content" placeholder="Đáp án B" required></div>
 			<div class="sub-option"><input type="radio" class="correct-radio" value="C" required><span>C.</span><input type="text" class="form-control option-content" placeholder="Đáp án C" required></div>
-			<div class="sub-option"><input type="radio" class="correct-radio" value="D" required><span>D.</span><input type="text" class="form-control option-content" placeholder="Đáp án D" required></div>
+			<div class="sub-option sub-option-d"><input type="radio" class="correct-radio" value="D"><span>D.</span><input type="text" class="form-control option-content" placeholder="Đáp án D"></div>
 		</div>
 		<label style="font-weight: 600; display: block; margin-top: 15px; margin-bottom: 5px;">Giải thích (Tùy chọn)</label>
 		<textarea class="form-control explanation" placeholder="Giải thích đáp án..." rows="2"></textarea>

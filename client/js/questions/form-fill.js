@@ -5,7 +5,7 @@
 /**
  * Helper dùng chung để điền các trường cơ bản của 1 câu hỏi (Số câu, Nội dung, Đáp án, Giải thích)
  */
-function fillBaseQuestionUI(container, question) {
+function fillBaseQuestionUI(container, question, part = null) {
 	const setVal = (sel, val) => { const el = container.querySelector(sel); if(el) el.value = val || ''; };
 	
 	const qNumClass = container.classList.contains('sub-question-item') ? '.sub-question-number' : '.question-number';
@@ -14,8 +14,11 @@ function fillBaseQuestionUI(container, question) {
 	setVal('.explanation', (question.explanation && question.explanation !== 'null') ? question.explanation : '');
 
 	const optionInputs = container.querySelectorAll('.option-content');
-	if (question.options && question.options.length === 4) {
-		question.options.forEach((opt, idx) => { if (optionInputs[idx]) optionInputs[idx].value = opt.content || ''; });
+	// ✅ Cho phép cả 3 options (Part 2) và 4 options (Part khác)
+	if (question.options && (question.options.length === 3 || question.options.length === 4)) {
+		question.options.forEach((opt, idx) => { 
+			if (optionInputs[idx]) optionInputs[idx].value = opt.content || ''; 
+		});
 	}
 
 	container.querySelectorAll('.correct-radio').forEach(radio => {
@@ -29,7 +32,12 @@ function fillBaseQuestionUI(container, question) {
 function fillSingleQuestionData(question, block) {
 	if (!block) return;
 	
-	fillBaseQuestionUI(block, question);
+	// ✅ Get part từ partSelect hoặc data-part của block
+	const partSelect = document.getElementById('partSelect');
+	const part = partSelect ? partSelect.value : block.dataset.part;
+	if (part) block.dataset.part = part; // Set data-part nếu chưa có
+	
+	fillBaseQuestionUI(block, question, part);
 
 	const mediaSection = block.querySelector('.media-upload-section');
 	if (mediaSection) {
@@ -50,6 +58,11 @@ function fillSingleQuestionData(question, block) {
 
 function fillGroupQuestionData(passage, subQuestions, block) {
 	if (!block) return;
+
+	// ✅ Get part từ partSelect hoặc data-part của block
+	const partSelect = document.getElementById('partSelect');
+	const part = partSelect ? partSelect.value : block.dataset.part;
+	if (part) block.dataset.part = part; // Set data-part nếu chưa có
 
 	const passageInput = block.querySelector('.passage-content');
 	if (passageInput) passageInput.value = passage.content || '';
@@ -76,7 +89,7 @@ function fillGroupQuestionData(passage, subQuestions, block) {
 		if (subQuestions) {
 			subQuestions.forEach((subQ, idx) => {
 				const subDiv = createSubQuestionDOM(block.dataset.blockId, subQ.question_number || idx + 1);
-				fillBaseQuestionUI(subDiv, subQ);
+				fillBaseQuestionUI(subDiv, subQ, part);
 				subContainer.appendChild(subDiv);
 			});
 		}

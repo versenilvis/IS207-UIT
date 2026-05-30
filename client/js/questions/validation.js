@@ -41,6 +41,8 @@
 function validateAllBlocks(blocks, part) {
     let isValid = true;
     const seenQuestionNumbers = new Set();
+    const isPartTwo = part === '2';
+    const expectedOptionsCount = isPartTwo ? 3 : 4;
 
     const checkError = (condition, msg) => {
         if (condition) { showMessage(msg, 'error'); isValid = false; return true; }
@@ -62,8 +64,18 @@ function validateAllBlocks(blocks, part) {
 
             if (checkError(!block.querySelector('.question-content')?.value.trim(), `Câu #${blockIndex + 1}: Vui lòng nhập nội dung câu hỏi`)) return;
 
-            const options = block.querySelectorAll('.option-content');
-            options.forEach(opt => { checkError(!opt.value.trim(), `Câu #${blockIndex + 1}: Vui lòng nhập đầy đủ 4 đáp án`); });
+            // ✅ Kiểm tra số options (3 cho Part 2, 4 cho Part khác)
+            const options = block.querySelectorAll('.option-item:not(.option-item-d) .option-content, .option-item-d:not([style*="display: none"]) .option-content');
+            const optionInputs = block.querySelectorAll('.option-content');
+            let filledOptionsCount = 0;
+            optionInputs.forEach((opt, idx) => {
+                const isPartD = opt.closest('.option-item-d');
+                if (isPartTwo && isPartD) return; // Skip option D check khi Part 2
+                if (opt.value.trim()) filledOptionsCount++;
+                if (!isPartTwo || !isPartD) { // Yêu cầu required cho A, B, C
+                    checkError(!opt.value.trim(), `Câu #${blockIndex + 1}: Vui lòng nhập đầy đủ tất cả đáp án`);
+                }
+            });
             if (!isValid) return;
 
             if (checkError(!block.querySelector('.correct-radio:checked'), `Câu #${blockIndex + 1}: Vui lòng chọn đáp án đúng`)) return;
@@ -100,7 +112,18 @@ function validateAllBlocks(blocks, part) {
                 seenQuestionNumbers.add(qNum);
 
                 if (checkError(!subQ.querySelector('.question-content')?.value.trim(), `Cụm #${blockIndex + 1}, Câu #${subIndex + 1}: Thiếu nội dung`)) return;
-                subQ.querySelectorAll('.option-content').forEach(opt => { checkError(!opt.value.trim(), `Cụm #${blockIndex + 1}, Câu #${subIndex + 1}: Thiếu đáp án`); });
+                
+                // ✅ Kiểm tra options cho sub-question (3 cho Part 2, 4 cho Part khác)
+                const subOptInputs = subQ.querySelectorAll('.option-content');
+                subOptInputs.forEach((opt, idx) => {
+                    const isPartD = opt.closest('.sub-option-d');
+                    if (isPartTwo && isPartD) return; // Skip option D check khi Part 2
+                    if (!opt.value.trim()) {
+                        checkError(true, `Cụm #${blockIndex + 1}, Câu #${subIndex + 1}: Thiếu đáp án`);
+                    }
+                });
+                if (!isValid) return;
+                
                 if (checkError(!subQ.querySelector('input[type="radio"]:checked'), `Cụm #${blockIndex + 1}, Câu #${subIndex + 1}: Chưa chọn đáp án đúng`)) return;
             });
         }

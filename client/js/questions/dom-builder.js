@@ -23,6 +23,7 @@ function addBlock(type) {
 	const blockDiv = clone.querySelector('.question-block');
 	
 	blockDiv.dataset.blockId = AppState.globalBlockCounter;
+	blockDiv.dataset.part = part; // ✅ Set data-part để CSS ẩn/hiện option D
 	const nextNumber = getLastQuestionNumber() + 1;
 
 	if (type === 'single') {

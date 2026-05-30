@@ -15,6 +15,12 @@
     --danger-color: #ef4444;
 }
 
+/* Part 2 có 3 options: ẩn option D */
+.question-block[data-part="2"] .option-item-d,
+.question-block[data-part="2"] .sub-option-d {
+    display: none;
+}
+
 .header-actions {
     margin-bottom: 20px;
     display: flex;
