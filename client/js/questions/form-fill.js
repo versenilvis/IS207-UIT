@@ -14,7 +14,7 @@ function fillBaseQuestionUI(container, question, part = null) {
 	setVal('.explanation', (question.explanation && question.explanation !== 'null') ? question.explanation : '');
 
 	const optionInputs = container.querySelectorAll('.option-content');
-	// ✅ Cho phép cả 3 options (Part 2) và 4 options (Part khác)
+	// Cho phép cả 3 options (Part 2) và 4 options (Part khác)
 	if (question.options && (question.options.length === 3 || question.options.length === 4)) {
 		question.options.forEach((opt, idx) => { 
 			if (optionInputs[idx]) optionInputs[idx].value = opt.content || ''; 
@@ -32,7 +32,7 @@ function fillBaseQuestionUI(container, question, part = null) {
 function fillSingleQuestionData(question, block) {
 	if (!block) return;
 	
-	// ✅ Get part từ partSelect hoặc data-part của block
+	// Get part từ partSelect hoặc data-part của block
 	const partSelect = document.getElementById('partSelect');
 	const part = partSelect ? partSelect.value : block.dataset.part;
 	if (part) block.dataset.part = part; // Set data-part nếu chưa có
@@ -44,8 +44,11 @@ function fillSingleQuestionData(question, block) {
 		const updateMedia = (idx, url, type) => {
 			const input = mediaSection.querySelector(`.upload-item:nth-child(${idx}) input[type="file"]`);
 			const preview = mediaSection.querySelector(`.upload-item:nth-child(${idx}) .preview-container`);
-			if (input) input.dataset.existingUrl = url;
-			if (preview && url) {
+			// Chỉ gán existingUrl nếu URL thực sự có giá trị (không phải null/undefined)
+			if (input && url && url !== 'null') {
+				input.dataset.existingUrl = url;
+			}
+			if (preview && url && url !== 'null') {
 				preview.innerHTML = type === 'image' 
 					? `<img src="${url}" alt="Question image" style="max-width: 200px;">`
 					: `<audio controls src="${url}" style="width: 100%;"></audio>`;
@@ -59,7 +62,7 @@ function fillSingleQuestionData(question, block) {
 function fillGroupQuestionData(passage, subQuestions, block) {
 	if (!block) return;
 
-	// ✅ Get part từ partSelect hoặc data-part của block
+	// Get part từ partSelect hoặc data-part của block
 	const partSelect = document.getElementById('partSelect');
 	const part = partSelect ? partSelect.value : block.dataset.part;
 	if (part) block.dataset.part = part; // Set data-part nếu chưa có
@@ -70,8 +73,11 @@ function fillGroupQuestionData(passage, subQuestions, block) {
 	const updateGroupMedia = (selector, url, type) => {
 		const input = block.querySelector(selector);
 		const preview = input?.closest('.upload-item')?.querySelector('.preview-container');
-		if (input) input.dataset.existingUrl = url;
-		if (preview && url) {
+		// Chỉ gán existingUrl nếu URL thực sự có giá trị (không phải null/undefined)
+		if (input && url && url !== 'null') {
+			input.dataset.existingUrl = url;
+		}
+		if (preview && url && url !== 'null') {
 			preview.innerHTML = type === 'image'
 				? `<img src="${url}" alt="Passage image" style="max-width: 200px;">`
 				: `<audio controls src="${url}" style="width: 100%;"></audio>`;

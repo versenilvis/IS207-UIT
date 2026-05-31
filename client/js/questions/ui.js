@@ -67,23 +67,34 @@ function previewMedia(input, type) {
 	if (!container) return;
 
 	container.innerHTML = '';
-	if (!input.files || !input.files[0]) return;
 
-	const file = input.files[0];
-	const maxSize = type === 'audio' ? 50 * 1024 * 1024 : 5 * 1024 * 1024;
-	if (file.size > maxSize) {
-		showMessage(`File quá lớn! Tối đa ${type === 'audio' ? '50MB' : '5MB'}`, 'error');
-		input.value = ''; return;
-	}
+	// Ưu tiên file mới nếu có
+	if (input.files && input.files[0]) {
+		const file = input.files[0];
+		const maxSize = type === 'audio' ? 50 * 1024 * 1024 : 5 * 1024 * 1024;
+		if (file.size > maxSize) {
+			showMessage(`File quá lớn! Tối đa ${type === 'audio' ? '50MB' : '5MB'}`, 'error');
+			input.value = '';
+			return;
+		}
 
-	const url = URL.createObjectURL(file);
-	const isImage = type === 'image' || (type === 'auto' && file.type.startsWith('image'));
-	const isAudio = type === 'audio' || (type === 'auto' && file.type.startsWith('audio'));
+		const url = URL.createObjectURL(file);
+		const isImage = type === 'image' || (type === 'auto' && file.type.startsWith('image'));
+		const isAudio = type === 'audio' || (type === 'auto' && file.type.startsWith('audio'));
 
-	if (isImage) {
-		container.innerHTML = `<img src="${url}" style="max-width: 200px;">`;
-	} else if (isAudio) {
-		container.innerHTML = `<audio controls src="${url}" style="width: 100%;"></audio>`;
+		if (isImage) {
+			container.innerHTML = `<img src="${url}" style="max-width: 200px;">`;
+		} else if (isAudio) {
+			container.innerHTML = `<audio controls src="${url}" style="width: 100%;"></audio>`;
+		}
+	} else if (input.dataset.existingUrl && input.dataset.existingUrl !== 'null') {
+		// Nếu không có file mới, hiển thị file cũ từ server
+		const url = input.dataset.existingUrl;
+		if (type === 'image') {
+			container.innerHTML = `<img src="${url}" style="max-width: 200px;">`;
+		} else if (type === 'audio') {
+			container.innerHTML = `<audio controls src="${url}" style="width: 100%;"></audio>`;
+		}
 	}
 }
 
