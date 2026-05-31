@@ -118,6 +118,17 @@ function validatePassageExists(PDO $db, $passageId, $testId)
 	if (!is_numeric($passageId) || $passageId <= 0) {
 		throw new InvalidArgumentException("ID của passage không hợp lệ.");
 	}
+
+	// Nếu testId là UUID string, chuyển thành internal ID
+	if (strlen($testId) === 36) { // UUID format
+		require_once dirname(__DIR__) . '/controllers/question-controller.php';
+		$internalTestId = helperGetInternalTestId($db, $testId);
+		if (!$internalTestId) {
+			throw new Exception("Bài test không tồn tại.");
+		}
+		$testId = $internalTestId;
+	}
+
 	$sql = "SELECT id FROM passages WHERE id = :id AND test_id = :test_id LIMIT 1";
 	$stmt = $db->prepare($sql);
 	$stmt->execute([':id' => $passageId, ':test_id' => $testId]);
