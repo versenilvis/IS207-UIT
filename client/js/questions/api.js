@@ -316,7 +316,6 @@ async function submitSingleQuestionAPIWithResult(block, testId, part) {
 		const options = { A: opts[0]?.value.trim(), B: opts[1]?.value.trim(), C: opts[2]?.value.trim(), D: opts[3]?.value.trim() };
 
 		const questionId = block.dataset.questionId;
-		if (questionId) await fetch('/api/questions/' + questionId, { method: 'DELETE' });
 
 		const formData = new FormData();
 		formData.append('test_id', testId);
@@ -328,12 +327,25 @@ async function submitSingleQuestionAPIWithResult(block, testId, part) {
 		formData.append('options', JSON.stringify(options));
 
 		const audioIn = block.querySelector('.audio-file');
-		if (audioIn?.files[0]) formData.append('audio_file', audioIn.files[0]);
-		else if (audioIn?.dataset.existingUrl) formData.append('audio_url', audioIn.dataset.existingUrl);
+		if (audioIn?.files[0]) {
+			formData.append('audio_file', audioIn.files[0]);
+		} else if (audioIn?.dataset.existingUrl) {
+			// Giữ lại URL cũ nếu user không upload file mới
+			formData.append('audio_url', audioIn.dataset.existingUrl);
+		}
 
 		const imageIn = block.querySelector('.image-file');
-		if (imageIn?.files[0]) formData.append('image_file', imageIn.files[0]);
-		else if (imageIn?.dataset.existingUrl) formData.append('image_url', imageIn.dataset.existingUrl);
+		if (imageIn?.files[0]) {
+			formData.append('image_file', imageIn.files[0]);
+		} else if (imageIn?.dataset.existingUrl) {
+			// Giữ lại URL cũ nếu user không upload file mới
+			formData.append('image_url', imageIn.dataset.existingUrl);
+		}
+
+		// Nếu là câu hỏi cũ, gửi ID để backend xử lý cập nhật thay vì xóa-tạo mới
+		if (questionId) {
+			formData.append('existing_question_id', questionId);
+		}
 
 		const response = await fetch('/api/questions', { method: 'POST', body: formData });
 		return await response.json();
@@ -359,20 +371,32 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 		const subQuestions = block.querySelectorAll('.sub-question-item');
 
 		const existingPassageId = block.dataset.passageId;
-		if (existingPassageId) await fetch('/api/passages/' + existingPassageId, { method: 'DELETE' });
 
 		const pFormData = new FormData();
 		pFormData.append('test_id', testId);
 		pFormData.append('part', part);
 		if (passageContent) pFormData.append('content', passageContent);
 
+		// Nếu là passage cũ, gửi ID để backend xử lý cập nhật
+		if (existingPassageId) {
+			pFormData.append('existing_passage_id', existingPassageId);
+		}
+
 		const aIn = block.querySelector('.group-audio-file');
-		if (aIn?.files[0]) pFormData.append('audio_file', aIn.files[0]);
-		else if (aIn?.dataset.existingUrl) pFormData.append('audio_url', aIn.dataset.existingUrl);
+		if (aIn?.files[0]) {
+			pFormData.append('audio_file', aIn.files[0]);
+		} else if (aIn?.dataset.existingUrl) {
+			// Giữ lại URL cũ nếu user không upload file mới
+			pFormData.append('audio_url', aIn.dataset.existingUrl);
+		}
 
 		const iIn = block.querySelector('.group-image-file');
-		if (iIn?.files[0]) pFormData.append('image_file', iIn.files[0]);
-		else if (iIn?.dataset.existingUrl) pFormData.append('image_url', iIn.dataset.existingUrl);
+		if (iIn?.files[0]) {
+			pFormData.append('image_file', iIn.files[0]);
+		} else if (iIn?.dataset.existingUrl) {
+			// Giữ lại URL cũ nếu user không upload file mới
+			pFormData.append('image_url', iIn.dataset.existingUrl);
+		}
 
 		const pRes = await fetch('/api/passages', { method: 'POST', body: pFormData });
 		const pResult = await pRes.json();

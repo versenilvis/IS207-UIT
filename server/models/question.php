@@ -181,7 +181,7 @@ function questionGetByTestAndPart(PDO $db, $testId, $part)
 /**
  * cập nhật câu hỏi
  */
-function questionUpdate(PDO $db, $questionId, $data)
+function questionUpdate(PDO $db, $questionId, $data, $optionsData = null)
 {
 	try {
 		$updates = [];
@@ -195,14 +195,28 @@ function questionUpdate(PDO $db, $questionId, $data)
 			}
 		}
 
-		if (empty($updates)) {
-			return true;
+		if (!empty($updates)) {
+			$sql = "UPDATE questions SET " . implode(", ", $updates) . " WHERE id = :id";
+			$stmt = $db->prepare($sql);
+			$stmt->execute($params);
 		}
 
-		$sql = "UPDATE questions SET " . implode(", ", $updates) . " WHERE id = :id";
-		$stmt = $db->prepare($sql);
+		// Cập nhật options nếu được cung cấp
+		if ($optionsData) {
+			$deleteStmt = $db->prepare("DELETE FROM options WHERE question_id = :id");
+			$deleteStmt->execute([':id' => $questionId]);
 
-		return $stmt->execute($params);
+			foreach ($optionsData as $option) {
+				$insertStmt = $db->prepare("INSERT INTO options (question_id, label, content) VALUES (:q_id, :label, :content)");
+				$insertStmt->execute([
+					':q_id' => $questionId,
+					':label' => $option['label'],
+					':content' => $option['content']
+				]);
+			}
+		}
+
+		return true;
 	} catch (Exception $e) {
 		throw new Exception("Lỗi khi cập nhật câu hỏi: " . $e->getMessage());
 	}

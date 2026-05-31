@@ -9,6 +9,7 @@ require_once __DIR__ . '/../utils/response.php';
 
 /**
  * tạo một câu hỏi mới với các tệp phương tiện tùy chọn
+ * nếu existing_question_id được cung cấp, sẽ cập nhật câu hỏi cũ thay vì tạo mới
  */
 function apiCreateQuestion(PDO $db)
 {
@@ -20,6 +21,7 @@ function apiCreateQuestion(PDO $db)
 		$content = helperGetPostValue('content');
 		$correctAnswer = helperGetPostValue('correct_answer');
 		$explanation = helperGetPostValue('explanation');
+		$existingQuestionId = helperGetPostValue('existing_question_id');
 		$isSubQuestion = !empty($passageId);
 
 		$options = json_decode(helperGetPostValue('options', '{}'), true);
@@ -48,20 +50,41 @@ function apiCreateQuestion(PDO $db)
 
 		$audioUrl = null;
 		$imageUrl = null;
+		$oldQuestion = null;
+
+		// Lấy dữ liệu câu hỏi cũ để xóa file cũ nếu cần
+		if ($existingQuestionId) {
+			$oldQuestion = questionGetById($db, $existingQuestionId);
+			if (!$oldQuestion) {
+				throw new Exception("Câu hỏi cũ không tồn tại");
+			}
+		}
 
 		if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
 			try {
 				$audioUrl = fh_upload_file($_FILES['audio_file'], 'audio');
+				// Xóa file audio cũ nếu có file mới được upload
+				if ($oldQuestion && $oldQuestion['audio_url']) {
+					fh_delete_file($oldQuestion['audio_url']);
+				}
 			} catch (Exception $e) {
 				throw new Exception("Lỗi upload audio: " . $e->getMessage());
 			}
 		} else {
 			$audioUrl = helperGetPostValue('audio_url');
+			// Nếu không upload file mới, giữ lại URL cũ
+			if (!$audioUrl && $oldQuestion) {
+				$audioUrl = $oldQuestion['audio_url'];
+			}
 		}
 
 		if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
 			try {
 				$imageUrl = fh_upload_file($_FILES['image_file'], 'image');
+				// Xóa file image cũ nếu có file mới được upload
+				if ($oldQuestion && $oldQuestion['image_url']) {
+					fh_delete_file($oldQuestion['image_url']);
+				}
 			} catch (Exception $e) {
 				if ($audioUrl && isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
 					fh_delete_file($audioUrl);
@@ -70,6 +93,10 @@ function apiCreateQuestion(PDO $db)
 			}
 		} else {
 			$imageUrl = helperGetPostValue('image_url');
+			// Nếu không upload file mới, giữ lại URL cũ
+			if (!$imageUrl && $oldQuestion) {
+				$imageUrl = $oldQuestion['image_url'];
+			}
 		}
 
 		helperValidatePartRequirements($part, $content, $audioUrl, $imageUrl, $passageId, $isSubQuestion);
@@ -93,7 +120,12 @@ function apiCreateQuestion(PDO $db)
 			['label' => 'D', 'content' => $options['D']]
 		];
 
-		$questionId = questionCreateWithOptions($db, $questionData, $optionsData);
+		// Nếu là câu hỏi cũ, cập nhật; nếu không, tạo mới
+		if ($existingQuestionId) {
+			$questionId = questionUpdate($db, $existingQuestionId, $questionData, $optionsData);
+		} else {
+			$questionId = questionCreateWithOptions($db, $questionData, $optionsData);
+		}
 
 		return [
 			'success' => true,
@@ -288,6 +320,7 @@ function apiCreatePassage(PDO $db)
 		$testId = helperGetPostValue('test_id');
 		$part = helperGetPostValue('part');
 		$content = helperGetPostValue('content');
+		$existingPassageId = helperGetPostValue('existing_passage_id');
 
 		$internalTestId = helperGetInternalTestId($db, $testId);
 		if (empty($testId))
@@ -297,20 +330,41 @@ function apiCreatePassage(PDO $db)
 
 		$audioUrl = null;
 		$imageUrl = null;
+		$oldPassage = null;
+
+		// Lấy dữ liệu passage cũ để xóa file cũ nếu cần
+		if ($existingPassageId) {
+			$oldPassage = passageGetById($db, $existingPassageId);
+			if (!$oldPassage) {
+				throw new Exception("Đoạn văn cũ không tồn tại");
+			}
+		}
 
 		if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
 			try {
 				$audioUrl = fh_upload_file($_FILES['audio_file'], 'audio');
+				// Xóa file audio cũ nếu có file mới được upload
+				if ($oldPassage && $oldPassage['audio_url']) {
+					fh_delete_file($oldPassage['audio_url']);
+				}
 			} catch (Exception $e) {
 				throw new Exception("Lỗi upload audio: " . $e->getMessage());
 			}
 		} else {
 			$audioUrl = helperGetPostValue('audio_url');
+			// Nếu không upload file mới, giữ lại URL cũ
+			if (!$audioUrl && $oldPassage) {
+				$audioUrl = $oldPassage['audio_url'];
+			}
 		}
 
 		if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
 			try {
 				$imageUrl = fh_upload_file($_FILES['image_file'], 'image');
+				// Xóa file image cũ nếu có file mới được upload
+				if ($oldPassage && $oldPassage['image_url']) {
+					fh_delete_file($oldPassage['image_url']);
+				}
 			} catch (Exception $e) {
 				if ($audioUrl)
 					fh_delete_file($audioUrl);
@@ -318,6 +372,10 @@ function apiCreatePassage(PDO $db)
 			}
 		} else {
 			$imageUrl = helperGetPostValue('image_url');
+			// Nếu không upload file mới, giữ lại URL cũ
+			if (!$imageUrl && $oldPassage) {
+				$imageUrl = $oldPassage['image_url'];
+			}
 		}
 
 		if (!empty($part)) {
@@ -331,7 +389,12 @@ function apiCreatePassage(PDO $db)
 			'image_url' => $imageUrl
 		];
 
-		$passageId = passageCreate($db, $passageData);
+		// Nếu là passage cũ, cập nhật; nếu không, tạo mới
+		if ($existingPassageId) {
+			$passageId = passageUpdate($db, $existingPassageId, $passageData);
+		} else {
+			$passageId = passageCreate($db, $passageData);
+		}
 
 		return [
 			'success' => true,
