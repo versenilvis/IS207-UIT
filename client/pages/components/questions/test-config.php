@@ -20,6 +20,12 @@
 				<option value="7">Part 7: Đọc hiểu</option>
 			</select>
 		</div>
+		<div class="config-group">
+			<label><i class="bx bx-volume-full" style="font-size: 1.2rem; vertical-align: -0.125em; margin-right: 4px;"></i>Âm thanh bài thi</label>
+			<input type="file" accept="audio/*" id="testAudioFile" onchange="previewTestAudio(this)">
+			<small style="color: #666; display: block; margin-top: 4px;">File âm thanh của toàn bài thi (tuỳ chọn)</small>
+			<div id="testAudioPreview" style="margin-top: 8px;"></div>
+		</div>
 	</div>
 </div>
 

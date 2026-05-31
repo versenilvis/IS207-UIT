@@ -86,3 +86,24 @@ function previewMedia(input, type) {
 		container.innerHTML = `<audio controls src="${url}" style="width: 100%;"></audio>`;
 	}
 }
+
+//  Hàm preview audio của toàn bài thi
+function previewTestAudio(input) {
+	const container = document.getElementById('testAudioPreview');
+	if (!container) return;
+
+	container.innerHTML = '';
+	if (!input.files || !input.files[0]) return;
+
+	const file = input.files[0];
+	const maxSize = 50 * 1024 * 1024; // 50MB
+	if (file.size > maxSize) {
+		showMessage('File âm thanh quá lớn! Tối đa 50MB', 'error');
+		input.value = '';
+		return;
+	}
+
+	const url = URL.createObjectURL(file);
+	container.innerHTML = `<audio controls src="${url}" style="width: 100%;"></audio>`;
+}
+

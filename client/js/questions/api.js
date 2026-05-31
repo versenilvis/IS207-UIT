@@ -86,6 +86,31 @@ curl -X POST http://localhost:3000/api/tests \
  */
 // tức là hàm này gửi POST request qua API/tests. xong api gọi createTest() trong test-controller.php
 // và trả về cho data cho hàm này
+
+// ✅ Hàm lưu audio của bài thi
+async function submitTestAudio(testId) {
+	const testAudioFile = document.getElementById('testAudioFile');
+	if (!testAudioFile || !testAudioFile.files || !testAudioFile.files[0]) {
+		return; // Không có file audio, bỏ qua
+	}
+
+	const formData = new FormData();
+	formData.append('audio', testAudioFile.files[0]);
+
+	try {
+		const response = await fetch(`/api/tests/${testId}/audio`, {
+			method: 'PUT',
+			body: formData
+		});
+		const result = await response.json();
+		if (!result.success) {
+			console.warn('Cảnh báo: Không thể lưu audio bài thi', result.message);
+		}
+	} catch (error) {
+		console.warn('Cảnh báo: Lỗi lưu audio bài thi', error);
+	}
+}
+
 async function handleCreateTestSubmit(e) {
 	e.preventDefault();
 	const form = e.target;
@@ -422,6 +447,9 @@ async function submitData(event) {
 	}
 
 	showMessage('Đang lưu dữ liệu...', 'info');
+
+	// ✅ Lưu audio của bài test trước
+	await submitTestAudio(testId);
 
 	let totalCreated = 0;
 	let errorMessages = [];
