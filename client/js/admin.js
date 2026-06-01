@@ -99,11 +99,6 @@ async function loadOverviewStats() {
             document.getElementById('stat-total-tests').textContent = data.total_tests;
             document.getElementById('stat-total-revenue').textContent = formatVND(data.total_revenue);
             document.getElementById('stat-total-purchased').textContent = data.total_purchased_users;
-            
-            // cập nhật mục tiêu dòng tiền dựa trên tổng doanh thu hoặc một dữ liệu tạm
-            // do stats chỉ trả về tổng doanh thu nên ta tạm lấy 25% tổng doanh thu làm doanh thu tháng này nếu không có api dòng tiền
-            const estimatedMonthRevenue = Math.min(data.total_revenue, 1250000);
-            updateSidebarWidget(estimatedMonthRevenue);
         }
     } catch (error) {
         console.error('error loading stats:', error);
@@ -506,6 +501,32 @@ function renderAttemptsTable(attempts) {
     });
 }
 
+// hiển thị bảng phân tích doanh thu theo gói dịch vụ
+function renderRevenueBreakdown(breakdown) {
+    const tbody = document.getElementById('revenueBreakdownTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    if (!breakdown || breakdown.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Không có dữ liệu phân tích</td></tr>';
+        return;
+    }
+
+    breakdown.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${item.plan_name}</strong></td>
+            <td>${item.success_count}</td>
+            <td><strong>${formatVND(item.gross_revenue)}</strong></td>
+            <td>${item.refunded_count}</td>
+            <td><strong style="color: var(--accent-red);">${item.refunded_count > 0 ? '-' : ''}${formatVND(item.refunded_amount)}</strong></td>
+            <td><strong style="color: var(--accent-blue);">${formatVND(item.net_revenue)}</strong></td>
+            <td><span class="badge ${item.refund_rate > 10 ? 'failed' : (item.refund_rate > 0 ? 'warning' : 'success')}">${item.refund_rate}%</span></td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
 // tải tóm tắt doanh thu và dữ liệu biểu đồ
 async function loadRevenueData() {
     try {
@@ -515,6 +536,14 @@ async function loadRevenueData() {
             const data = result.data;
             document.getElementById('revenue-stat-month').textContent = formatVND(data.current_month);
             document.getElementById('revenue-stat-alltime').textContent = formatVND(data.all_time);
+
+            // điền thêm các chỉ số thống kê giao dịch và hoàn tiền
+            document.getElementById('revenue-stat-success-count').textContent = `${data.success_count} giao dịch`;
+            document.getElementById('revenue-stat-refund-amount').textContent = formatVND(data.refunded_amount);
+            document.getElementById('revenue-stat-refund-count').textContent = `${data.refunded_count} giao dịch`;
+
+            // vẽ bảng phân tích doanh thu
+            renderRevenueBreakdown(data.breakdown);
 
             // cập nhật sidebar mục tiêu dòng tiền
             updateSidebarWidget(data.current_month);
@@ -542,20 +571,26 @@ function renderRevenueChart(chartData) {
         revenueChartInstance.destroy();
     }
 
-    const labels = chartData.map(item => item.month);
+    const labels = chartData.map(item => item.label);
     const totals = chartData.map(item => parseInt(item.total));
 
     revenueChartInstance = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Doanh thu (VND)',
+                label: 'Doanh thu ròng (VND)',
                 data: totals,
-                backgroundColor: 'rgba(37, 99, 235, 0.85)',
                 borderColor: 'rgb(37, 99, 235)',
-                borderWidth: 1,
-                borderRadius: 4
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                borderWidth: 3,
+                tension: 0.35,
+                fill: true,
+                pointBackgroundColor: 'rgb(37, 99, 235)',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
@@ -563,7 +598,6 @@ function renderRevenueChart(chartData) {
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true,
                     ticks: {
                         callback: function(value) {
                             return formatVND(value);
@@ -613,6 +647,11 @@ function renderTransactionsTable(transactions) {
 
     transactions.forEach(tx => {
         const fullName = `${tx.first_name} ${tx.last_name}`;
+        const isRefunded = tx.status === 'refunded';
+        const priceStyle = isRefunded ? 'color: var(--accent-red);' : 'color: var(--accent-green);';
+        const priceSign = isRefunded ? '-' : '';
+        const statusBadge = isRefunded ? ' <span class="badge failed">Đã hoàn tiền</span>' : '';
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td><code>${tx.tx_id}</code></td>
@@ -622,8 +661,8 @@ function renderTransactionsTable(transactions) {
                     <div style="font-size: 11px; color: var(--text-secondary);">${tx.email}</div>
                 </div>
             </td>
-            <td><span class="badge info">${tx.plan_name}</span></td>
-            <td><strong style="color: var(--accent-green);">${formatVND(tx.price)}</strong></td>
+            <td><span class="badge info">${tx.plan_name}</span>${statusBadge}</td>
+            <td><strong style="${priceStyle}">${priceSign}${formatVND(tx.price)}</strong></td>
             <td>Thanh toán theo ${tx.period}</td>
             <td>${formatDateTime(tx.created_at)}</td>
         `;
@@ -730,6 +769,16 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // tải dữ liệu cho tab mặc định
     loadSectionData(initialSection);
+
+    // cập nhật doanh số mục tiêu ở sidebar bằng dữ liệu thực tế ngay khi tải trang
+    fetch('/api/admin/revenue')
+        .then(res => res.json())
+        .then(result => {
+            if (result.success && result.data) {
+                updateSidebarWidget(result.data.current_month);
+            }
+        })
+        .catch(err => console.error('error loading target widget:', err));
 
     // thiết lập đóng modal nếu đang ở danh sách đề thi
     const editForm = document.getElementById('editForm');

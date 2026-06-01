@@ -222,28 +222,100 @@ function getAdminRevenue() {
     checkAdminAccess();
 
     try {
-        // tổng doanh thu tháng hiện tại
+        // tổng doanh thu thực tế tháng hiện tại
         $current_month_revenue = (int)$conn->query("SELECT COALESCE(SUM(price), 0) FROM transaction_history WHERE status = 'success' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')")->fetchColumn();
         
-        // tổng doanh thu mọi thời gian
+        // tổng doanh thu thực tế mọi thời gian
         $all_time_revenue = (int)$conn->query("SELECT COALESCE(SUM(price), 0) FROM transaction_history WHERE status = 'success'")->fetchColumn();
 
-        // dữ liệu biểu đồ 12 tháng qua
-        $sql = "SELECT 
-                    DATE_FORMAT(created_at, '%Y-%m') AS month,
-                    SUM(price) AS total
-                FROM transaction_history
-                WHERE status = 'success' AND created_at >= DATE_SUB(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL 11 MONTH)
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-                ORDER BY month ASC";
+        // lấy các chỉ số thống kê giao dịch thành công và hoàn tiền
+        $success_count = (int)$conn->query("SELECT COUNT(*) FROM transaction_history WHERE status = 'success'")->fetchColumn();
+        $refunded_count = (int)$conn->query("SELECT COUNT(*) FROM transaction_history WHERE status = 'refunded'")->fetchColumn();
+        $refunded_amount = (int)$conn->query("SELECT COALESCE(SUM(price), 0) FROM transaction_history WHERE status = 'refunded'")->fetchColumn();
+
+        // tính toán bảng phân rã chi tiết doanh thu theo gói
+        $breakdown_sql = "
+            SELECT plan_id, plan_name,
+                   SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) AS success_count,
+                   SUM(CASE WHEN status = 'success' THEN price ELSE 0 END) AS success_amount,
+                   SUM(CASE WHEN status = 'refunded' THEN 1 ELSE 0 END) AS refunded_count,
+                   SUM(CASE WHEN status = 'refunded' THEN price ELSE 0 END) AS refunded_amount
+            FROM transaction_history
+            WHERE status IN ('success', 'refunded')
+            GROUP BY plan_id, plan_name
+        ";
+        $breakdown_raw = $conn->query($breakdown_sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        $breakdown_data = [];
+        foreach ($breakdown_raw as $row) {
+            $s_count = (int)$row['success_count'];
+            $s_amount = (int)$row['success_amount'];
+            $r_count = (int)$row['refunded_count'];
+            $r_amount = (int)$row['refunded_amount'];
+            
+            $gross_revenue = $s_amount + $r_amount;
+            $net_revenue = $s_amount;
+            
+            $total_count = $s_count + $r_count;
+            $refund_rate = $total_count > 0 ? round(($r_count / $total_count) * 100, 1) : 0;
+            
+            $breakdown_data[] = [
+                'plan_id' => $row['plan_id'],
+                'plan_name' => $row['plan_name'],
+                'success_count' => $s_count,
+                'gross_revenue' => $gross_revenue,
+                'refunded_count' => $r_count,
+                'refunded_amount' => $r_amount,
+                'net_revenue' => $net_revenue,
+                'refund_rate' => $refund_rate
+            ];
+        }
+
+        // lấy danh sách tất cả giao dịch theo thứ tự thời gian tăng dần
+        $sql = "SELECT created_at, price, status FROM transaction_history WHERE status = 'success' OR status = 'refunded' ORDER BY created_at ASC";
+        $raw_chart = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        // tính doanh thu luỹ kế bắt đầu từ 0
+        $chart_data = [];
+        $chart_data[] = [
+            'label' => 'Bắt đầu',
+            'total' => 0
+        ];
         
-        $chart_data = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $running_total = 0;
+        foreach ($raw_chart as $tx) {
+            $price = (int)$tx['price'];
+            if ($tx['status'] === 'success') {
+                $running_total += $price;
+                $chart_data[] = [
+                    'label' => date('d/m/Y H:i', strtotime($tx['created_at'])),
+                    'total' => $running_total
+                ];
+            } elseif ($tx['status'] === 'refunded') {
+                // cộng tiền thanh toán trước
+                $running_total += $price;
+                $chart_data[] = [
+                    'label' => date('d/m/Y H:i', strtotime($tx['created_at'])) . ' (Thanh toán)',
+                    'total' => $running_total
+                ];
+                // trừ tiền hoàn trả sau
+                $running_total -= $price;
+                $chart_data[] = [
+                    'label' => date('d/m/Y H:i', strtotime($tx['created_at'])) . ' (Hoàn tiền)',
+                    'total' => $running_total
+                ];
+            }
+        }
 
         sendJson([
             'success' => true,
             'data' => [
                 'current_month' => $current_month_revenue,
                 'all_time' => $all_time_revenue,
+                'success_count' => $success_count,
+                'refunded_count' => $refunded_count,
+                'refunded_amount' => $refunded_amount,
+                'breakdown' => $breakdown_data,
                 'chart' => $chart_data
             ]
         ]);
@@ -263,14 +335,14 @@ function getAdminTransactions() {
 
     try {
         // lấy tổng số giao dịch
-        $total = (int)$conn->query("SELECT COUNT(*) FROM transaction_history WHERE status = 'success'")->fetchColumn();
+        $total = (int)$conn->query("SELECT COUNT(*) FROM transaction_history WHERE status = 'success' OR status = 'refunded'")->fetchColumn();
 
         // lấy danh sách giao dịch
-        $sql = "SELECT t.id, t.tx_id, t.plan_id, t.plan_name, t.price, t.period, t.created_at,
+        $sql = "SELECT t.id, t.tx_id, t.plan_id, t.plan_name, t.price, t.period, t.status, t.created_at,
                        u.first_name, u.last_name, u.email
                 FROM transaction_history t
                 JOIN users u ON t.user_id = u.id
-                WHERE t.status = 'success'
+                WHERE t.status = 'success' OR t.status = 'refunded'
                 ORDER BY t.created_at DESC
                 LIMIT :limit OFFSET :offset";
 

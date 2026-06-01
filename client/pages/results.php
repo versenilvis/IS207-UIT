@@ -10,7 +10,6 @@ $navbarMode = 'light';
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php include './components/metadata.php'; ?>
 	<title>Kết quả bài thi | Prephub</title>
-	<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="../styles/results.css?v=<?= time() ?>">
 </head>
 

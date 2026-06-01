@@ -36,7 +36,7 @@ $test_id = $_GET['test_id'] ?? '';
     <!-- thanh sidebar điều hướng -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <i class="bx bxs-dashboard" style="color: var(--accent-blue);"></i>
+            <i class="bx bx-dashboard" style="color: var(--accent-blue);"></i>
             <span>PrepHub Admin</span>
         </div>
 
@@ -87,7 +87,7 @@ $test_id = $_GET['test_id'] ?? '';
         <div class="sidebar-footer">
             <!-- thống kê tiến trình mục tiêu -->
             <div class="sidebar-widget">
-                <div class="widget-title">Doanh số mục tiêu</div>
+                <div class="widget-title">Doanh số mục tiêu tháng</div>
                 <div class="widget-value" id="widget-revenue-val">0 VND</div>
                 <div class="progress-bar-container">
                     <div class="progress-bar" id="widget-revenue-progress" style="width: 0%;"></div>
@@ -121,8 +121,8 @@ $test_id = $_GET['test_id'] ?? '';
                 </div>
             </div>
             
-            <div class="stats-grid">
-                <div class="stat-card">
+            <div class="stats-grid grid-4">
+                <div class="stat-card theme-dark">
                     <div class="stat-info">
                         <h3>Tổng số User</h3>
                         <p id="stat-total-users">...</p>
@@ -131,30 +131,30 @@ $test_id = $_GET['test_id'] ?? '';
                         <i class="bx bx-group"></i>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card theme-orange">
                     <div class="stat-info">
                         <h3>Tổng số Đề thi</h3>
                         <p id="stat-total-tests">...</p>
                     </div>
-                    <div class="stat-icon orange">
+                    <div class="stat-icon">
                         <i class="bx bx-book-content"></i>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card theme-green">
                     <div class="stat-info">
                         <h3>Tổng doanh thu</h3>
                         <p id="stat-total-revenue">...</p>
                     </div>
-                    <div class="stat-icon green">
-                        <i class="bx bx-money"></i>
+                    <div class="stat-icon">
+                        <i class="bx bx-credit-card"></i>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card theme-blue">
                     <div class="stat-info">
                         <h3>User đã mua gói</h3>
                         <p id="stat-total-purchased">...</p>
                     </div>
-                    <div class="stat-icon red">
+                    <div class="stat-icon">
                         <i class="bx bx-credit-card"></i>
                     </div>
                 </div>
@@ -389,31 +389,31 @@ $test_id = $_GET['test_id'] ?? '';
                 </div>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
+            <div class="stats-grid grid-3">
+                <div class="stat-card theme-blue">
                     <div class="stat-info">
                         <h3>Tổng User</h3>
                         <p id="user-stat-total">...</p>
                     </div>
                     <div class="stat-icon">
-                        <i class="bx bx-user-pin"></i>
+                        <i class="bx bx-group"></i>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card theme-green">
                     <div class="stat-info">
                         <h3>User mới tháng này</h3>
                         <p id="user-stat-new">...</p>
                     </div>
-                    <div class="stat-icon green">
+                    <div class="stat-icon">
                         <i class="bx bx-user-plus"></i>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card theme-orange">
                     <div class="stat-info">
                         <h3>Không hoạt động 7 ngày</h3>
                         <p id="user-stat-inactive">...</p>
                     </div>
-                    <div class="stat-icon orange">
+                    <div class="stat-icon">
                         <i class="bx bx-user-x"></i>
                     </div>
                 </div>
@@ -493,29 +493,68 @@ $test_id = $_GET['test_id'] ?? '';
                 </div>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
+            <div class="stats-grid grid-4">
+                <div class="stat-card theme-green">
                     <div class="stat-info">
                         <h3>Doanh thu tháng này</h3>
                         <p id="revenue-stat-month">...</p>
                     </div>
-                    <div class="stat-icon green">
+                    <div class="stat-icon">
                         <i class="bx bx-trending-up"></i>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card theme-blue">
                     <div class="stat-info">
                         <h3>Doanh thu mọi thời gian</h3>
                         <p id="revenue-stat-alltime">...</p>
                     </div>
                     <div class="stat-icon">
-                        <i class="bx bx-line-chart"></i>
+                        <i class="bx bx-chart-line"></i>
+                    </div>
+                </div>
+                <div class="stat-card theme-orange">
+                    <div class="stat-info">
+                        <h3>Giao dịch thành công</h3>
+                        <p id="revenue-stat-success-count">...</p>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="bx bx-badge-check"></i>
+                    </div>
+                </div>
+                <div class="stat-card theme-red">
+                    <div class="stat-info">
+                        <h3>Đã hoàn tiền</h3>
+                        <p id="revenue-stat-refund-amount">...</p>
+                        <span id="revenue-stat-refund-count" style="font-size: 12px; color: #b91c1c; font-weight: 500; display: block; margin-top: 4px;">...</span>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="bx bx-refresh-ccw"></i>
                     </div>
                 </div>
             </div>
 
             <div class="chart-container">
                 <canvas id="revenueChart"></canvas>
+            </div>
+
+            <div class="table-container" style="overflow-x: auto; margin-bottom: 32px;">
+                <h2 style="font-size: 15px; font-weight: 600; padding: 16px 20px 0 20px;">Phân tích doanh thu theo gói dịch vụ</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Gói dịch vụ</th>
+                            <th>Lượt mua thành công</th>
+                            <th>Doanh thu gộp</th>
+                            <th>Lượt hoàn tiền</th>
+                            <th>Tổng hoàn tiền</th>
+                            <th>Doanh thu ròng</th>
+                            <th>Tỷ lệ hoàn tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="revenueBreakdownTableBody">
+                        <!-- hiển thị bằng JS -->
+                    </tbody>
+                </table>
             </div>
 
             <div class="table-container" style="overflow-x: auto;">
