@@ -530,14 +530,44 @@ async function submitData(event) {
 	}
 
 	const blocks = document.querySelectorAll('.question-block');
-	if (blocks.length === 0) {
-		return showMessage('Không có dữ liệu để lưu', 'warning');
-	}
 
 	showMessage('Đang lưu dữ liệu...', 'info');
 
 	let totalCreated = 0;
 	let errorMessages = [];
+
+	// Tìm những câu hỏi đã bị xóa (có trong loadedQuestionIds nhưng không còn trong DOM)
+	const remainingQuestionIds = new Set();
+	blocks.forEach(block => {
+		const qId = block.dataset.questionId;
+		if (qId) remainingQuestionIds.add(parseInt(qId));
+	});
+
+	const deletedQuestionIds = Array.from(AppState.loadedQuestionIds).filter(id => !remainingQuestionIds.has(id));
+
+	// Xóa những câu hỏi đã bị xóa
+	for (let qId of deletedQuestionIds) {
+		try {
+			const response = await fetch(`/api/questions/${qId}`, { method: 'DELETE' });
+			const result = await response.json();
+			if (!result.success) {
+				errorMessages.push(`Xóa câu ${qId}: ${result.message}`);
+			}
+		} catch (e) {
+			errorMessages.push(`Lỗi xóa câu ${qId}`);
+		}
+	}
+
+	// Lưu các câu hỏi còn lại
+	if (blocks.length === 0) {
+		if (deletedQuestionIds.length > 0) {
+			showMessage(`Đã xóa ${deletedQuestionIds.length} câu hỏi!`, 'success');
+			await loadSavedQuestionsToForm();
+		} else {
+			showMessage('Không có dữ liệu để lưu', 'warning');
+		}
+		return;
+	}
 
 	for (let block of blocks) {
 		const isGroup = block.classList.contains('group-type');
