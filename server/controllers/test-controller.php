@@ -352,3 +352,69 @@ function getTestCore($uuid) {
         sendError($e->getMessage(), 500);
     }
 }
+
+// PUT /api/tests/{uuid}/audio - upload audio cho đề thi
+function uploadTestAudio($uuid) {
+    global $conn;
+    try {
+        // Kiểm tra đề tồn tại
+        $stmt_check = $conn->prepare("SELECT id FROM tests WHERE uuid = :uuid LIMIT 1");
+        $stmt_check->execute([':uuid' => $uuid]);
+        $test = $stmt_check->fetch();
+        if (!$test) {
+            sendError("Không tìm thấy đề thi", 404);
+        }
+
+        $audioUrl = null;
+
+        // Xử lý upload file audio
+        if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
+            try {
+                require_once __DIR__ . '/../utils/fileHandler.php';
+                $audioUrl = fh_upload_file($_FILES['audio_file'], 'audio');
+            } catch (Exception $e) {
+                sendError("Lỗi upload audio: " . $e->getMessage(), 400);
+                return;
+            }
+        } else {
+            // Hoặc lấy URL từ POST data nếu không upload file mới
+            // Cần kiểm tra cả $_POST và $_REQUEST vì FormData với PUT method
+            $audioUrl = $_POST['audio_url'] ?? $_REQUEST['audio_url'] ?? null;
+        }
+
+        // Nếu có URL mới (upload thành công) hoặc có audio_url từ POST, cập nhật
+        if ($audioUrl) {
+            // Lấy URL cũ để xóa file cũ nếu có
+            $stmt_old = $conn->prepare("SELECT audio_url FROM tests WHERE uuid = :uuid LIMIT 1");
+            $stmt_old->execute([':uuid' => $uuid]);
+            $oldTest = $stmt_old->fetch(PDO::FETCH_ASSOC);
+            
+            // Xóa file audio cũ nếu có file mới được upload
+            if ($oldTest && $oldTest['audio_url'] && isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
+                require_once __DIR__ . '/../utils/fileHandler.php';
+                fh_delete_file($oldTest['audio_url']);
+            }
+
+            // Cập nhật URL mới vào database
+            $stmt = $conn->prepare("UPDATE tests SET audio_url = :audio_url WHERE uuid = :uuid");
+            $stmt->execute([
+                ':audio_url' => $audioUrl,
+                ':uuid' => $uuid
+            ]);
+
+            sendJson([
+                "success" => true,
+                "message" => "Audio đề thi đã được lưu thành công",
+                "data" => [
+                    "audio_url" => $audioUrl
+                ]
+            ]);
+        } else {
+            sendError("Không có file audio hoặc URL audio được cung cấp", 400);
+        }
+    } catch (PDOException $e) {
+        sendError("Lỗi database: " . $e->getMessage(), 500);
+    } catch (Exception $e) {
+        sendError("Lỗi: " . $e->getMessage(), 500);
+    }
+}

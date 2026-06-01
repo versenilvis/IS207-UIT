@@ -88,26 +88,55 @@ curl -X POST http://localhost:3000/api/tests \
 // và trả về cho data cho hàm này
 
 // ✅ Hàm lưu audio của bài thi
-async function submitTestAudio(testId) {
+// Lưu audio bài thi độc lập (gọi từ nút Lưu Audio)
+async function saveTestAudio() {
+	const testSelect = document.getElementById('testSelect');
+	if (!testSelect || !testSelect.value) {
+		showMessage('Vui lòng chọn đề thi trước', 'error');
+		return;
+	}
+
+	const testId = testSelect.value;
 	const testAudioFile = document.getElementById('testAudioFile');
-	if (!testAudioFile || !testAudioFile.files || !testAudioFile.files[0]) {
-		return; // Không có file audio, bỏ qua
+	if (!testAudioFile) {
+		showMessage('Không tìm thấy input audio', 'error');
+		return;
 	}
 
 	const formData = new FormData();
-	formData.append('audio', testAudioFile.files[0]);
+
+	// Nếu có file mới, upload file
+	if (testAudioFile.files && testAudioFile.files[0]) {
+		formData.append('audio_file', testAudioFile.files[0]);
+	} else if (testAudioFile.dataset.existingUrl && testAudioFile.dataset.existingUrl !== 'null') {
+		// Nếu không có file mới nhưng có URL cũ, gửi URL cũ
+		formData.append('audio_url', testAudioFile.dataset.existingUrl);
+	} else {
+		// Không có file mới cũng không có URL cũ
+		showMessage('Vui lòng chọn file audio', 'warning');
+		return;
+	}
 
 	try {
+		showMessage('Đang lưu audio bài thi...', 'info');
 		const response = await fetch(`/api/tests/${testId}/audio`, {
-			method: 'PUT',
+			method: 'POST',
 			body: formData
 		});
 		const result = await response.json();
-		if (!result.success) {
-			console.warn('Cảnh báo: Không thể lưu audio bài thi', result.message);
+		if (result.success) {
+			showMessage('Audio bài thi đã được lưu thành công', 'success');
+			// Lưu URL mới vào dataset để giữ lại nếu reload
+			if (result.data && result.data.audio_url) {
+				testAudioFile.dataset.existingUrl = result.data.audio_url;
+			}
+		} else {
+			showMessage('Lỗi: ' + result.message, 'error');
+			console.error('Lỗi lưu audio:', result);
 		}
 	} catch (error) {
-		console.warn('Cảnh báo: Lỗi lưu audio bài thi', error);
+		showMessage('Lỗi khi lưu audio: ' + error.message, 'error');
+		console.error('Exception lưu audio:', error);
 	}
 }
 
@@ -216,6 +245,38 @@ async function handleCreateTestSubmit(e) {
   "count": 1
 }
  */
+// Load audio đề thi từ server khi đổi đề
+async function loadTestAudio(testId) {
+	const testAudioFile = document.getElementById('testAudioFile');
+	const testAudioPreview = document.getElementById('testAudioPreview');
+	if (!testAudioFile || !testAudioPreview) return;
+
+	try {
+		const response = await fetch(`/api/tests/${testId}`);
+		if (!response.ok) return;
+		
+		const result = await response.json();
+		if (result.success && result.data && result.data.audio_url) {
+			const audioUrl = result.data.audio_url;
+			// Lưu URL cũ vào dataset
+			testAudioFile.dataset.existingUrl = audioUrl;
+			testAudioFile.value = ''; // Clear file input
+			// Hiển thị preview audio cũ
+			testAudioPreview.innerHTML = `<audio controls src="${audioUrl}" style="width: 100%;"></audio>`;
+		} else {
+			// Không có audio, clear preview
+			testAudioFile.dataset.existingUrl = '';
+			testAudioFile.value = '';
+			testAudioPreview.innerHTML = '';
+		}
+	} catch (error) {
+		console.warn('Lỗi load audio đề thi:', error);
+		testAudioFile.dataset.existingUrl = '';
+		testAudioFile.value = '';
+		testAudioPreview.innerHTML = '';
+	}
+}
+
 async function loadSavedQuestionsToForm() {
 	const testSelect = document.getElementById('testSelect');
 	const partSelect = document.getElementById('partSelect');
@@ -227,6 +288,9 @@ async function loadSavedQuestionsToForm() {
 
 	AppState.loadedQuestionIds.clear();
 	AppState.loadedPassageIds.clear();
+
+	// Load audio đề thi
+	await loadTestAudio(testId);
 
 	try {
 		const response = await fetch(`/api/questions?test_id=${testId}`);
@@ -471,9 +535,6 @@ async function submitData(event) {
 	}
 
 	showMessage('Đang lưu dữ liệu...', 'info');
-
-	// ✅ Lưu audio của bài test trước
-	await submitTestAudio(testId);
 
 	let totalCreated = 0;
 	let errorMessages = [];

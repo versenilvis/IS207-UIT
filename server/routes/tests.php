@@ -23,8 +23,15 @@ if ($method === 'GET') {
     }
 } elseif ($method === 'POST') {
     // POST /api/tests - tạo đề mới, chỉ admin
-    requireAdmin();
-    createTest();
+    // POST /api/tests/{uuid}/audio - upload audio đề thi
+    if (!empty($parts[1]) && !empty($parts[2]) && $parts[2] === 'audio') {
+        // Upload audio đề thi - user có quyền chỉnh sửa câu hỏi có thể lưu
+        requireAuth();
+        uploadTestAudio($parts[1]);
+    } else {
+        requireAdmin();
+        createTest();
+    }
 } elseif ($method === 'PUT') {
     // PUT /api/tests/{uuid} - cập nhật đề, chỉ admin
     requireAdmin();

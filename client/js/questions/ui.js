@@ -107,13 +107,6 @@ function previewTestAudio(input) {
 	if (!input.files || !input.files[0]) return;
 
 	const file = input.files[0];
-	const maxSize = 50 * 1024 * 1024; // 50MB
-	if (file.size > maxSize) {
-		showMessage('File âm thanh quá lớn! Tối đa 50MB', 'error');
-		input.value = '';
-		return;
-	}
-
 	const url = URL.createObjectURL(file);
 	container.innerHTML = `<audio controls src="${url}" style="width: 100%;"></audio>`;
 }
