@@ -64,7 +64,7 @@ function validateAllBlocks(blocks, part) {
 
             if (checkError(!block.querySelector('.question-content')?.value.trim(), `Câu #${blockIndex + 1}: Vui lòng nhập nội dung câu hỏi`)) return;
 
-            // ✅ Kiểm tra số options (3 cho Part 2, 4 cho Part khác)
+            //  Kiểm tra số options (3 cho Part 2, 4 cho Part khác)
             const options = block.querySelectorAll('.option-item:not(.option-item-d) .option-content, .option-item-d:not([style*="display: none"]) .option-content');
             const optionInputs = block.querySelectorAll('.option-content');
             let filledOptionsCount = 0;
@@ -113,7 +113,7 @@ function validateAllBlocks(blocks, part) {
 
                 if (checkError(!subQ.querySelector('.question-content')?.value.trim(), `Cụm #${blockIndex + 1}, Câu #${subIndex + 1}: Thiếu nội dung`)) return;
                 
-                // ✅ Kiểm tra options cho sub-question (3 cho Part 2, 4 cho Part khác)
+                //  Kiểm tra options cho sub-question (3 cho Part 2, 4 cho Part khác)
                 const subOptInputs = subQ.querySelectorAll('.option-content');
                 subOptInputs.forEach((opt, idx) => {
                     const isPartD = opt.closest('.sub-option-d');
