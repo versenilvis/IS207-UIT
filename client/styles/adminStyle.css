@@ -33,7 +33,7 @@ body {
     overflow-x: hidden;
 }
 
-/* thanh sidebar quản trị */
+
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--bg-sidebar);
@@ -57,7 +57,7 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* danh mục menu sidebar */
+
 .sidebar-menu {
     list-style: none;
     padding: 10px 0;
@@ -108,7 +108,7 @@ body {
     border-radius: 10px;
 }
 
-/* chân trang của sidebar */
+
 .sidebar-footer {
     padding: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -152,7 +152,7 @@ body {
     color: #fca5a5;
 }
 
-/* vùng hiển thị nội dung chính */
+
 .main-content {
     margin-left: var(--sidebar-width);
     flex: 1;
@@ -178,7 +178,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* tiêu đề trang kiểu mới */
+
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -211,7 +211,7 @@ body {
     color: var(--text-primary);
 }
 
-/* cấu trúc tab ngang ở đầu trang */
+
 .horizontal-tabs {
     display: flex;
     gap: 24px;
@@ -240,7 +240,7 @@ body {
     border-bottom-color: var(--accent-blue);
 }
 
-/* bộ lọc điều khiển kiểu mới */
+
 .filter-toolbar {
     display: flex;
     gap: 12px;
@@ -279,7 +279,7 @@ body {
     border-color: var(--accent-blue);
 }
 
-/* cấu trúc danh sách dạng thẻ cho học viên */
+
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -342,7 +342,7 @@ body {
     margin-top: 2px;
 }
 
-/* thanh tiến trình trong thẻ */
+
 .progress-section {
     margin-bottom: 16px;
 }
@@ -382,7 +382,7 @@ body {
     border-top: 1px solid var(--border-color);
 }
 
-/* cấu trúc bảng dữ liệu kiểu mới */
+
 .table-container {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -426,7 +426,7 @@ tr:hover td {
     background-color: #f8fafc;
 }
 
-/* nhãn trạng thái */
+
 .badge {
     display: inline-flex;
     align-items: center;
@@ -461,7 +461,7 @@ tr:hover td {
     color: #64748b;
 }
 
-/* nút hành động dạng gọn */
+
 .btn-primary {
     background-color: var(--accent-blue);
     color: #ffffff;
@@ -513,7 +513,7 @@ tr:hover td {
     transform: scale(0.98);
 }
 
-/* cấu phần phân trang */
+
 .pagination-wrapper {
     display: flex;
     justify-content: space-between;
@@ -563,7 +563,7 @@ tr:hover td {
     opacity: 0.4;
 }
 
-/* biểu đồ và modal */
+
 .chart-container {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -694,7 +694,7 @@ tr:hover td {
     color: var(--text-primary);
 }
 
-/* khung thống kê nhanh */
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -776,7 +776,7 @@ tr:hover td {
     letter-spacing: -0.02em;
 }
 
-/* biểu tượng chìm cỡ lớn giống trang Results */
+
 .stat-icon {
     position: absolute;
     right: -15px;
@@ -798,7 +798,7 @@ tr:hover td {
     opacity: 0.12;
 }
 
-/* các theme màu giống trang Results */
+
 .stat-card.theme-dark {
     background: linear-gradient(135deg, #05102b 0%, #1e3a8a 100%);
     border: none;
@@ -861,7 +861,7 @@ tr:hover td {
     color: #dc2626;
 }
 
-/* thiết lập đa dạng màn hình */
+
 @media (max-width: 768px) {
     :root {
         --sidebar-width: 70px;
@@ -901,7 +901,7 @@ tr:hover td {
     }
 }
 
-/* spinning animation for import loader */
+
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
@@ -911,7 +911,7 @@ tr:hover td {
     animation: spin 2s linear infinite;
 }
 
-/* import message styles */
+
 .import-message-box {
     margin-top: 15px;
     padding: 10px;
@@ -929,4 +929,251 @@ tr:hover td {
     background-color: rgba(239, 68, 68, 0.1);
     color: var(--accent-red);
     border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+
+.bulk-actions-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+    padding: 14px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.bulk-actions-toolbar .selected-count {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--accent-blue);
+}
+
+.bulk-actions-toolbar .bulk-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+/* bulk action buttons */
+.bulk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid transparent;
+}
+
+.bulk-btn:active {
+    transform: scale(0.96);
+}
+
+.bulk-btn i {
+    font-size: 1rem;
+}
+
+.bulk-btn-admin {
+    background-color: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: #d97706;
+}
+
+.bulk-btn-admin:hover {
+    background-color: #d97706;
+    border-color: #d97706;
+    color: #ffffff;
+}
+
+.bulk-btn-user {
+    background-color: rgba(100, 116, 139, 0.08);
+    border-color: rgba(100, 116, 139, 0.2);
+    color: #475569;
+}
+
+.bulk-btn-user:hover {
+    background-color: #475569;
+    border-color: #475569;
+    color: #ffffff;
+}
+
+.bulk-btn-lock {
+    background-color: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #dc2626;
+}
+
+.bulk-btn-lock:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+.bulk-btn-unlock {
+    background-color: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #059669;
+}
+
+.bulk-btn-unlock:hover {
+    background-color: #059669;
+    border-color: #059669;
+    color: #ffffff;
+}
+
+.custom-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.custom-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.custom-modal-box {
+    background-color: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 460px;
+    padding: 28px;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(15, 23, 42, 0.02);
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.custom-modal-overlay.active .custom-modal-box {
+    transform: scale(1);
+}
+
+.custom-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.custom-modal-header .header-icon {
+    font-size: 1.6rem;
+    padding: 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-modal-header.danger-header .header-icon {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.08);
+}
+
+.custom-modal-header.warning-header .header-icon {
+    color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.08);
+}
+
+.custom-modal-header.success-header .header-icon {
+    color: #10b981;
+    background-color: rgba(16, 185, 129, 0.08);
+}
+
+.custom-modal-header.info-header .header-icon,
+.custom-modal-header.alert-header .header-icon {
+    color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.08);
+}
+
+.custom-modal-header h2 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.custom-modal-body p {
+    font-size: 14.5px;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.custom-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.custom-modal-footer button {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-btn-confirm {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.modal-btn-confirm:hover {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.modal-btn-confirm:active {
+    transform: scale(0.97);
+}
+
+.modal-btn-confirm-danger {
+    background-color: #dc2626;
+    color: #ffffff;
+    border: 1px solid #dc2626;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.modal-btn-confirm-danger:hover {
+    background-color: #b91c1c;
+    border-color: #b91c1c;
+}
+
+.modal-btn-confirm-danger:active {
+    transform: scale(0.97);
+}
+
+.modal-btn-cancel {
+    background-color: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.modal-btn-cancel:hover {
+    background-color: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
+.modal-btn-cancel:active {
+    transform: scale(0.97);
 }

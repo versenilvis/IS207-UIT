@@ -170,6 +170,102 @@ function updateAdminUser($userId) {
     }
 }
 
+// cập nhật hàng loạt trạng thái khóa/mở khóa hoặc vai trò của các user
+function bulkUpdateAdminUsers() {
+    global $conn;
+    checkAdminAccess();
+
+    $actorId = (int)$_SESSION['user_id'];
+
+    $input = json_decode(file_get_contents('php://input'), true);
+    $ids = $input['ids'] ?? [];
+    $is_banned = isset($input['is_banned']) ? (int)$input['is_banned'] : null;
+    $role = $input['role'] ?? null;
+
+    if (empty($ids) || ($is_banned === null && $role === null)) {
+        sendError("Dữ liệu yêu cầu không đầy đủ", 400);
+    }
+
+    try {
+        $conn->beginTransaction();
+
+        // chỉ lọc ra những id hợp lệ (không tự thay đổi chính mình)
+        $allowedIds = [];
+        foreach ($ids as $id) {
+            $idInt = (int)$id;
+            if ($idInt !== $actorId) {
+                $allowedIds[] = $idInt;
+            }
+        }
+
+        if (empty($allowedIds)) {
+            sendError("Danh sách tài khoản được chọn không hợp lệ", 400);
+        }
+
+        $updatePlaceholders = implode(',', array_fill(0, count($allowedIds), '?'));
+        
+        if ($is_banned !== null) {
+            $updateSql = "UPDATE users SET is_banned = ? WHERE id IN ($updatePlaceholders)";
+            $params = array_merge([$is_banned], $allowedIds);
+        } else {
+            if (!in_array($role, ['user', 'admin'])) {
+                sendError("Vai trò không hợp lệ", 400);
+            }
+            $updateSql = "UPDATE users SET role = ? WHERE id IN ($updatePlaceholders)";
+            $params = array_merge([$role], $allowedIds);
+        }
+
+        $updateStmt = $conn->prepare($updateSql);
+        $updateStmt->execute($params);
+
+        $conn->commit();
+
+        sendJson([
+            'success' => true,
+            'message' => 'Đã cập nhật trạng thái thành công cho ' . count($allowedIds) . ' học viên'
+        ]);
+    } catch (Exception $e) {
+        if ($conn->inTransaction()) {
+            $conn->rollBack();
+        }
+        sendError("Lỗi hệ thống: " . $e->getMessage(), 500);
+    }
+}
+
+// xóa người dùng khỏi hệ thống
+function deleteAdminUser($userId) {
+    global $conn;
+    checkAdminAccess();
+
+    $actorId = (int)$_SESSION['user_id'];
+    if ($userId === $actorId) {
+        sendError("Bạn không thể tự xóa tài khoản của chính mình", 400);
+    }
+
+    try {
+        // lấy thông tin avatar để xóa tệp
+        $stmt = $conn->prepare("SELECT avatar FROM users WHERE id = :id");
+        $stmt->execute(['id' => $userId]);
+        $avatar = $stmt->fetchColumn();
+
+        if ($avatar && strpos($avatar, '/server/uploads/') === 0) {
+            require_once __DIR__ . '/../utils/fileHandler.php';
+            fh_delete_file($avatar);
+        }
+
+        // thực hiện xóa user
+        $stmtDelete = $conn->prepare("DELETE FROM users WHERE id = :id");
+        $stmtDelete->execute(['id' => $userId]);
+
+        sendJson([
+            'success' => true,
+            'message' => 'Xóa tài khoản người dùng thành công'
+        ]);
+    } catch (PDOException $e) {
+        sendError("Lỗi database: " . $e->getMessage(), 500);
+    }
+}
+
 // lấy danh sách lượt thi phân trang
 function getAdminAttempts() {
     global $conn;

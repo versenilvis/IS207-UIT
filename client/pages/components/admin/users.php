@@ -55,11 +55,31 @@
         </select>
     </div>
 
+    <!-- thanh thao tác hàng loạt -->
+    <div class="bulk-actions-toolbar" id="bulk-actions-toolbar" style="display: none;">
+        <span class="selected-count" id="selected-users-count">Đã chọn 0 học viên</span>
+        <div class="bulk-buttons">
+            <button class="bulk-btn bulk-btn-admin" id="bulk-admin-btn">
+                <i class="bx bx-shield"></i> Lên Admin
+            </button>
+            <button class="bulk-btn bulk-btn-user" id="bulk-user-btn">
+                <i class="bx bx-user"></i> Xuống Học viên
+            </button>
+            <button class="bulk-btn bulk-btn-lock" id="bulk-lock-btn">
+                <i class="bx bx-block"></i> Khóa tài khoản
+            </button>
+            <button class="bulk-btn bulk-btn-unlock" id="bulk-unlock-btn">
+                <i class="bx bx-check-circle"></i> Mở khóa
+            </button>
+        </div>
+    </div>
+
     <!-- danh sách người dùng hiển thị dưới dạng bảng -->
     <div class="table-container" style="overflow-x: auto;">
         <table>
             <thead>
                 <tr>
+                    <th style="width: 40px; text-align: center; vertical-align: middle;"><input type="checkbox" id="select-all-users" style="cursor: pointer; width: 16px; height: 16px; margin: 0;"></th>
                     <th>Học viên</th>
                     <th>Email</th>
                     <th>Vai trò</th>

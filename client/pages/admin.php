@@ -59,6 +59,10 @@ $test_id = $_GET['test_id'] ?? '';
         <script src="../js/questions/main.js"></script>
     <?php endif; ?>
 
+    <script>
+        window.adminUserId = <?= (int)$_SESSION['user_id'] ?>
+    </script>
+
     <!-- tải các file điều khiển mô-đun chính dashboard -->
     <script src="../js/admin/main.js?v=<?= time() ?>"></script>
     <script src="../js/admin/overview.js?v=<?= time() ?>"></script>

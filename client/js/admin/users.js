@@ -1,3 +1,110 @@
+// hiển thị cửa sổ xác nhận tùy chỉnh
+function showConfirmModal(title, message, type = 'warning', confirmText = 'Xác nhận', cancelText = 'Hủy') {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'custom-modal-overlay';
+        
+        let iconClass = 'bx-help-circle';
+        let headerClass = 'warning-header';
+        let confirmBtnClass = 'modal-btn-confirm';
+        
+        if (type === 'danger') {
+            iconClass = 'bx-x-circle';
+            headerClass = 'danger-header';
+            confirmBtnClass = 'modal-btn-confirm-danger';
+        }
+        
+        modal.innerHTML = `
+            <div class="custom-modal-box">
+                <div class="custom-modal-header ${headerClass}">
+                    <i class="bx ${iconClass} header-icon"></i>
+                    <h2>${title}</h2>
+                </div>
+                <div class="custom-modal-body">
+                    <p>${message}</p>
+                </div>
+                <div class="custom-modal-footer">
+                    <button class="modal-btn-cancel">${cancelText}</button>
+                    <button class="${confirmBtnClass}">${confirmText}</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.classList.add('active');
+        }, 10);
+        
+        const close = (result) => {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.remove();
+                resolve(result);
+            }, 250);
+        };
+        
+        modal.querySelector(`.${confirmBtnClass}`).addEventListener('click', () => close(true));
+        modal.querySelector('.modal-btn-cancel').addEventListener('click', () => close(false));
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) close(false);
+        });
+    });
+}
+
+// hiển thị thông báo tùy chỉnh
+function showAlertModal(title, message, type = 'info', buttonText = 'Đóng') {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'custom-modal-overlay';
+        
+        let iconClass = 'bx-info-circle';
+        let headerClass = 'info-header';
+        
+        if (type === 'error') {
+            iconClass = 'bx-x-circle';
+            headerClass = 'danger-header';
+        } else if (type === 'success') {
+            iconClass = 'bx-check-circle';
+            headerClass = 'success-header';
+        }
+        
+        modal.innerHTML = `
+            <div class="custom-modal-box">
+                <div class="custom-modal-header ${headerClass}">
+                    <i class="bx ${iconClass} header-icon"></i>
+                    <h2>${title}</h2>
+                </div>
+                <div class="custom-modal-body">
+                    <p>${message}</p>
+                </div>
+                <div class="custom-modal-footer">
+                    <button class="modal-btn-confirm">${buttonText}</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.classList.add('active');
+        }, 10);
+        
+        const close = () => {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.remove();
+                resolve();
+            }, 250);
+        };
+        
+        modal.querySelector('.modal-btn-confirm').addEventListener('click', close);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) close();
+        });
+    });
+}
+
 // tải danh sách người dùng phân trang
 async function loadUsersList(page) {
     usersState.page = page;
@@ -70,6 +177,11 @@ function renderUsersTable(users) {
 
         const row = document.createElement('tr');
         row.innerHTML = `
+            <td style="text-align: center; vertical-align: middle;">
+                ${parseInt(user.id) === window.adminUserId ? '' : `
+                    <input type="checkbox" class="user-select-checkbox" data-id="${user.id}" style="cursor: pointer; width: 16px; height: 16px; margin: 0;">
+                `}
+            </td>
             <td>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     ${avatarHtml}
@@ -103,11 +215,22 @@ function renderUsersTable(users) {
                     <button class="btn-primary ban-btn" style="padding: 5px 10px; font-size: 11px; background-color: ${isBanned ? 'var(--accent-green)' : 'var(--accent-red)'};" data-id="${user.id}" data-banned="${isBanned ? '0' : '1'}">
                         ${isBanned ? 'Bỏ' : 'Khóa'}
                     </button>
+                    <button class="btn-primary delete-btn" style="padding: 5px 10px; font-size: 11px; background-color: var(--accent-red); border-color: var(--accent-red); ${parseInt(user.id) === window.adminUserId ? 'visibility: hidden;' : ''}" data-id="${user.id}">
+                        Xóa
+                    </button>
                 </div>
             </td>
         `;
         tbody.appendChild(row);
     });
+
+    // gắn sự kiện thay đổi chọn checkbox
+    tbody.querySelectorAll('.user-select-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateBulkActionsToolbar);
+    });
+
+    // cập nhật lại trạng thái toolbar mỗi khi vẽ lại bảng
+    updateBulkActionsToolbar();
 
     // gắn sự kiện thay đổi trực tuyến
     tbody.querySelectorAll('.role-select').forEach(select => {
@@ -123,11 +246,55 @@ function renderUsersTable(users) {
             const userId = e.target.dataset.id;
             const newBanned = parseInt(e.target.dataset.banned);
             const msg = newBanned === 1 ? "Bạn có chắc chắn muốn khóa tài khoản này không?" : "Bạn muốn bỏ khóa tài khoản này?";
-            if (confirm(msg)) {
+            const confirmed = await showConfirmModal(
+                newBanned === 1 ? "Khóa tài khoản" : "Mở khóa tài khoản",
+                msg,
+                newBanned === 1 ? 'danger' : 'warning'
+            );
+            if (confirmed) {
                 await updateUserField(userId, { is_banned: newBanned });
             }
         });
     });
+
+    tbody.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const userId = parseInt(e.target.dataset.id);
+            if (userId === window.adminUserId) return;
+            const confirmed = await showConfirmModal(
+                "Xóa tài khoản",
+                "Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản người dùng này không? Tất cả lịch sử làm bài và giao dịch sẽ bị xóa và hành động này không thể hoàn tác",
+                "danger",
+                "Xác nhận xóa"
+            );
+            if (confirmed) {
+                await deleteUser(userId);
+            }
+        });
+    });
+}
+
+// cập nhật trạng thái hiển thị của thanh bulk actions
+function updateBulkActionsToolbar() {
+    const checkboxes = document.querySelectorAll('.user-select-checkbox');
+    const checked = Array.from(checkboxes).filter(cb => cb.checked);
+    const toolbar = document.getElementById('bulk-actions-toolbar');
+    const countEl = document.getElementById('selected-users-count');
+    const selectAllCheckbox = document.getElementById('select-all-users');
+
+    if (!toolbar) return;
+
+    if (checked.length > 0) {
+        toolbar.style.display = 'flex';
+        countEl.textContent = `Đã chọn ${checked.length} học viên`;
+    } else {
+        toolbar.style.display = 'none';
+    }
+
+    // cập nhật trạng thái checkbox chọn tất cả
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = checkboxes.length > 0 && checked.length === checkboxes.length;
+    }
 }
 
 // cập nhật vai trò hoặc trạng thái khóa qua API
@@ -142,10 +309,29 @@ async function updateUserField(userId, data) {
         if (result.success) {
             await loadUsersList(usersState.page);
         } else {
-            alert("Lỗi: " + result.message);
+            await showAlertModal("Lỗi", result.message, "error");
         }
     } catch (error) {
         console.error('error updating user status:', error);
+    }
+}
+
+// xóa người dùng qua API
+async function deleteUser(userId) {
+    try {
+        const response = await fetch(`/api/admin/users/${userId}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+        if (result.success) {
+            await showAlertModal("Thành công", result.message || 'Xóa tài khoản thành công', "success");
+            await loadUsersList(usersState.page);
+        } else {
+            await showAlertModal("Lỗi", result.message, "error");
+        }
+    } catch (error) {
+        console.error('error deleting user:', error);
+        await showAlertModal("Lỗi", "Có lỗi xảy ra khi xóa tài khoản", "error");
     }
 }
 
@@ -172,4 +358,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (filterUsersRole) filterUsersRole.addEventListener('change', handleUsersFilterChange);
     if (filterUsersStatus) filterUsersStatus.addEventListener('change', handleUsersFilterChange);
+
+    // xử lý chọn tất cả học viên
+    const selectAllCheckbox = document.getElementById('select-all-users');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', (e) => {
+            const checked = e.target.checked;
+            document.querySelectorAll('.user-select-checkbox').forEach(cb => {
+                cb.checked = checked;
+            });
+            updateBulkActionsToolbar();
+        });
+    }
+
+    // xử lý sự kiện click cho các nút thao tác hàng loạt
+    const bulkLockBtn = document.getElementById('bulk-lock-btn');
+    const bulkUnlockBtn = document.getElementById('bulk-unlock-btn');
+    const bulkAdminBtn = document.getElementById('bulk-admin-btn');
+    const bulkUserBtn = document.getElementById('bulk-user-btn');
+
+    const handleBulkAction = async (payload, actionText) => {
+        const checkedBoxes = document.querySelectorAll('.user-select-checkbox:checked');
+        const ids = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.id));
+        if (ids.length === 0) return;
+
+        const confirmed = await showConfirmModal(
+            "Thao tác hàng loạt",
+            `Bạn có chắc chắn muốn ${actionText} ${ids.length} tài khoản đã chọn?`,
+            payload.is_banned === 1 ? 'danger' : 'warning'
+        );
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/admin/users', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ids: ids,
+                    ...payload
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                await showAlertModal("Thành công", result.message || 'Thao tác hàng loạt thành công', "success");
+                const selectAllCheckbox = document.getElementById('select-all-users');
+                if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                await loadUsersList(usersState.page);
+            } else {
+                await showAlertModal("Lỗi", result.message, "error");
+            }
+        } catch (error) {
+            console.error('error executing bulk action:', error);
+            await showAlertModal("Lỗi", "Có lỗi xảy ra khi thực hiện thao tác hàng loạt", "error");
+        }
+    };
+
+    if (bulkLockBtn) bulkLockBtn.addEventListener('click', () => handleBulkAction({ is_banned: 1 }, 'khóa'));
+    if (bulkUnlockBtn) bulkUnlockBtn.addEventListener('click', () => handleBulkAction({ is_banned: 0 }, 'mở khóa'));
+    if (bulkAdminBtn) bulkAdminBtn.addEventListener('click', () => handleBulkAction({ role: 'admin' }, 'nâng lên admin'));
+    if (bulkUserBtn) bulkUserBtn.addEventListener('click', () => handleBulkAction({ role: 'user' }, 'hạ xuống học viên'));
 });

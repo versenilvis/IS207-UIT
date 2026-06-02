@@ -154,8 +154,14 @@ function handleLogin() {
         $stmt->execute(['email' => $data['email']]);
         $user = $stmt->fetch();
         
-        //Thêm phần kiểm tra xem account token có NULL hay không. Nếu null mới được đăng nhập.
+        // Thêm phần kiểm tra xem account token có NULL hay không. Nếu null mới được đăng nhập.
         if ($user && password_verify($data['password'], $user['password']) && $user['account_activation_hash'] === null) {
+            // kiểm tra tài khoản bị khóa
+            if (isset($user['is_banned']) && (int)$user['is_banned'] === 1) {
+                authResponse(false, "Tài khoản của bạn đã bị đình chỉ hoạt động do vi phạm điều khoản dịch vụ. Nếu bạn cho rằng đây là một sự cố hoặc sai sót, vui lòng báo cáo tới support@prephub.com để được hỗ trợ", "/client/pages/home.php", "login_error");
+                return;
+            }
+
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['first_name'] = $user['first_name'];

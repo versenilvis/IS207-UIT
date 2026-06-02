@@ -26,9 +26,17 @@ switch ($sub_resource) {
         } elseif ($method === 'PUT') {
             $user_id = $parts[2] ?? '';
             if (empty($user_id)) {
-                sendError("Thiếu ID người dùng", 400);
+                bulkUpdateAdminUsers();
+            } else {
+                updateAdminUser((int)$user_id);
             }
-            updateAdminUser((int)$user_id);
+        } elseif ($method === 'DELETE') {
+            $user_id = $parts[2] ?? '';
+            if (empty($user_id)) {
+                sendError("Thiếu ID người dùng", 400);
+            } else {
+                deleteAdminUser((int)$user_id);
+            }
         } else {
             sendError("Phương thức không được hỗ trợ", 405);
         }
