@@ -38,9 +38,10 @@ async function fetchExamData() {
         const questions_lists = await response.json();
         const questions = questions_lists.data.questions;
         const testDuration = Number(questions_lists.data.duration);
+        const testAudioUrl = questions_lists.data.audio_url;
 
         
-        setupExamAudio(questions);
+        setupExamAudio(testAudioUrl, questions);
         renderQuestions(questions);
         document.getElementById("exam-title").innerHTML = questions_lists.data.title;  
         renderSidebar(questions); 
@@ -57,14 +58,14 @@ async function fetchExamData() {
 }
 
 /**
- * Tìm link audio đầu tiên có trong danh sách câu hỏi -> Gán vào thẻ <audio> -> 
+ * Lấy audio từ tests.audio_url -> Gán vào thẻ <audio> -> 
  * Nếu không có audio thì khóa nút Play.
  */
-function setupExamAudio(questions) {
+function setupExamAudio(testAudioUrl, questions) {
     const audioEl = document.getElementById('exam-audio');
     const playBtn = document.getElementById('custom-play-btn');
     const statusText = document.getElementById('audio-status');
-    if (!audioEl || !playBtn || !Array.isArray(questions)) return;
+    if (!audioEl || !playBtn) return;
 
     // kiểm tra xem đây có phải đề reading thuần hay không
     const isReadingOnly = questions.every(q => parseInt(q.part) >= 5);
@@ -80,13 +81,8 @@ function setupExamAudio(questions) {
         return;
     }
 
-    // Tìm URL audio đầu tiên xuất hiện trong đề
-    const firstAudioUrl = questions.reduce((foundUrl, q) => {
-        if (foundUrl) return foundUrl;
-        return q.passage_audio || q.audio_url || '';
-    }, '');
-
-    if (!firstAudioUrl) {
+    // Sử dụng audio từ tests.audio_url
+    if (!testAudioUrl || testAudioUrl === 'null') {
         audioEl.removeAttribute('src');
         playBtn.disabled = true;
         playBtn.classList.replace('btn-primary', 'btn-secondary');
@@ -95,7 +91,7 @@ function setupExamAudio(questions) {
         return;
     }
 
-    audioEl.src = firstAudioUrl;
+    audioEl.src = testAudioUrl;
     audioEl.load();
 
     const warningBox = document.getElementById('listening-intro-warning');
