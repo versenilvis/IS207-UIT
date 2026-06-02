@@ -237,7 +237,7 @@ function renderReviewList(questions) {
             });
 
             let explanationHtml = '';
-            if (item.explanation && item.explanation.trim()) {
+            if (item.explanation && item.explanation.trim() && item.explanation !== 'null') {
                 explanationHtml = `
                 <div class="explanation-box mt-3 p-3 rounded" style="font-size: 0.9rem; background-color: #f8fafc; border-left: 4px solid #3b82f6; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
                     <strong style="color: #2563eb; display: block; margin-bottom: 4px;"><i class="bx bx-info-circle me-1"></i>Giải thích:</strong>
