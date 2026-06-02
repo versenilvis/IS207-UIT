@@ -145,7 +145,7 @@ function renderReviewList(questions) {
                     </div>`;
                 }
                 let passageAudioHtml = '';
-                if (item.passage_audio) {
+                if (item.passage_audio && item.passage_audio !== 'null') {
                     passageAudioHtml = `<audio controls src="${item.passage_audio}" class="mt-2" style="max-width: 320px; display: block;"></audio>`;
                 }
                 const isPlaceholder = item.paragraph.trim().startsWith('Questions ') && !item.paragraph.includes('<');
@@ -193,8 +193,8 @@ function renderReviewList(questions) {
             }
 
             let mediaHtml = '';
-            if (item.image_url) mediaHtml += `<img src="${item.image_url}" class="img-fluid mt-2" style="max-height:280px;">`;
-            if (item.audio_url) mediaHtml += `<audio controls src="${item.audio_url}" class="mt-2" style="max-width: 320px; display: block;"></audio>`;
+            if (item.image_url && item.image_url !== 'null') mediaHtml += `<img src="${item.image_url}" class="img-fluid mt-2" style="max-height:280px;">`;
+            if (item.audio_url && item.audio_url !== 'null') mediaHtml += `<audio controls src="${item.audio_url}" class="mt-2" style="max-width: 320px; display: block;"></audio>`;
 
             const displayContent = item.question_content || (parseInt(item.part) === 2 ? 'Mark your answer on your answer sheet.' : '');
             const contentHtml = displayContent || (mediaHtml ? '' : '<i style="color:#94a3b8;">Nội dung không khả dụng.</i>');
