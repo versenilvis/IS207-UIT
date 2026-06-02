@@ -17,7 +17,6 @@ function showConfirmModal(title, message, type = 'warning', confirmText = 'Xác 
         modal.innerHTML = `
             <div class="custom-modal-box">
                 <div class="custom-modal-header ${headerClass}">
-                    <i class="bx ${iconClass} header-icon"></i>
                     <h2>${title}</h2>
                 </div>
                 <div class="custom-modal-body">

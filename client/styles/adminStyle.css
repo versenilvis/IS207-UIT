@@ -200,6 +200,32 @@ body {
     text-decoration: none;
 }
 
+#section-users .table-container {
+    min-height: 570px;
+}
+
+#section-users td {
+    white-space: nowrap;
+}
+
+#section-users td strong {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#section-users td code {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .page-title-container {
     display: flex;
     flex-direction: column;
