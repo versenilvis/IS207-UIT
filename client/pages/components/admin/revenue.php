@@ -75,7 +75,7 @@
         </table>
     </div>
 
-    <div class="table-container" style="overflow-x: auto;">
+    <div class="table-container transaction-history-container" style="overflow-x: auto;">
         <h2 style="font-size: 15px; font-weight: 600; padding: 16px 20px 0 20px;">Lịch sử giao dịch thành công</h2>
         <table>
             <thead>

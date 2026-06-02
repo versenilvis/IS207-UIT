@@ -212,6 +212,10 @@ body {
     min-height: 570px;
 }
 
+#section-revenue .transaction-history-container {
+    min-height: 610px;
+}
+
 #section-tests td {
     white-space: nowrap;
 }
