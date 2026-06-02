@@ -204,6 +204,10 @@ body {
     min-height: 570px;
 }
 
+#section-attempts .table-container {
+    min-height: 780px;
+}
+
 #section-users td {
     white-space: nowrap;
 }

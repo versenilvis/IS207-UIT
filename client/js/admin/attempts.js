@@ -55,14 +55,14 @@ function renderAttemptsTable(attempts) {
             <td>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     ${avatarHtml}
-                    <div>
-                        <div style="font-weight: 600;">${attempt.first_name} ${attempt.last_name}</div>
-                        <div style="font-size: 11px; color: var(--text-secondary);">${attempt.email}</div>
+                    <div style="max-width: 180px; overflow: hidden;">
+                        <div style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${attempt.first_name} ${attempt.last_name}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${attempt.email}</div>
                         ${isPremium ? '<span class="badge success" style="font-size: 9px; padding: 2px 4px; margin-top: 4px;">Pro</span>' : ''}
                     </div>
                 </div>
             </td>
-            <td><strong>${attempt.title}</strong></td>
+            <td><strong style="display: inline-block; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;">${attempt.title}</strong></td>
             <td>${correctText}</td>
             <td><strong style="color: var(--accent-blue);">${attempt.total_score}</strong> <span style="font-size: 11px; color: var(--text-secondary);">(${scoreText})</span></td>
             <td>${formatTimeSpent(attempt.time_spent)}</td>
