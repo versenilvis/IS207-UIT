@@ -77,7 +77,7 @@ function renderUsersTable(users) {
                 </div>
             </td>
             <td><code>${user.email}</code></td>
-            <td><span class="badge info">${user.role === 'admin' ? 'Quản trị viên' : 'Học viên'}</span></td>
+            <td><span class="badge ${user.role === 'admin' ? 'warning' : 'secondary'}">${user.role === 'admin' ? 'Quản trị viên' : 'Học viên'}</span></td>
             <td>${planBadge}</td>
             <td style="min-width: 140px;">
                 <div>
