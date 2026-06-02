@@ -433,9 +433,25 @@ $test_id = $_GET['test_id'] ?? '';
                 </select>
             </div>
 
-            <!-- danh sách người dùng hiển thị dưới dạng thẻ premium theo thiết kế mockup -->
-            <div class="cards-grid" id="userCardsGrid">
-                <!-- hiển thị bằng JS -->
+            <!-- danh sách người dùng hiển thị dưới dạng bảng -->
+            <div class="table-container" style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Học viên</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Gói dịch vụ</th>
+                            <th>Tiến trình học tập</th>
+                            <th>Ngày đăng ký</th>
+                            <th>Trạng thái</th>
+                            <th style="text-align: right; min-width: 160px;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <!-- hiển thị bằng JS -->
+                    </tbody>
+                </table>
             </div>
 
             <div class="pagination-wrapper" id="users-pagination">

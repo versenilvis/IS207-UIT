@@ -294,7 +294,7 @@ async function loadUsersList(page) {
         const result = await response.json();
         
         if (result.success) {
-            renderUsersCards(result.data);
+            renderUsersTable(result.data);
             
             // cập nhật thống kê người dùng
             const stats = result.stats;
@@ -310,14 +310,14 @@ async function loadUsersList(page) {
     }
 }
 
-// hiển thị danh sách người dùng dạng thẻ (mockup design)
-function renderUsersCards(users) {
-    const grid = document.getElementById('userCardsGrid');
-    if (!grid) return;
+// hiển thị danh sách người dùng dưới dạng bảng
+function renderUsersTable(users) {
+    const tbody = document.getElementById('userTableBody');
+    if (!tbody) return;
 
-    grid.innerHTML = '';
+    tbody.innerHTML = '';
     if (users.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1 / -1;" class="text-center text-muted">Không tìm thấy người dùng nào</div>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Không tìm thấy người dùng nào</td></tr>';
         return;
     }
 
@@ -342,43 +342,36 @@ function renderUsersCards(users) {
             planBadge = `<span class="badge success">${user.premium_plan || 'Pro'}</span>`;
         }
 
-        const card = document.createElement('div');
-        card.className = 'user-card';
-        card.innerHTML = `
-            <div>
-                <div class="card-top">
-                    <div class="user-avatar">
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 13px; display: flex; align-items: center; justify-content: center; background-color: var(--accent-blue); color: #ffffff; border-radius: 50%; font-weight: 600;">
                         ${user.first_name[0] || 'U'}
                     </div>
-                    <div class="user-meta-info">
-                        <div class="user-meta-name">${fullName}</div>
-                        <div class="user-meta-role">${user.role === 'admin' ? 'Quản trị viên' : 'Học viên'} ${planBadge}</div>
-                    </div>
+                    <strong>${fullName}</strong>
                 </div>
-
-                <div class="progress-section">
-                    <div class="progress-header">
-                        <span>Tiến trình học tập</span>
-                        <strong>${attempted}/${total} đề (${percentage}%)</strong>
-                    </div>
-                    <div class="progress-bar-container">
+            </td>
+            <td><code>${user.email}</code></td>
+            <td><span class="badge info">${user.role === 'admin' ? 'Quản trị viên' : 'Học viên'}</span></td>
+            <td>${planBadge}</td>
+            <td style="min-width: 140px;">
+                <div>
+                    <div class="progress-bar-container" style="height: 6px; margin-bottom: 4px;">
                         <div class="progress-bar ${progressClass}" style="width: ${percentage}%;"></div>
                     </div>
+                    <span style="font-size: 11px; color: var(--text-secondary); font-weight: 500;">${attempted}/${total} đề (${percentage}%)</span>
                 </div>
-                
-                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                    <div>Email: <code>${user.email}</code></div>
-                    <div style="margin-top: 4px;">Ngày đăng ký: ${formatDate(user.created_at)}</div>
-                </div>
-            </div>
-
-            <div class="card-footer">
+            </td>
+            <td>${formatDate(user.created_at)}</td>
+            <td>
                 <span class="badge ${isBanned ? 'failed' : 'success'}">
                     <i class="bx ${isBanned ? 'bx-block' : 'bx-check-circle'}" style="margin-right: 4px;"></i> 
                     ${isBanned ? 'Khóa' : 'Hoạt động'}
                 </span>
-                
-                <div style="display: flex; gap: 6px; align-items: center;">
+            </td>
+            <td style="text-align: right;">
+                <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
                     <select class="action-select role-select" style="padding: 4px 6px; font-size: 12px;" data-id="${user.id}">
                         <option value="user" ${user.role === 'user' ? 'selected' : ''}>Học viên</option>
                         <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Quản trị</option>
@@ -387,13 +380,13 @@ function renderUsersCards(users) {
                         ${isBanned ? 'Bỏ' : 'Khóa'}
                     </button>
                 </div>
-            </div>
+            </td>
         `;
-        grid.appendChild(card);
+        tbody.appendChild(row);
     });
 
     // gắn sự kiện thay đổi trực tuyến
-    document.querySelectorAll('.role-select').forEach(select => {
+    tbody.querySelectorAll('.role-select').forEach(select => {
         select.addEventListener('change', async (e) => {
             const userId = e.target.dataset.id;
             const newRole = e.target.value;
@@ -401,7 +394,7 @@ function renderUsersCards(users) {
         });
     });
 
-    document.querySelectorAll('.ban-btn').forEach(btn => {
+    tbody.querySelectorAll('.ban-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             const userId = e.target.dataset.id;
             const newBanned = parseInt(e.target.dataset.banned);
