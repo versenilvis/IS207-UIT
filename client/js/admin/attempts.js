@@ -1,0 +1,68 @@
+// tải danh sách lượt làm bài phân trang
+async function loadAttemptsList(page) {
+    attemptsState.page = page;
+    try {
+        const response = await fetch(`/api/admin/attempts?page=${page}&limit=${attemptsState.limit}`);
+        const result = await response.json();
+        if (result.success) {
+            renderAttemptsTable(result.data);
+            attemptsState.total = result.pagination.total;
+            renderPagination('attempts-pagination', result.pagination, loadAttemptsList);
+        }
+    } catch (error) {
+        console.error('error loading attempts:', error);
+    }
+}
+
+// hiển thị danh sách lượt làm bài
+function renderAttemptsTable(attempts) {
+    const tbody = document.getElementById('attemptTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    if (attempts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Không tìm thấy bài thi thử nào</td></tr>';
+        return;
+    }
+
+    attempts.forEach(attempt => {
+        const isPremium = parseInt(attempt.is_premium) === 1 || attempt.premium_plan !== null;
+        const correctText = `L: ${attempt.listening_correct} | R: ${attempt.reading_correct}`;
+        const scoreText = `L: ${attempt.listening_score} | R: ${attempt.reading_score} | T: ${attempt.total_score}`;
+        
+        // tính toán tỷ lệ tiến trình làm bài
+        const attempted = parseInt(attempt.user_tests_attempted) || 0;
+        const total = parseInt(attempt.total_active_tests) || 1;
+        const percentage = Math.min(100, Math.round((attempted / total) * 100));
+
+        // màu tiến trình nhỏ trong cột bảng
+        let progressClass = 'red';
+        if (percentage >= 80) progressClass = 'green';
+        else if (percentage >= 40) progressClass = 'orange';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div>
+                    <div style="font-weight: 600;">${attempt.first_name} ${attempt.last_name}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">${attempt.email}</div>
+                    ${isPremium ? '<span class="badge success" style="font-size: 9px; padding: 2px 4px; margin-top: 4px;">Pro</span>' : ''}
+                </div>
+            </td>
+            <td><strong>${attempt.title}</strong></td>
+            <td>${correctText}</td>
+            <td><strong style="color: var(--accent-blue);">${attempt.total_score}</strong> <span style="font-size: 11px; color: var(--text-secondary);">(${scoreText})</span></td>
+            <td>${formatTimeSpent(attempt.time_spent)}</td>
+            <td style="min-width: 140px;">
+                <div>
+                    <div class="progress-bar-container" style="height: 4px;">
+                        <div class="progress-bar ${progressClass}" style="width: ${percentage}%;"></div>
+                    </div>
+                    <span style="font-size: 10.5px; color: var(--text-secondary);">${attempted}/${total} đề (${percentage}%)</span>
+                </div>
+            </td>
+            <td>${formatDateTime(attempt.created_at)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
