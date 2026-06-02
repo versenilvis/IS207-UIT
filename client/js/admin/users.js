@@ -58,13 +58,21 @@ function renderUsersTable(users) {
             planBadge = `<span class="badge success">${user.premium_plan || 'Pro'}</span>`;
         }
 
+        let avatarHtml = '';
+        if (user.avatar) {
+            avatarHtml = `<img src="${user.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-color);">`;
+        } else {
+            avatarHtml = `
+                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 13px; display: flex; align-items: center; justify-content: center; background-color: var(--accent-blue); color: #ffffff; border-radius: 50%; font-weight: 600; flex-shrink: 0; border: 1px solid var(--border-color);">
+                    ${user.first_name[0] || 'U'}
+                </div>`;
+        }
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 13px; display: flex; align-items: center; justify-content: center; background-color: var(--accent-blue); color: #ffffff; border-radius: 50%; font-weight: 600;">
-                        ${user.first_name[0] || 'U'}
-                    </div>
+                    ${avatarHtml}
                     <strong>${fullName}</strong>
                 </div>
             </td>

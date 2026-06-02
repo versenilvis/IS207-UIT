@@ -149,13 +149,26 @@ function renderTransactionsTable(transactions) {
         const priceSign = isRefunded ? '-' : '';
         const statusBadge = isRefunded ? ' <span class="badge failed">Đã hoàn tiền</span>' : '';
 
+        let avatarHtml = '';
+        if (tx.avatar) {
+            avatarHtml = `<img src="${tx.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-color);">`;
+        } else {
+            avatarHtml = `
+                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 13px; display: flex; align-items: center; justify-content: center; background-color: var(--accent-blue); color: #ffffff; border-radius: 50%; font-weight: 600; flex-shrink: 0; border: 1px solid var(--border-color);">
+                    ${tx.first_name[0] || 'U'}
+                </div>`;
+        }
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td><code>${tx.tx_id}</code></td>
             <td>
-                <div>
-                    <div style="font-weight: 600;">${fullName}</div>
-                    <div style="font-size: 11px; color: var(--text-secondary);">${tx.email}</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    ${avatarHtml}
+                    <div>
+                        <div style="font-weight: 600;">${fullName}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">${tx.email}</div>
+                    </div>
                 </div>
             </td>
             <td><span class="badge info">${tx.plan_name}</span>${statusBadge}</td>

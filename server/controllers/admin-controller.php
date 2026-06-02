@@ -93,7 +93,7 @@ function getAdminUsers() {
         $total_filtered = (int)$count_stmt->fetchColumn();
 
         // lấy danh sách người dùng
-        $sql = "SELECT id, uuid, first_name, last_name, email, role, is_banned, is_premium, has_course, premium_plan, premium_until, created_at,
+        $sql = "SELECT id, uuid, first_name, last_name, email, role, is_banned, is_premium, has_course, premium_plan, premium_until, created_at, avatar,
                        (SELECT COUNT(DISTINCT a2.test_id) FROM attempts a2 WHERE a2.user_id = users.id) AS user_tests_attempted,
                        (SELECT COUNT(*) FROM tests WHERE is_active = 1) AS total_active_tests
                 FROM users" . $where_clause . " ORDER BY id DESC LIMIT :limit OFFSET :offset";
@@ -186,7 +186,7 @@ function getAdminAttempts() {
         // lấy lượt thi với thông tin chi tiết người dùng và đề thi kèm tiến trình
         $sql = "SELECT 
                     a.id, a.uuid, a.listening_correct, a.reading_correct, a.listening_score, a.reading_score, a.total_score, a.time_spent, a.created_at,
-                    u.first_name, u.last_name, u.email, u.is_premium, u.premium_plan, u.has_course,
+                    u.first_name, u.last_name, u.email, u.is_premium, u.premium_plan, u.has_course, u.avatar,
                     t.title,
                     (SELECT COUNT(DISTINCT a2.test_id) FROM attempts a2 WHERE a2.user_id = a.user_id) AS user_tests_attempted,
                     (SELECT COUNT(*) FROM tests WHERE is_active = 1) AS total_active_tests
@@ -339,7 +339,7 @@ function getAdminTransactions() {
 
         // lấy danh sách giao dịch
         $sql = "SELECT t.id, t.tx_id, t.plan_id, t.plan_name, t.price, t.period, t.status, t.created_at,
-                       u.first_name, u.last_name, u.email
+                       u.first_name, u.last_name, u.email, u.avatar
                 FROM transaction_history t
                 JOIN users u ON t.user_id = u.id
                 WHERE t.status = 'success' OR t.status = 'refunded'

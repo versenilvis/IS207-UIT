@@ -40,13 +40,26 @@ function renderAttemptsTable(attempts) {
         if (percentage >= 80) progressClass = 'green';
         else if (percentage >= 40) progressClass = 'orange';
 
+        let avatarHtml = '';
+        if (attempt.avatar) {
+            avatarHtml = `<img src="${attempt.avatar}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-color);">`;
+        } else {
+            avatarHtml = `
+                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 13px; display: flex; align-items: center; justify-content: center; background-color: var(--accent-blue); color: #ffffff; border-radius: 50%; font-weight: 600; flex-shrink: 0; border: 1px solid var(--border-color);">
+                    ${attempt.first_name[0] || 'U'}
+                </div>`;
+        }
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <div>
-                    <div style="font-weight: 600;">${attempt.first_name} ${attempt.last_name}</div>
-                    <div style="font-size: 11px; color: var(--text-secondary);">${attempt.email}</div>
-                    ${isPremium ? '<span class="badge success" style="font-size: 9px; padding: 2px 4px; margin-top: 4px;">Pro</span>' : ''}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    ${avatarHtml}
+                    <div>
+                        <div style="font-weight: 600;">${attempt.first_name} ${attempt.last_name}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">${attempt.email}</div>
+                        ${isPremium ? '<span class="badge success" style="font-size: 9px; padding: 2px 4px; margin-top: 4px;">Pro</span>' : ''}
+                    </div>
                 </div>
             </td>
             <td><strong>${attempt.title}</strong></td>
