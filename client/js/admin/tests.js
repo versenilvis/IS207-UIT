@@ -1,3 +1,9 @@
+let testsState = {
+    page: 1,
+    limit: 10,
+    total: 0
+};
+
 // tải danh sách đề thi
 async function loadTestsList() {
     try {
@@ -7,7 +13,7 @@ async function loadTestsList() {
         
         if (result.success && result.data && Array.isArray(result.data)) {
             allTests = result.data;
-            filterTests();
+            filterTests(1);
         }
     } catch (error) {
         console.error('error loading tests:', error);
@@ -15,7 +21,10 @@ async function loadTestsList() {
 }
 
 // lọc danh sách đề thi tại client
-function filterTests() {
+function filterTests(page = 1) {
+    if (typeof page !== 'number') page = 1;
+    testsState.page = page;
+    
     const searchInput = document.getElementById('search-tests');
     const premiumFilter = document.getElementById('filter-tests-premium');
     const statusFilter = document.getElementById('filter-tests-status');
@@ -45,7 +54,20 @@ function filterTests() {
         return titleMatch && premiumMatch && statusMatch;
     });
 
-    renderTestsTable(filtered);
+    testsState.total = filtered.length;
+    const start = (testsState.page - 1) * testsState.limit;
+    const end = start + testsState.limit;
+    const pageData = filtered.slice(start, end);
+
+    renderTestsTable(pageData);
+
+    renderPagination('tests-pagination', {
+        page: testsState.page,
+        limit: testsState.limit,
+        total: testsState.total
+    }, (targetPage) => {
+        filterTests(targetPage);
+    });
 }
 
 // hiển thị danh sách đề thi
@@ -123,21 +145,22 @@ function renderTestsTable(tests) {
 
 // phê duyệt và kích hoạt đề thi
 async function approveTest(uuid) {
-    if (!confirm('Bạn có chắc chắn muốn duyệt và kích hoạt đề thi này?')) return;
+    const confirmed = await showConfirmModal('Duyệt đề thi', 'Bạn có chắc chắn muốn duyệt và kích hoạt đề thi này?', 'warning', 'Duyệt đề');
+    if (!confirmed) return;
     try {
         const response = await fetch(`/api/admin/tests/${uuid}/activate`, {
             method: 'PUT'
         });
         const result = await response.json();
         if (result.success) {
-            alert('Duyệt đề thi thành công');
+            await showAlertModal('Thành công', 'Duyệt đề thi thành công', 'success');
             loadTestsList();
         } else {
-            alert('Lỗi: ' + result.message);
+            await showAlertModal('Lỗi', 'Không thể duyệt đề: ' + result.message, 'error');
         }
     } catch (error) {
         console.error('error approving test:', error);
-        alert('Có lỗi xảy ra khi phê duyệt đề');
+        await showAlertModal('Lỗi', 'Có lỗi xảy ra khi phê duyệt đề', 'error');
     }
 }
 
@@ -158,20 +181,20 @@ function closeEditModal() {
 
 // xóa đề thi bằng uuid
 async function deleteTest(uuid) {
-    if (confirm("Bạn có chắc chắn muốn xóa bài thi này không? Toàn bộ câu hỏi liên quan sẽ bị xóa vĩnh viễn.")) {
-        try {
-            const response = await fetch(`/api/tests/${uuid}`, { method: 'DELETE' });
-            const result = await response.json();
-            if (result.success) {
-                alert("Đã xóa bài thi thành công");
-                await loadTestsList();
-            } else {
-                alert("Lỗi: " + result.message);
-            }
-        } catch (error) {
-            console.error('error deleting test:', error);
-            alert("Lỗi khi gửi yêu cầu xóa bài thi");
+    const confirmed = await showConfirmModal('Xóa đề thi', 'Bạn có chắc chắn muốn xóa bài thi này không? Toàn bộ câu hỏi liên quan sẽ bị xóa vĩnh viễn', 'danger', 'Xóa vĩnh viễn');
+    if (!confirmed) return;
+    try {
+        const response = await fetch(`/api/tests/${uuid}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (result.success) {
+            await showAlertModal('Thành công', 'Đã xóa bài thi thành công', 'success');
+            await loadTestsList();
+        } else {
+            await showAlertModal('Lỗi', 'Không thể xóa bài thi: ' + result.message, 'error');
         }
+    } catch (error) {
+        console.error('error deleting test:', error);
+        await showAlertModal('Lỗi', 'Lỗi khi gửi yêu cầu xóa bài thi', 'error');
     }
 }
 
@@ -214,11 +237,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 const result = await response.json();
                 if (result.success) {
-                    alert("Đã lưu thông tin đề thi thành công");
+                    await showAlertModal('Thành công', 'Đã lưu thông tin đề thi thành công', 'success');
                     closeEditModal();
                     await loadTestsList();
                 } else {
-                    alert("Lỗi: " + result.message);
+                    await showAlertModal('Lỗi', 'Không thể lưu thông tin: ' + result.message, 'error');
                 }
             } catch (error) {
                 console.error('error updating test metadata:', error);

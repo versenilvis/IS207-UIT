@@ -79,6 +79,8 @@
             </table>
         </div>
 
+        <div class="pagination-wrapper" id="tests-pagination"></div>
+
         <!-- modal sửa thông tin đề thi -->
         <div class="modal-overlay" id="editModal">
             <div class="modal-content">

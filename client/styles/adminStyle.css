@@ -208,6 +208,23 @@ body {
     min-height: 780px;
 }
 
+#section-tests .table-container {
+    min-height: 570px;
+}
+
+#section-tests td {
+    white-space: nowrap;
+}
+
+#section-tests td strong {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 #section-users td {
     white-space: nowrap;
 }

@@ -145,7 +145,7 @@ function setupTabSwitching() {
     const sections = document.querySelectorAll('.section-content');
 
     sidebarItems.forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', async () => {
             const sectionName = item.dataset.section;
             if (!sectionName) return;
 
@@ -153,7 +153,8 @@ function setupTabSwitching() {
             const urlParams = new URLSearchParams(window.location.search);
             const action = urlParams.get('action');
             if (action && sectionName !== 'tests') {
-                if (!confirm("Các thay đổi chưa lưu trên đề thi sẽ bị mất, bạn có chắc chắn muốn chuyển trang?")) {
+                const confirmed = await showConfirmModal('Chuyển trang', 'Các thay đổi chưa lưu trên đề thi sẽ bị mất, bạn có chắc chắn muốn chuyển trang?', 'warning', 'Chuyển trang');
+                if (!confirmed) {
                     return;
                 }
             }
@@ -198,3 +199,109 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(err => console.error('error loading target widget:', err));
 });
+
+// hiển thị cửa sổ xác nhận tùy chỉnh
+function showConfirmModal(title, message, type = 'warning', confirmText = 'Xác nhận', cancelText = 'Hủy') {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'custom-modal-overlay';
+        
+        let iconClass = 'bx-help-circle';
+        let headerClass = 'warning-header';
+        let confirmBtnClass = 'modal-btn-confirm';
+        
+        if (type === 'danger') {
+            iconClass = 'bx-x-circle';
+            headerClass = 'danger-header';
+            confirmBtnClass = 'modal-btn-confirm-danger';
+        }
+        
+        modal.innerHTML = `
+            <div class="custom-modal-box">
+                <div class="custom-modal-header ${headerClass}">
+                    <h2>${title}</h2>
+                </div>
+                <div class="custom-modal-body">
+                    <p>${message}</p>
+                </div>
+                <div class="custom-modal-footer">
+                    <button class="modal-btn-cancel">${cancelText}</button>
+                    <button class="${confirmBtnClass}">${confirmText}</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.classList.add('active');
+        }, 10);
+        
+        const close = (result) => {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.remove();
+                resolve(result);
+            }, 250);
+        };
+        
+        modal.querySelector(`.${confirmBtnClass}`).addEventListener('click', () => close(true));
+        modal.querySelector('.modal-btn-cancel').addEventListener('click', () => close(false));
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) close(false);
+        });
+    });
+}
+
+// hiển thị thông báo tùy chỉnh
+function showAlertModal(title, message, type = 'info', buttonText = 'Đóng') {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'custom-modal-overlay';
+        
+        let iconClass = 'bx-info-circle';
+        let headerClass = 'info-header';
+        
+        if (type === 'error') {
+            iconClass = 'bx-x-circle';
+            headerClass = 'danger-header';
+        } else if (type === 'success') {
+            iconClass = 'bx-check-circle';
+            headerClass = 'success-header';
+        }
+        
+        modal.innerHTML = `
+            <div class="custom-modal-box">
+                <div class="custom-modal-header ${headerClass}">
+                    <i class="bx ${iconClass} header-icon"></i>
+                    <h2>${title}</h2>
+                </div>
+                <div class="custom-modal-body">
+                    <p>${message}</p>
+                </div>
+                <div class="custom-modal-footer">
+                    <button class="modal-btn-confirm">${buttonText}</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.classList.add('active');
+        }, 10);
+        
+        const close = () => {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.remove();
+                resolve();
+            }, 250);
+        };
+        
+        modal.querySelector('.modal-btn-confirm').addEventListener('click', close);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) close();
+        });
+    });
+}
