@@ -56,20 +56,20 @@
     background: #4CAF50;
 }
 
-.btn-add-group {
+.container-wrapper .btn-add-group {
     background: #2196F3;
 }
 
-.btn-delete-all {
+.container-wrapper .btn-delete-all {
     background: #f44336;
 }
 
-.btn-submit {
+.container-wrapper .btn-submit {
     background: #ff9800;
     margin-left: auto;
 }
 
-.btn-remove {
+.container-wrapper .btn-remove {
     background: #f44336;
     color: white;
     border: none;
