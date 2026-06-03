@@ -46,8 +46,6 @@
 				<h5>Tài nguyên</h5>
 				<ul>
 					<li><a href="tests.php">Thư viện đề thi</a></li>
-					<li><a href="#">Blog</a></li>
-					<li><a href="#">Tổng hợp tài liệu</a></li>
 				</ul>
 			</div>
 			<div class="footer-col">

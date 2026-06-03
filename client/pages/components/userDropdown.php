@@ -8,7 +8,6 @@ $userDropdownData = [
 $menuItems = [
     ['label' => 'Hồ sơ',    'icon' => 'bx-user-circle', 'href' => 'user.php'],
     ['label' => 'Hoá đơn',   'icon' => 'bx-receipt',     'href' => 'billing.php'],
-    ['label' => 'Thông báo', 'icon' => 'bx-bell',        'href' => '#'],
     ['label' => 'Đề thi',    'icon' => 'bx-edit',        'href' => 'tests.php'],
     ['label' => 'Nâng cấp',  'icon' => 'bxf bx-star',   'href' => 'pricing.php', 'badge' => '-20%', 'highlight' => true],
 ];
@@ -16,7 +15,6 @@ $menuItems = [
 $bottomItems = [
     ['label' => 'Cài đặt',  'icon' => 'bx-cog',         'href' => 'profile.php'],
     ['label' => 'Phím tắt', 'icon' => 'bx-command',     'href' => '?panel=shortcuts'],
-    ['label' => 'Có gì mới', 'icon' => 'bx-mail-open',  'href' => '#', 'external' => true],
     ['label' => 'Hỗ trợ',    'icon' => 'bx-help-circle', 'href' => 'tos.php?tab=lien-he', 'external' => true],
 ];
 
