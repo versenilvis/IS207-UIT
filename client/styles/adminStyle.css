@@ -241,16 +241,16 @@ body {
     white-space: nowrap;
 }
 
-/* phân bổ cột bảng học viên */
+/* column allocation for user table */
 #section-users table th:nth-child(1) { width: 36px; }
-#section-users table th:nth-child(2) { width: 13%; }
-#section-users table th:nth-child(3) { width: 15%; }
-#section-users table th:nth-child(4) { width: 7%; }
-#section-users table th:nth-child(5) { width: 7%; }
+#section-users table th:nth-child(2) { width: 14%; }
+#section-users table th:nth-child(3) { width: 16%; }
+#section-users table th:nth-child(4) { width: 10%; }
+#section-users table th:nth-child(5) { width: 10%; }
 #section-users table th:nth-child(6) { width: 13%; }
 #section-users table th:nth-child(7) { width: 10%; }
 #section-users table th:nth-child(8) { width: 9%; }
-#section-users table th:nth-child(9) { width: 19%; }
+#section-users table th:nth-child(9) { width: 18%; }
 
 #section-users td {
     overflow: hidden;
@@ -492,13 +492,13 @@ th {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 12px 10px;
+    padding: 10px 8px;
     border-bottom: 1px solid var(--border-color);
     white-space: nowrap;
 }
 
 td {
-    padding: 13px 10px;
+    padding: 10px 8px;
     border-bottom: 1px solid var(--border-color);
     font-size: 13px;
     color: var(--text-primary);

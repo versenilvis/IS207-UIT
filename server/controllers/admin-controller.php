@@ -528,7 +528,7 @@ function getInnerHtmlNode($node) {
 }
 
 // phân tích khối câu hỏi từ html
-function helperParseQuestion($xpath, $node, $examAudioUrl, &$isFirstQuestion) {
+function helperParseQuestion($xpath, $node, $examAudioUrl, &$isFirstQuestion, $partNum = 1) {
     $q = ['correct_answer' => 'A'];
     $numNodes = $xpath->query("descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' question-num ')]", $node);
     $numText = '';
@@ -555,6 +555,8 @@ function helperParseQuestion($xpath, $node, $examAudioUrl, &$isFirstQuestion) {
             $imgUrl = trim($src);
             if (str_starts_with($imgUrl, '/')) {
                 $imgUrl = 'https://tienganhmoingay.com' . $imgUrl;
+            } elseif (!str_starts_with($imgUrl, 'http://') && !str_starts_with($imgUrl, 'https://')) {
+                $imgUrl = 'https://tienganhmoingay.com/static/ToeicTests/images/Practice_Tests/Part_' . $partNum . '/' . basename($imgUrl);
             }
             $q['image_url'] = $imgUrl;
         }
@@ -680,7 +682,7 @@ function helperParseExamHtml($htmlContent) {
                 if ($closestSection !== $section) {
                     continue;
                 }
-                $q = helperParseQuestion($xpath, $s, null, $isFirstQuestion);
+                $q = helperParseQuestion($xpath, $s, null, $isFirstQuestion, $partNum);
                 if (isset($q['question_number'])) {
                     $questions[] = $q;
                 }
@@ -718,7 +720,7 @@ function helperParseExamHtml($htmlContent) {
                     if ($closestMCQG !== null) {
                         continue;
                     }
-                    $q = helperParseQuestion($xpath, $qSel, null, $isFirstQuestion);
+                    $q = helperParseQuestion($xpath, $qSel, null, $isFirstQuestion, $partNum);
                     if (isset($q['question_number'])) {
                         $questions[] = $q;
                     }
@@ -732,6 +734,8 @@ function helperParseExamHtml($htmlContent) {
                         $imgUrl = trim($src);
                         if (str_starts_with($imgUrl, '/')) {
                             $imgUrl = 'https://tienganhmoingay.com' . $imgUrl;
+                        } elseif (!str_starts_with($imgUrl, 'http://') && !str_starts_with($imgUrl, 'https://')) {
+                            $imgUrl = 'https://tienganhmoingay.com/static/ToeicTests/images/Practice_Tests/Part_' . $partNum . '/' . basename($imgUrl);
                         }
                         $passage['image_url'] = $imgUrl;
                     }
@@ -803,6 +807,15 @@ function helperParseAnswerHtml($htmlContent) {
             }
             $parent = $parent->parentNode;
         }
+        $partNum = 1;
+        if ($num >= 1 && $num <= 6) $partNum = 1;
+        elseif ($num >= 7 && $num <= 31) $partNum = 2;
+        elseif ($num >= 32 && $num <= 70) $partNum = 3;
+        elseif ($num >= 71 && $num <= 100) $partNum = 4;
+        elseif ($num >= 101 && $num <= 130) $partNum = 5;
+        elseif ($num >= 131 && $num <= 146) $partNum = 6;
+        elseif ($num >= 147 && $num <= 200) $partNum = 7;
+
         if ($parentMCQG) {
             $viDivNode = $xpath->query("descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' reading-text-wrapper ') and contains(concat(' ', normalize-space(@class), ' '), ' text-vi ')]/div", $parentMCQG)->item(0);
             if ($viDivNode) {
@@ -819,6 +832,8 @@ function helperParseAnswerHtml($htmlContent) {
                     $passageAudio = trim($src);
                     if (str_starts_with($passageAudio, '/')) {
                         $passageAudio = 'https://tienganhmoingay.com' . $passageAudio;
+                    } elseif (!str_starts_with($passageAudio, 'http://') && !str_starts_with($passageAudio, 'https://')) {
+                        $passageAudio = 'https://tienganhmoingay.com/static/ToeicTests/audios/Practice_Tests/Part_' . $partNum . '/' . basename($passageAudio);
                     }
                 }
             }
@@ -831,6 +846,9 @@ function helperParseAnswerHtml($htmlContent) {
                 $questionAudio = trim($src);
                 if (str_starts_with($questionAudio, '/')) {
                     $questionAudio = 'https://tienganhmoingay.com' . $questionAudio;
+                } elseif (!str_starts_with($questionAudio, 'http://') && !str_starts_with($questionAudio, 'https://')) {
+                    // map to original website domain for downloaded assets
+                    $questionAudio = 'https://tienganhmoingay.com/static/ToeicTests/audios/Practice_Tests/Part_' . $partNum . '/' . basename($questionAudio);
                 }
             }
         }

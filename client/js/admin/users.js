@@ -78,12 +78,14 @@ function renderUsersTable(users) {
                 `}
             </td>
             <td>
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; min-width: 0;">
                     ${avatarHtml}
-                    <strong>${fullName}</strong>
+                    <strong style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;" title="${fullName}">${fullName}</strong>
                 </div>
             </td>
-            <td><code>${user.email}</code></td>
+            <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <code style="display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom;" title="${user.email}">${user.email}</code>
+            </td>
             <td><span class="badge ${user.role === 'admin' ? 'warning' : 'secondary'}">${user.role === 'admin' ? 'Quản trị viên' : 'Học viên'}</span></td>
             <td>${planBadge}</td>
             <td style="min-width: 140px;">
