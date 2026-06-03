@@ -25,6 +25,7 @@ db:
 # cài đặt thư viện PHP từ composer.json bằng Docker
 composer-install:
 	docker run --rm -v "$(CURDIR):/app" -w /app composer install
+	docker run --rm -v "$(CURDIR):/app" -w /app composer require google/apiclient
 
 # alias ngắn gọn để setup dependencies
 install: composer-install

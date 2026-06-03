@@ -6,6 +6,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 require_once dirname(__DIR__, 2) . '/server/db/config.php';
 
+Firebase\JWT\JWT::$leeway = 60;
+
 $googleConfig = require dirname(__DIR__, 2) . '/server/config/google.php';
 
 function redirectGoogleLoginFailed($message) {
