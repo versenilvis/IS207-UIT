@@ -47,6 +47,11 @@ $mode = $_GET['mode'] ?? 'exam';
         <?php include './components/admin/revenue.php'; ?>
     </main>
 
+    <!-- các modal quản lý đề thi -->
+    <?php if ($section === 'tests' && $action !== 'create' && $action !== 'edit'): ?>
+        <?php include './components/admin/tests-modals.php'; ?>
+    <?php endif; ?>
+
     <!-- điều khiển javascript -->
     <?php if ($section === 'tests' && ($action === 'create' || $action === 'edit')): ?>
         <!-- tải các file script phục vụ form câu hỏi -->

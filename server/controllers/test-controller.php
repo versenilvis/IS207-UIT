@@ -169,6 +169,7 @@ function updateTest($uuid)
         $input = json_decode(file_get_contents('php://input'), true);
 
         $title = trim($input['title'] ?? '');
+        $description = isset($input['description']) ? trim($input['description']) : null;
         $is_premium = isset($input['is_premium']) ? (int) $input['is_premium'] : null;
         $is_active = isset($input['is_active']) ? (int) $input['is_active'] : null;
 
@@ -194,12 +195,14 @@ function updateTest($uuid)
         $stmt = $conn->prepare("
             UPDATE tests SET
                 title      = :title,
+                description = COALESCE(:description, description),
                 is_premium = COALESCE(:is_premium, is_premium),
                 is_active  = COALESCE(:is_active,  is_active)
             WHERE uuid = :uuid
         ");
         $stmt->execute([
             'title' => $title,
+            'description' => $description,
             'is_premium' => $is_premium,
             'is_active' => $is_active,
             'uuid' => $uuid
@@ -217,7 +220,7 @@ function updateTestPost($uuid)
     global $conn;
     try {
         // kiểm tra đề tồn tại
-        $stmt_check = $conn->prepare("SELECT id, title, is_premium, is_active, audio_url FROM tests WHERE uuid = :uuid LIMIT 1");
+        $stmt_check = $conn->prepare("SELECT id, title, description, is_premium, is_active, audio_url FROM tests WHERE uuid = :uuid LIMIT 1");
         $stmt_check->execute([':uuid' => $uuid]);
         $test = $stmt_check->fetch();
         if (!$test) {
@@ -225,6 +228,7 @@ function updateTestPost($uuid)
         }
 
         $title = isset($_POST['title']) ? trim($_POST['title']) : $test['title'];
+        $description = isset($_POST['description']) ? trim($_POST['description']) : $test['description'];
         $is_premium = isset($_POST['is_premium']) ? (int) $_POST['is_premium'] : (int) $test['is_premium'];
         $is_active = isset($_POST['is_active']) ? (int) $_POST['is_active'] : (int) $test['is_active'];
 
@@ -244,6 +248,7 @@ function updateTestPost($uuid)
         $stmt = $conn->prepare("
             UPDATE tests SET
                 title      = :title,
+                description = :description,
                 is_premium = :is_premium,
                 is_active  = :is_active,
                 audio_url  = :audio_url
@@ -251,6 +256,7 @@ function updateTestPost($uuid)
         ");
         $stmt->execute([
             'title' => $title,
+            'description' => $description,
             'is_premium' => $is_premium,
             'is_active' => $is_active,
             'audio_url' => $audioUrl,

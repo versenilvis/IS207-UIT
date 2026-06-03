@@ -98,6 +98,9 @@ function renderTestsTable(tests) {
                             Duyệt
                         </button>
                     ` : ''}
+                    <button class="btn-primary edit-info-btn" style="padding: 6px 12px; font-size: 12px; background-color: var(--accent-blue);" data-uuid="${test.uuid}" data-title="${test.title}" data-description="${test.description || ''}" data-premium="${isPremium ? '1' : '0'}" data-active="${isActive ? '1' : '0'}">
+                        Sửa thông tin
+                    </button>
                     <a href="admin.php?section=tests&action=edit&mode=exam&test_id=${test.uuid}" class="btn-primary" style="padding: 6px 12px; font-size: 12px;">
                         <i class="bx bx-edit-alt"></i> Sửa đề & đáp án
                     </a>
@@ -119,8 +122,9 @@ function renderTestsTable(tests) {
     // gắn sự kiện cho các nút hành động
     document.querySelectorAll('.edit-info-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const data = e.target.dataset;
-            openEditModal(data.uuid, data.title, data.premium === '1', data.active === '1');
+            const targetBtn = e.target.closest('.edit-info-btn');
+            const data = targetBtn.dataset;
+            openEditModal(data.uuid, data.title, data.description, data.premium === '1', data.active === '1');
         });
     });
 
@@ -161,10 +165,11 @@ async function approveTest(uuid) {
 }
 
 // mở modal chỉnh sửa nhanh
-function openEditModal(uuid, title, isPremium, isActive) {
+function openEditModal(uuid, title, description, isPremium, isActive) {
     const modal = document.getElementById('editModal');
     document.getElementById('edit_id').value = uuid;
     document.getElementById('edit_title').value = title;
+    document.getElementById('edit_description').value = description || '';
     document.getElementById('edit_premium').checked = isPremium;
     document.getElementById('edit_active').checked = isActive;
     modal.classList.add('show');
@@ -218,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             const uuid = document.getElementById('edit_id').value;
             const title = document.getElementById('edit_title').value;
+            const description = document.getElementById('edit_description').value;
             const isPremium = document.getElementById('edit_premium').checked ? 1 : 0;
             const isActive = document.getElementById('edit_active').checked ? 1 : 0;
 
@@ -227,6 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: title,
+                        description: description,
                         is_premium: isPremium,
                         is_active: isActive
                     })

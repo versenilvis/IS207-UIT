@@ -671,14 +671,16 @@ tr:hover td {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 200;
+    z-index: 1000;
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal-overlay.show {
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
 }
 

@@ -1007,12 +1007,13 @@ function importAdminTest() {
             throw new Exception("File đề thi không hợp lệ hoặc không có dữ liệu câu hỏi");
         }
         global $conn;
-        $testTitle = $examData['title'] ?? 'Đề thi thử mới';
+        $testTitle = isset($_POST['title']) && trim($_POST['title']) !== '' ? trim($_POST['title']) : ($examData['title'] ?? 'Đề thi thử mới');
+        $testDesc = isset($_POST['desc']) && trim($_POST['desc']) !== '' ? trim($_POST['desc']) : 'Đề thi import tự động, ở trạng thái chờ duyệt';
         $conn->beginTransaction();
         $stmt = $conn->prepare("INSERT INTO tests (uuid, title, description, duration, audio_url, is_premium, is_active) VALUES (UUID(), :title, :desc, :duration, :audio_url, :is_premium, 0)");
         $stmt->execute([
             'title' => $testTitle,
-            'desc' => 'Đề thi import tự động, ở trạng thái chờ duyệt',
+            'desc' => $testDesc,
             'duration' => $examData['duration'] ?? 7200,
             'audio_url' => $examData['audio_url'] ?? null,
             'is_premium' => $isPremium
