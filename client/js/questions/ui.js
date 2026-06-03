@@ -34,6 +34,28 @@ function updateMediaBadges(block, part) {
 	const config = PART_CONFIG[parseInt(part)];
 	if (!config) return;
 
+	const partNum = parseInt(part);
+
+	// show or hide upload items based on part support
+	const imageUploadItem = block.querySelector('.upload-item:nth-child(1)') || block.querySelector('.group-resource-grid > .upload-item:nth-child(1)');
+	const audioUploadItem = block.querySelector('.upload-item:nth-child(2)') || block.querySelector('.group-resource-grid > .upload-item:nth-child(2)');
+
+	if (imageUploadItem) {
+		const supportsImage = [1, 3, 4, 7].includes(partNum);
+		imageUploadItem.style.display = supportsImage ? 'block' : 'none';
+	}
+
+	if (audioUploadItem) {
+		const supportsAudio = [1, 2, 3, 4].includes(partNum);
+		audioUploadItem.style.display = supportsAudio ? 'block' : 'none';
+	}
+
+	const mediaSection = block.querySelector('.media-upload-section');
+	if (mediaSection) {
+		const supportsAny = [1, 2, 3, 4, 7].includes(partNum);
+		mediaSection.style.display = supportsAny ? 'grid' : 'none';
+	}
+
 	const updateEls = (selector, required, reqText, hintText) => {
 		const labels = block.querySelectorAll(`${selector} .media-required-badge`);
 		const hints = block.querySelectorAll(`${selector} .media-hint`);

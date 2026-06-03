@@ -160,10 +160,27 @@ try {
 						}
 					}
 					
-					$stmtPass = $pdo->prepare("INSERT INTO passages (test_id, content, image_url, audio_url) VALUES (:test_id, :content, :image_url, :audio_url)");
+					$isPlaceholder = preg_match('/^Questions \d+ - \d+:$/i', trim($passage['content'] ?? ''));
+					$contentVal = null;
+					$translationEnVal = null;
+
+					if ($isPlaceholder) {
+						$contentVal = trim($passage['content']);
+					} else {
+						$nums = array_column($passage['questions'] ?? [], 'question_number');
+						if (!empty($nums)) {
+							$contentVal = "Questions " . min($nums) . " - " . max($nums) . ":";
+						} else {
+							$contentVal = "Questions:";
+						}
+						$translationEnVal = trim($passage['content']);
+					}
+
+					$stmtPass = $pdo->prepare("INSERT INTO passages (test_id, content, translation_en, image_url, audio_url) VALUES (:test_id, :content, :translation_en, :image_url, :audio_url)");
 					$stmtPass->execute([
 						'test_id' => $testId,
-						'content' => $passage['content'] ?: null,
+						'content' => $contentVal,
+						'translation_en' => $translationEnVal,
 						'image_url' => $copyImage($passage['image_url'] ?? null, $newBaseName),
 						'audio_url' => (!empty($passage['audio_url'])) ? "/server/uploads/audio/" . $passage['audio_url'] : null
 					]);

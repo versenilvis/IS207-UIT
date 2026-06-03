@@ -1,4 +1,8 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Navbar mode: 'dark'  → starts transparent (white text on dark bg), scrolls to light bg
 //             'light' → starts transparent (dark text on light bg), scrolls to dark bg
 $navbarMode = $navbarMode ?? 'dark';
@@ -40,6 +44,9 @@ $isPricing = ($currentPage === 'pricing.php' || $currentPage === 'billing.php');
 				<li class="nav-item"><a class="nav-link<?= $isExam ? ' active' : '' ?>" href="tests.php">Đề thi</a></li>
 				<li class="nav-item"><a class="nav-link<?= $isIntro ? ' active' : '' ?>" href="tos.php?tab=gioi-thieu">Giới thiệu</a></li>
 				<li class="nav-item"><a class="nav-link<?= $isPricing ? ' active' : '' ?>" href="pricing.php">Nâng cấp</a></li>
+				<?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+					<li class="nav-item"><a class="nav-link<?= ($currentPage === 'admin.php') ? ' active' : '' ?>" href="admin.php">Quản trị</a></li>
+				<?php endif; ?>
 				<div class="nav-indicator" id="navIndicator" style="opacity: 0;"></div>
 			</ul>
 			<!-- login: locked right -->

@@ -13,9 +13,17 @@ function fillBaseQuestionUI(container, question) {
 	setVal('.question-content', question.content);
 	setVal('.explanation', (question.explanation && question.explanation !== 'null') ? question.explanation : '');
 
+	if (question.part) {
+		adjustOptionDVisibility(container, question.part);
+	}
+
 	const optionInputs = container.querySelectorAll('.option-content');
-	if (question.options && question.options.length === 4) {
-		question.options.forEach((opt, idx) => { if (optionInputs[idx]) optionInputs[idx].value = opt.content || ''; });
+	const translationInputs = container.querySelectorAll('.option-translation');
+	if (question.options) {
+		question.options.forEach((opt, idx) => {
+			if (optionInputs[idx]) optionInputs[idx].value = opt.content || '';
+			if (translationInputs[idx]) translationInputs[idx].value = opt.translation || '';
+		});
 	}
 
 	container.querySelectorAll('.correct-radio').forEach(radio => {
@@ -36,11 +44,18 @@ function fillSingleQuestionData(question, block) {
 		const updateMedia = (idx, url, type) => {
 			const input = mediaSection.querySelector(`.upload-item:nth-child(${idx}) input[type="file"]`);
 			const preview = mediaSection.querySelector(`.upload-item:nth-child(${idx}) .preview-container`);
-			if (input) input.dataset.existingUrl = url;
-			if (preview && url) {
-				preview.innerHTML = type === 'image' 
-					? `<img src="${url}" alt="Question image" style="max-width: 200px;">`
-					: `<audio controls src="${url}" style="width: 100%;"></audio>`;
+			const isValid = url && url !== 'null' && url !== 'NULL' && url.trim() !== '';
+			if (input) {
+				input.dataset.existingUrl = isValid ? url : '';
+			}
+			if (preview) {
+				if (isValid) {
+					preview.innerHTML = type === 'image' 
+						? `<img src="${url}" alt="Question image" style="max-width: 200px;">`
+						: `<audio controls src="${url}" style="width: 100%;"></audio>`;
+				} else {
+					preview.innerHTML = '';
+				}
 			}
 		};
 		updateMedia(1, question.image_url, 'image');
@@ -51,17 +66,35 @@ function fillSingleQuestionData(question, block) {
 function fillGroupQuestionData(passage, subQuestions, block) {
 	if (!block) return;
 
-	const passageInput = block.querySelector('.passage-content');
-	if (passageInput) passageInput.value = passage.content || '';
+	const passageHeader = block.querySelector('.passage-header');
+	const passageContent = block.querySelector('.passage-content');
+	const passageTranslation = block.querySelector('.passage-translation');
+
+	const isLegacy = passage.content && (passage.content.includes('<') || !passage.content.trim().startsWith('Questions '));
+	if (isLegacy) {
+		if (passageContent) passageContent.value = passage.content || '';
+		if (passageHeader) passageHeader.value = '';
+	} else {
+		if (passageHeader) passageHeader.value = passage.content || '';
+		if (passageContent) passageContent.value = passage.translation_en || '';
+	}
+	if (passageTranslation) passageTranslation.value = passage.translation || '';
 
 	const updateGroupMedia = (selector, url, type) => {
 		const input = block.querySelector(selector);
 		const preview = input?.closest('.upload-item')?.querySelector('.preview-container');
-		if (input) input.dataset.existingUrl = url;
-		if (preview && url) {
-			preview.innerHTML = type === 'image'
-				? `<img src="${url}" alt="Passage image" style="max-width: 200px;">`
-				: `<audio controls src="${url}" style="width: 100%;"></audio>`;
+		const isValid = url && url !== 'null' && url !== 'NULL' && url.trim() !== '';
+		if (input) {
+			input.dataset.existingUrl = isValid ? url : '';
+		}
+		if (preview) {
+			if (isValid) {
+				preview.innerHTML = type === 'image'
+					? `<img src="${url}" alt="Passage image" style="max-width: 200px;">`
+					: `<audio controls src="${url}" style="width: 100%;"></audio>`;
+			} else {
+				preview.innerHTML = '';
+			}
 		}
 	};
 	updateGroupMedia('.group-image-file', passage.image_url, 'image');
@@ -70,12 +103,13 @@ function fillGroupQuestionData(passage, subQuestions, block) {
 	block.dataset.passageId = passage.id;
 	AppState.loadedPassageIds.add(passage.id);
 
+	const part = block.dataset.part;
 	const subContainer = block.querySelector('.sub-questions-container');
 	if (subContainer) {
 		subContainer.innerHTML = '';
 		if (subQuestions) {
 			subQuestions.forEach((subQ, idx) => {
-				const subDiv = createSubQuestionDOM(block.dataset.blockId, subQ.question_number || idx + 1);
+				const subDiv = createSubQuestionDOM(block.dataset.blockId, subQ.question_number || idx + 1, part);
 				fillBaseQuestionUI(subDiv, subQ);
 				subContainer.appendChild(subDiv);
 			});

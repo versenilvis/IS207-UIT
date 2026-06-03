@@ -260,7 +260,7 @@ html, body { height: 100%; overflow: hidden; background: #f8fafc; }
 }
 .btn-home:hover { background: #0e2050; color: white; }
 
-img {
+img:not(.avatar-img-custom) {
 	border-radius: 0 !important;
 	box-shadow: none !important;
 }

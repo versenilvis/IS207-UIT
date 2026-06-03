@@ -22,6 +22,11 @@ function apiCreateQuestion(PDO $db)
 		$explanation = helperGetPostValue('explanation');
 		$isSubQuestion = !empty($passageId);
 
+		if ($content === 'null' || $content === 'NULL')
+			$content = null;
+		if ($explanation === 'null' || $explanation === 'NULL')
+			$explanation = null;
+
 		$options = json_decode(helperGetPostValue('options', '{}'), true);
 		if (!is_array($options)) {
 			throw new Exception("Định dạng đáp án không hợp lệ");
@@ -31,7 +36,7 @@ function apiCreateQuestion(PDO $db)
 		validateQuestionNumber($questionNumber, $part);
 		validateQuestionContent($content, $part);
 		validateCorrectAnswer($correctAnswer);
-		validateOptions($options);
+		validateOptions($options, $part);
 
 		if (!empty($explanation)) {
 			validateExplanation($explanation);
@@ -39,11 +44,11 @@ function apiCreateQuestion(PDO $db)
 
 		$internalTestId = helperGetInternalTestId($db, $testId);
 		if (!$internalTestId) {
-			throw new Exception("Đề thi không tồn tại hoặc không hoạt động");
+			throw new Exception("Đề thi không tồn tại");
 		}
 
 		if (!empty($passageId)) {
-			validatePassageExists($db, $passageId, $testId);
+			validatePassageExists($db, $passageId, $internalTestId);
 		}
 
 		$audioUrl = null;
@@ -58,6 +63,8 @@ function apiCreateQuestion(PDO $db)
 		} else {
 			$audioUrl = helperGetPostValue('audio_url');
 		}
+		if ($audioUrl === 'null' || $audioUrl === 'NULL')
+			$audioUrl = null;
 
 		if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
 			try {
@@ -71,6 +78,8 @@ function apiCreateQuestion(PDO $db)
 		} else {
 			$imageUrl = helperGetPostValue('image_url');
 		}
+		if ($imageUrl === 'null' || $imageUrl === 'NULL')
+			$imageUrl = null;
 
 		helperValidatePartRequirements($part, $content, $audioUrl, $imageUrl, $passageId, $isSubQuestion);
 
@@ -86,12 +95,7 @@ function apiCreateQuestion(PDO $db)
 			'explanation' => !empty($explanation) ? trim($explanation) : null
 		];
 
-		$optionsData = [
-			['label' => 'A', 'content' => $options['A']],
-			['label' => 'B', 'content' => $options['B']],
-			['label' => 'C', 'content' => $options['C']],
-			['label' => 'D', 'content' => $options['D']]
-		];
+		$optionsData = helperNormalizeOptionsData($options, $part);
 
 		$questionId = questionCreateWithOptions($db, $questionData, $optionsData);
 
@@ -169,7 +173,7 @@ function apiCreateQuestionsFromForm(PDO $db)
 
 				validateQuestionContent($qData['content'], $part);
 				validateCorrectAnswer($qData['correct_answer']);
-				validateOptions($questionData['options']);
+				validateOptions($questionData['options'], $part);
 
 				$questionId = questionCreate($db, $qData);
 				$createdQuestions[] = [
@@ -224,12 +228,26 @@ function apiGetQuestions(PDO $db, $testId)
 		$stmt->execute([':test_id' => $internalTestId]);
 		$questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		$optionsSql = "SELECT id, label, content FROM options WHERE question_id = :question_id ORDER BY label";
-		$optionsStmt = $db->prepare($optionsSql);
+		if (!empty($questions)) {
+			$questionIds = array_column($questions, 'id');
+			$placeholders = implode(',', array_fill(0, count($questionIds), '?'));
+			$optionsSql = "SELECT id, question_id, label, content, translation FROM options WHERE question_id IN ($placeholders) ORDER BY question_id ASC, label ASC";
+			$optionsStmt = $db->prepare($optionsSql);
+			$optionsStmt->execute($questionIds);
 
-		foreach ($questions as &$question) {
-			$optionsStmt->execute([':question_id' => $question['id']]);
-			$question['options'] = $optionsStmt->fetchAll(PDO::FETCH_ASSOC);
+			$optionsByQuestion = [];
+			foreach ($optionsStmt->fetchAll(PDO::FETCH_ASSOC) as $option) {
+				$optionsByQuestion[$option['question_id']][] = [
+					'id' => $option['id'],
+					'label' => $option['label'],
+					'content' => $option['content'],
+					'translation' => $option['translation']
+				];
+			}
+
+			foreach ($questions as &$question) {
+				$question['options'] = $optionsByQuestion[$question['id']] ?? [];
+			}
 		}
 
 		return [
@@ -261,7 +279,7 @@ function apiGetQuestion(PDO $db, $questionId)
 			throw new Exception("Câu hỏi không tồn tại");
 		}
 
-		$optionsSql = "SELECT id, label, content FROM options WHERE question_id = :question_id ORDER BY label";
+		$optionsSql = "SELECT id, label, content, translation FROM options WHERE question_id = :question_id ORDER BY label";
 		$optionsStmt = $db->prepare($optionsSql);
 		$optionsStmt->execute([':question_id' => $questionId]);
 		$question['options'] = $optionsStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -288,6 +306,16 @@ function apiCreatePassage(PDO $db)
 		$testId = helperGetPostValue('test_id');
 		$part = helperGetPostValue('part');
 		$content = helperGetPostValue('content');
+		if ($content === 'null' || $content === 'NULL')
+			$content = null;
+
+		$translationEn = helperGetPostValue('translation_en');
+		if ($translationEn === 'null' || $translationEn === 'NULL')
+			$translationEn = null;
+
+		$translation = helperGetPostValue('translation');
+		if ($translation === 'null' || $translation === 'NULL')
+			$translation = null;
 
 		$internalTestId = helperGetInternalTestId($db, $testId);
 		if (empty($testId))
@@ -307,6 +335,8 @@ function apiCreatePassage(PDO $db)
 		} else {
 			$audioUrl = helperGetPostValue('audio_url');
 		}
+		if ($audioUrl === 'null' || $audioUrl === 'NULL')
+			$audioUrl = null;
 
 		if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
 			try {
@@ -319,6 +349,8 @@ function apiCreatePassage(PDO $db)
 		} else {
 			$imageUrl = helperGetPostValue('image_url');
 		}
+		if ($imageUrl === 'null' || $imageUrl === 'NULL')
+			$imageUrl = null;
 
 		if (!empty($part)) {
 			helperValidatePassageMediaRequirements($part, $audioUrl, $imageUrl);
@@ -326,7 +358,9 @@ function apiCreatePassage(PDO $db)
 
 		$passageData = [
 			'test_id' => $internalTestId,
-			'content' => !empty($content) ? trim($content) : null,
+			'content' => ($content !== null && $content !== '') ? trim($content) : null,
+			'translation_en' => ($translationEn !== null && $translationEn !== '') ? trim($translationEn) : null,
+			'translation' => ($translation !== null && $translation !== '') ? trim($translation) : null,
 			'audio_url' => $audioUrl,
 			'image_url' => $imageUrl
 		];
@@ -424,13 +458,13 @@ function apiDeletePassage(PDO $db, $passageId)
 		if (!$passage)
 			throw new Exception("Đoạn văn không tồn tại");
 
-		// Xóa file của passage
+		// xóa file của passage
 		if ($passage['audio_url'])
 			fh_delete_file($passage['audio_url']);
 		if ($passage['image_url'])
 			fh_delete_file($passage['image_url']);
 
-		// Lấy danh sách câu hỏi thuộc passage này để dọn dẹp file
+		// lấy danh sách câu hỏi thuộc passage này để dọn dẹp file
 		$sql = "SELECT id, audio_url, image_url FROM questions WHERE passage_id = :passage_id";
 		$stmt = $db->prepare($sql);
 		$stmt->execute([':passage_id' => $passageId]);
@@ -442,14 +476,14 @@ function apiDeletePassage(PDO $db, $passageId)
 			if ($q['image_url'])
 				fh_delete_file($q['image_url']);
 
-			// Xóa options (nếu DB không có ON DELETE CASCADE)
+			// xóa options (nếu db không có on delete cascade)
 			$db->prepare("DELETE FROM options WHERE question_id = ?")->execute([$q['id']]);
 		}
 
-		// Xóa các câu hỏi
+		// xóa các câu hỏi
 		$db->prepare("DELETE FROM questions WHERE passage_id = ?")->execute([$passageId]);
 
-		// Cuối cùng xóa passage
+		// cuối cùng xóa passage
 		passageDelete($db, $passageId);
 
 		return [
@@ -477,14 +511,31 @@ function helperGetPostValue($key, $default = null)
 	return isset($_POST[$key]) ? $_POST[$key] : $default;
 }
 
+function helperNormalizeOptionsData($options, $part = null)
+{
+	$partNum = intval($part);
+	$labels = ($partNum === 2) ? ['A', 'B', 'C'] : ['A', 'B', 'C', 'D'];
+	$normalized = [];
+	foreach ($labels as $label) {
+		$value = $options[$label] ?? '';
+		$normalized[] = [
+			'label' => $label,
+			'content' => is_array($value) ? ($value['content'] ?? '') : $value,
+			'translation' => is_array($value) ? trim($value['translation'] ?? '') : null
+		];
+	}
+
+	return $normalized;
+}
+
 function helperGetInternalTestId(PDO $db, $uuid)
 {
 	try {
-		$sql = "SELECT id FROM tests WHERE uuid = :uuid AND is_active = 1";
+		$sql = "SELECT id FROM tests WHERE uuid = :uuid";
 		$stmt = $db->prepare($sql);
 		$stmt->execute([':uuid' => $uuid]);
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
-		return $result ? (int)$result['id'] : false;
+		return $result ? (int) $result['id'] : false;
 	} catch (Exception $e) {
 		return false;
 	}
@@ -501,8 +552,7 @@ function helperValidatePassageMediaRequirements($part, $audioUrl, $imageUrl)
 		case 2:
 		case 3:
 		case 4:
-			if (empty($audioUrl))
-				throw new Exception("Part $part: Âm thanh là bắt buộc cho cụm câu hỏi");
+			// audio is optional for listening parts now
 			break;
 	}
 }
@@ -516,10 +566,11 @@ function helperValidatePartRequirements($part, $content, $audioUrl, $imageUrl, $
 				throw new Exception("Part 1: Cần có ít nhất hình ảnh hoặc âm thanh");
 			break;
 		case 2:
+			// part 2 does not need question content nor audio
+			break;
 		case 3:
 		case 4:
-			if (!$isSubQuestion && empty($audioUrl))
-				throw new Exception("Part $part: Âm thanh là bắt buộc");
+			// audio is optional for listening parts now
 			if (empty($content))
 				throw new Exception("Part $part: Nội dung câu hỏi là bắt buộc");
 			break;
@@ -529,6 +580,214 @@ function helperValidatePartRequirements($part, $content, $audioUrl, $imageUrl, $
 			if (empty($content))
 				throw new Exception("Part $part: Nội dung câu hỏi là bắt buộc");
 			break;
+	}
+}
+
+/**
+ * cập nhật một câu hỏi
+ */
+function apiUpdateQuestion(PDO $db, $questionId)
+{
+	try {
+		// kiểm tra câu hỏi tồn tại
+		$question = questionGetById($db, $questionId);
+		if (!$question) {
+			throw new Exception("Câu hỏi không tồn tại");
+		}
+
+		$part = helperGetPostValue('part', $question['part']);
+		$questionNumber = helperGetPostValue('question_number', $question['question_number']);
+		$passageId = helperGetPostValue('passage_id', $question['passage_id']);
+		$content = helperGetPostValue('content', $question['content']);
+		$correctAnswer = helperGetPostValue('correct_answer', $question['correct_answer']);
+		$explanation = helperGetPostValue('explanation', $question['explanation']);
+		$isSubQuestion = !empty($passageId);
+
+		if ($content === 'null' || $content === 'NULL')
+			$content = null;
+		if ($explanation === 'null' || $explanation === 'NULL')
+			$explanation = null;
+
+		$optionsJson = helperGetPostValue('options');
+		$options = $optionsJson ? json_decode($optionsJson, true) : null;
+
+		validateToeicPart($part);
+		validateQuestionNumber($questionNumber, $part);
+		if (isset($content)) {
+			validateQuestionContent($content, $part);
+		}
+		if (isset($correctAnswer)) {
+			validateCorrectAnswer($correctAnswer);
+		}
+		if (isset($options)) {
+			validateOptions($options, $part);
+		}
+
+		if (!empty($passageId)) {
+			validatePassageExists($db, $passageId, $question['test_id']);
+		}
+
+		$audioUrl = $question['audio_url'];
+		$imageUrl = $question['image_url'];
+
+		if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
+			try {
+				if ($audioUrl) {
+					fh_delete_file($audioUrl);
+				}
+				$audioUrl = fh_upload_file($_FILES['audio_file'], 'audio');
+			} catch (Exception $e) {
+				throw new Exception("Lỗi upload audio: " . $e->getMessage());
+			}
+		} else {
+			$audioUrl = helperGetPostValue('audio_url', $audioUrl);
+		}
+		if ($audioUrl === 'null' || $audioUrl === 'NULL')
+			$audioUrl = null;
+
+		if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
+			try {
+				if ($imageUrl) {
+					fh_delete_file($imageUrl);
+				}
+				$imageUrl = fh_upload_file($_FILES['image_file'], 'image');
+			} catch (Exception $e) {
+				throw new Exception("Lỗi upload hình ảnh: " . $e->getMessage());
+			}
+		} else {
+			$imageUrl = helperGetPostValue('image_url', $imageUrl);
+		}
+		if ($imageUrl === 'null' || $imageUrl === 'NULL')
+			$imageUrl = null;
+
+		helperValidatePartRequirements($part, $content, $audioUrl, $imageUrl, $passageId, $isSubQuestion);
+
+		$questionData = [
+			'part' => $part,
+			'question_number' => $questionNumber,
+			'passage_id' => !empty($passageId) ? $passageId : null,
+			'content' => isset($content) ? trim($content) : null,
+			'correct_answer' => strtoupper($correctAnswer),
+			'audio_url' => $audioUrl,
+			'image_url' => $imageUrl,
+			'explanation' => isset($explanation) ? trim($explanation) : null
+		];
+
+		questionUpdate($db, $questionId, $questionData);
+
+		if (isset($options)) {
+			// xóa các đáp án cũ để lưu lại
+			$db->prepare("DELETE FROM options WHERE question_id = ?")->execute([$questionId]);
+			$optionsData = helperNormalizeOptionsData($options, $part);
+			// lưu các đáp án mới
+			$stmtOpt = $db->prepare("INSERT INTO options (question_id, label, content, translation) VALUES (:question_id, :label, :content, :translation)");
+			foreach ($optionsData as $opt) {
+				$stmtOpt->execute([
+					'question_id' => $questionId,
+					'label' => $opt['label'],
+					'content' => $opt['content'] ?? '',
+					'translation' => $opt['translation'] ?? null
+				]);
+			}
+		}
+
+		return [
+			'success' => true,
+			'message' => 'Câu hỏi đã được cập nhật thành công'
+		];
+	} catch (Exception $e) {
+		return [
+			'success' => false,
+			'message' => $e->getMessage(),
+			'code' => 'VALIDATION_ERROR'
+		];
+	}
+}
+
+/**
+ * cập nhật đoạn văn
+ */
+function apiUpdatePassage(PDO $db, $passageId)
+{
+	try {
+		$passage = passageGetById($db, $passageId);
+		if (!$passage) {
+			throw new Exception("Đoạn văn không tồn tại");
+		}
+
+		$part = helperGetPostValue('part');
+		$content = helperGetPostValue('content', $passage['content']);
+		if ($content === 'null' || $content === 'NULL')
+			$content = null;
+
+		$translationEn = helperGetPostValue('translation_en', $passage['translation_en']);
+		if ($translationEn === 'null' || $translationEn === 'NULL')
+			$translationEn = null;
+
+		$translation = helperGetPostValue('translation', $passage['translation']);
+		if ($translation === 'null' || $translation === 'NULL')
+			$translation = null;
+
+		$audioUrl = $passage['audio_url'];
+		$imageUrl = $passage['image_url'];
+
+		if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
+			try {
+				if ($audioUrl) {
+					fh_delete_file($audioUrl);
+				}
+				$audioUrl = fh_upload_file($_FILES['audio_file'], 'audio');
+			} catch (Exception $e) {
+				throw new Exception("Lỗi upload audio: " . $e->getMessage());
+			}
+		} else {
+			$audioUrl = helperGetPostValue('audio_url', $audioUrl);
+		}
+		if ($audioUrl === 'null' || $audioUrl === 'NULL')
+			$audioUrl = null;
+
+		if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
+			try {
+				if ($imageUrl) {
+					fh_delete_file($imageUrl);
+				}
+				$imageUrl = fh_upload_file($_FILES['image_file'], 'image');
+			} catch (Exception $e) {
+				throw new Exception("Lỗi upload hình ảnh: " . $e->getMessage());
+			}
+		} else {
+			$imageUrl = helperGetPostValue('image_url', $imageUrl);
+		}
+		if ($imageUrl === 'null' || $imageUrl === 'NULL')
+			$imageUrl = null;
+
+		if (!empty($part)) {
+			helperValidatePassageMediaRequirements($part, $audioUrl, $imageUrl);
+		}
+
+		$passageData = [
+			'content' => ($content !== null && $content !== '') ? trim($content) : null,
+			'translation_en' => ($translationEn !== null && $translationEn !== '') ? trim($translationEn) : null,
+			'translation' => ($translation !== null && $translation !== '') ? trim($translation) : null,
+			'audio_url' => $audioUrl,
+			'image_url' => $imageUrl
+		];
+
+		passageUpdate($db, $passageId, $passageData);
+
+		return [
+			'success' => true,
+			'message' => 'Đoạn văn đã được cập nhật thành công',
+			'data' => [
+				'passage_id' => $passageId
+			]
+		];
+	} catch (Exception $e) {
+		return [
+			'success' => false,
+			'message' => $e->getMessage(),
+			'code' => 'VALIDATION_ERROR'
+		];
 	}
 }
 

@@ -309,7 +309,7 @@ $greet = $hour < 12 ? 'Chào buổi sáng ☀️' : ($hour < 18 ? 'Chào buổi 
 					} else {
 						let html = '';
 						history.forEach(item => {
-							const d = new Date(item.created_at);
+							const d = new Date(item.created_at ? item.created_at.replace(' ', 'T') : '');
 							const day = String(d.getDate()).padStart(2, '0');
 							const month = String(d.getMonth() + 1).padStart(2, '0');
 							const year = d.getFullYear();

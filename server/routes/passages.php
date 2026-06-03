@@ -31,4 +31,10 @@ elseif (preg_match('/\/api\/passages\/(\d+)$/', $path, $matches) && $method === 
 	http_response_code($response['success'] ? 200 : 404);
 	echo json_encode($response);
 }
+// POST /api/passages/:id - cập nhật đoạn văn
+elseif (preg_match('/\/api\/passages\/(\d+)$/', $path, $matches) && $method === 'POST') {
+	$response = apiUpdatePassage($db_connection, $matches[1]);
+	http_response_code($response['success'] ? 200 : 400);
+	echo json_encode($response);
+}
 ?>

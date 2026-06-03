@@ -22,6 +22,10 @@ $refundWindow = 7 * 86400; // 7 ngày
 
 if ($userId && isset($conn)) {
 	try {
+		$plans = require __DIR__ . '/../config/premiumPlan.php';
+		$ultraPrice = $plans['ultra']['price'] ?? 289000;
+		$ultraYearPrice = $plans['ultra_year']['price'] ?? 749000;
+
 		// 1. Lấy tất cả các giao dịch 'success' của user
 		$stmtTxList = $conn->prepare("SELECT * FROM transaction_history WHERE user_id = :user_id AND status = 'success'");
 		$stmtTxList->execute(['user_id' => $userId]);
@@ -29,13 +33,17 @@ if ($userId && isset($conn)) {
 
 		// 2. Tính tổng số tiền hoàn và cập nhật trạng thái các giao dịch đủ điều kiện
 		$totalPaid = 0;
-		$hasCombo = false;
+		$deductCourse = false;
 		foreach ($activeTxList as $tx) {
 			$txAge = time() - strtotime($tx['created_at']);
 			if ($txAge <= $refundWindow) {
 				$totalPaid += $tx['price'];
 				if (in_array($tx['plan_id'] ?? '', ['ultra', 'ultra_year'])) {
-					$hasCombo = true;
+					if ($tx['plan_id'] === 'ultra' && $tx['price'] >= $ultraPrice) {
+						$deductCourse = true;
+					} elseif ($tx['plan_id'] === 'ultra_year' && $tx['price'] >= $ultraYearPrice) {
+						$deductCourse = true;
+					}
 				}
 
 				// Cập nhật giao dịch thành 'refunded'
@@ -45,7 +53,7 @@ if ($userId && isset($conn)) {
 		}
 
 		$refundAmount = $totalPaid;
-		if ($hasCombo) {
+		if ($deductCourse) {
 			$refundAmount = max(0, $totalPaid - 249000);
 		}
 
@@ -58,8 +66,6 @@ if ($userId && isset($conn)) {
 		$stmtTxLeft = $conn->prepare("SELECT * FROM transaction_history WHERE user_id = :user_id AND status = 'success' ORDER BY created_at ASC");
 		$stmtTxLeft->execute(['user_id' => $userId]);
 		$txsLeft = $stmtTxLeft->fetchAll(PDO::FETCH_ASSOC);
-
-		$plans = require __DIR__ . '/../config/premiumPlan.php';
 
 		$isPremium = 0;
 		$premiumPlan = null;

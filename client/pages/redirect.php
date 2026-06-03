@@ -143,6 +143,12 @@ try {
         $user = $stmt->fetch();
     }
 
+    // kiểm tra tài khoản bị khóa
+    if ($user && isset($user['is_banned']) && (int)$user['is_banned'] === 1) {
+        $conn->rollBack();
+        redirectGoogleLoginFailed('Tài khoản của bạn đã bị đình chỉ hoạt động do vi phạm điều khoản dịch vụ. Nếu bạn cho rằng đây là một sự cố hoặc sai sót, vui lòng báo cáo tới support@prephub.com để được hỗ trợ');
+    }
+
     if (!$user) {
         $insertUser = $conn->prepare(
             'INSERT INTO users (uuid, first_name, last_name, email, password, avatar, account_activation_hash)

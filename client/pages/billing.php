@@ -1,9 +1,11 @@
 <?php
 session_start();
 date_default_timezone_set('Asia/Ho_Chi_Minh');
+require_once '../../server/db/config.php';
 require_once '../../server/middleware/auth.php';
 homeRedirect();
 
+$userId = $_SESSION['user_id'];
 $fullName = trim(($_SESSION['last_name'] ?? '') . ' ' . ($_SESSION['first_name'] ?? ''));
 $email = $_SESSION['email'] ?? '';
 $isPremium = $_SESSION['is_premium'] ?? false;
@@ -12,8 +14,13 @@ $planName = $_SESSION['premium_name'] ?? null;
 $planPrice = $_SESSION['premium_price'] ?? null;
 $planPeriod = $_SESSION['premium_period'] ?? null;
 $premiumUntil = $_SESSION['premium_until'] ?? null;
-$lastPayment = $_SESSION['last_payment'] ?? null;
-$history = array_reverse($_SESSION['payment_history'] ?? []);
+
+// lấy lịch sử giao dịch trực tiếp từ database để tránh lệch session
+$stmtAllTx = $conn->prepare("SELECT tx_id as id, plan_id, plan_name, price, period, status, created_at FROM transaction_history WHERE user_id = :user_id ORDER BY created_at DESC");
+$stmtAllTx->execute(['user_id' => $userId]);
+$history = $stmtAllTx->fetchAll(PDO::FETCH_ASSOC);
+
+$lastPayment = !empty($history) ? $history[0] : null;
 
 $allPlans = require '../../server/config/premiumPlan.php';
 if ($planId && isset($allPlans[$planId])) {
@@ -49,20 +56,31 @@ if ($premiumUntil) {
 	$daysLeft = max(0, (int) ceil((strtotime($premiumUntil) - time()) / 86400));
 }
 
-// Tính số tiền hoàn lại dự kiến (tổng tất cả các giao dịch thành công trong vòng 7 ngày chưa hoàn tiền, khấu trừ 249k khóa học đúng 1 lần nếu có combo)
+// tính số tiền hoàn lại dự kiến
 $totalPaid = 0;
 $hasCombo = false;
+$deductCourse = false;
 $refundWindow = 7 * 86400; // 7 ngày
+
+$ultraPrice = $allPlans['ultra']['price'] ?? 289000;
+$ultraYearPrice = $allPlans['ultra_year']['price'] ?? 749000;
+
 foreach ($history as $tx) {
 	if ($tx['status'] === 'success' && (time() - strtotime($tx['created_at']) <= $refundWindow)) {
 		$totalPaid += $tx['price'];
 		if (in_array($tx['plan_id'] ?? '', ['ultra', 'ultra_year'])) {
 			$hasCombo = true;
+			if ($tx['plan_id'] === 'ultra' && $tx['price'] >= $ultraPrice) {
+				$deductCourse = true;
+			} elseif ($tx['plan_id'] === 'ultra_year' && $tx['price'] >= $ultraYearPrice) {
+				$deductCourse = true;
+			}
 		}
 	}
 }
+
 $refundAmount = $totalPaid;
-if ($hasCombo) {
+if ($deductCourse) {
 	$refundAmount = max(0, $totalPaid - 249000);
 }
 
@@ -257,7 +275,7 @@ if ($lastPayment && $lastPayment['status'] === 'success') {
 		<div class="refund-modal">
 			<h3 class="rfm-title">Xác nhận hủy gói</h3>
 			<p class="rfm-desc">Bạn có chắc muốn hủy gói <strong><?= htmlspecialchars($planName) ?></strong> và nhận hoàn tiền <strong><?= number_format($refundAmount, 0, ',', '.') ?>₫</strong>? Tài khoản sẽ trở về mức Miễn phí ngay lập tức.
-				<?php if ($hasCombo): ?>
+				<?php if ($deductCourse): ?>
 					<br><span style="font-size: 0.85em; color: #71717a; margin-top: 4px; display: inline-block;">(Số tiền hoàn lại đã khấu trừ giá trị Khóa Học 249.000₫ không được hoàn trả)</span>
 				<?php endif; ?>
 			</p>
@@ -276,7 +294,7 @@ if ($lastPayment && $lastPayment['status'] === 'success') {
 						<?php endif; ?>
 					<?php endforeach; ?>
 
-					<?php if ($hasCombo): ?>
+					<?php if ($deductCourse): ?>
 						<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding-top: 6px; border-top: 1px dashed #cbd5e1; color: #ef4444; font-weight: 600;">
 							<span>Khấu trừ Khóa học (giữ quyền sở hữu)</span>
 							<span style="font-family: monospace;">-249.000₫</span>

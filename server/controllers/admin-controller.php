@@ -93,7 +93,7 @@ function getAdminUsers() {
         $total_filtered = (int)$count_stmt->fetchColumn();
 
         // lấy danh sách người dùng
-        $sql = "SELECT id, uuid, first_name, last_name, email, role, is_banned, is_premium, has_course, premium_plan, premium_until, created_at,
+        $sql = "SELECT id, uuid, first_name, last_name, email, role, is_banned, is_premium, has_course, premium_plan, premium_until, created_at, avatar,
                        (SELECT COUNT(DISTINCT a2.test_id) FROM attempts a2 WHERE a2.user_id = users.id) AS user_tests_attempted,
                        (SELECT COUNT(*) FROM tests WHERE is_active = 1) AS total_active_tests
                 FROM users" . $where_clause . " ORDER BY id DESC LIMIT :limit OFFSET :offset";
@@ -170,6 +170,102 @@ function updateAdminUser($userId) {
     }
 }
 
+// cập nhật hàng loạt trạng thái khóa/mở khóa hoặc vai trò của các user
+function bulkUpdateAdminUsers() {
+    global $conn;
+    checkAdminAccess();
+
+    $actorId = (int)$_SESSION['user_id'];
+
+    $input = json_decode(file_get_contents('php://input'), true);
+    $ids = $input['ids'] ?? [];
+    $is_banned = isset($input['is_banned']) ? (int)$input['is_banned'] : null;
+    $role = $input['role'] ?? null;
+
+    if (empty($ids) || ($is_banned === null && $role === null)) {
+        sendError("Dữ liệu yêu cầu không đầy đủ", 400);
+    }
+
+    try {
+        $conn->beginTransaction();
+
+        // chỉ lọc ra những id hợp lệ (không tự thay đổi chính mình)
+        $allowedIds = [];
+        foreach ($ids as $id) {
+            $idInt = (int)$id;
+            if ($idInt !== $actorId) {
+                $allowedIds[] = $idInt;
+            }
+        }
+
+        if (empty($allowedIds)) {
+            sendError("Danh sách tài khoản được chọn không hợp lệ", 400);
+        }
+
+        $updatePlaceholders = implode(',', array_fill(0, count($allowedIds), '?'));
+        
+        if ($is_banned !== null) {
+            $updateSql = "UPDATE users SET is_banned = ? WHERE id IN ($updatePlaceholders)";
+            $params = array_merge([$is_banned], $allowedIds);
+        } else {
+            if (!in_array($role, ['user', 'admin'])) {
+                sendError("Vai trò không hợp lệ", 400);
+            }
+            $updateSql = "UPDATE users SET role = ? WHERE id IN ($updatePlaceholders)";
+            $params = array_merge([$role], $allowedIds);
+        }
+
+        $updateStmt = $conn->prepare($updateSql);
+        $updateStmt->execute($params);
+
+        $conn->commit();
+
+        sendJson([
+            'success' => true,
+            'message' => 'Đã cập nhật trạng thái thành công cho ' . count($allowedIds) . ' học viên'
+        ]);
+    } catch (Exception $e) {
+        if ($conn->inTransaction()) {
+            $conn->rollBack();
+        }
+        sendError("Lỗi hệ thống: " . $e->getMessage(), 500);
+    }
+}
+
+// xóa người dùng khỏi hệ thống
+function deleteAdminUser($userId) {
+    global $conn;
+    checkAdminAccess();
+
+    $actorId = (int)$_SESSION['user_id'];
+    if ($userId === $actorId) {
+        sendError("Bạn không thể tự xóa tài khoản của chính mình", 400);
+    }
+
+    try {
+        // lấy thông tin avatar để xóa tệp
+        $stmt = $conn->prepare("SELECT avatar FROM users WHERE id = :id");
+        $stmt->execute(['id' => $userId]);
+        $avatar = $stmt->fetchColumn();
+
+        if ($avatar && strpos($avatar, '/server/uploads/') === 0) {
+            require_once __DIR__ . '/../utils/fileHandler.php';
+            fh_delete_file($avatar);
+        }
+
+        // thực hiện xóa user
+        $stmtDelete = $conn->prepare("DELETE FROM users WHERE id = :id");
+        $stmtDelete->execute(['id' => $userId]);
+
+        sendJson([
+            'success' => true,
+            'message' => 'Xóa tài khoản người dùng thành công'
+        ]);
+    } catch (PDOException $e) {
+        sendError("Lỗi database: " . $e->getMessage(), 500);
+    }
+}
+
 // lấy danh sách lượt thi phân trang
 function getAdminAttempts() {
     global $conn;
@@ -186,7 +282,7 @@ function getAdminAttempts() {
         // lấy lượt thi với thông tin chi tiết người dùng và đề thi kèm tiến trình
         $sql = "SELECT 
                     a.id, a.uuid, a.listening_correct, a.reading_correct, a.listening_score, a.reading_score, a.total_score, a.time_spent, a.created_at,
-                    u.first_name, u.last_name, u.email, u.is_premium, u.premium_plan, u.has_course,
+                    u.first_name, u.last_name, u.email, u.is_premium, u.premium_plan, u.has_course, u.avatar,
                     t.title,
                     (SELECT COUNT(DISTINCT a2.test_id) FROM attempts a2 WHERE a2.user_id = a.user_id) AS user_tests_attempted,
                     (SELECT COUNT(*) FROM tests WHERE is_active = 1) AS total_active_tests
@@ -222,28 +318,100 @@ function getAdminRevenue() {
     checkAdminAccess();
 
     try {
-        // tổng doanh thu tháng hiện tại
+        // tổng doanh thu thực tế tháng hiện tại
         $current_month_revenue = (int)$conn->query("SELECT COALESCE(SUM(price), 0) FROM transaction_history WHERE status = 'success' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')")->fetchColumn();
         
-        // tổng doanh thu mọi thời gian
+        // tổng doanh thu thực tế mọi thời gian
         $all_time_revenue = (int)$conn->query("SELECT COALESCE(SUM(price), 0) FROM transaction_history WHERE status = 'success'")->fetchColumn();
 
-        // dữ liệu biểu đồ 12 tháng qua
-        $sql = "SELECT 
-                    DATE_FORMAT(created_at, '%Y-%m') AS month,
-                    SUM(price) AS total
-                FROM transaction_history
-                WHERE status = 'success' AND created_at >= DATE_SUB(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL 11 MONTH)
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-                ORDER BY month ASC";
+        // lấy các chỉ số thống kê giao dịch thành công và hoàn tiền
+        $success_count = (int)$conn->query("SELECT COUNT(*) FROM transaction_history WHERE status = 'success'")->fetchColumn();
+        $refunded_count = (int)$conn->query("SELECT COUNT(*) FROM transaction_history WHERE status = 'refunded'")->fetchColumn();
+        $refunded_amount = (int)$conn->query("SELECT COALESCE(SUM(price), 0) FROM transaction_history WHERE status = 'refunded'")->fetchColumn();
+
+        // tính toán bảng phân rã chi tiết doanh thu theo gói
+        $breakdown_sql = "
+            SELECT plan_id, plan_name,
+                   SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) AS success_count,
+                   SUM(CASE WHEN status = 'success' THEN price ELSE 0 END) AS success_amount,
+                   SUM(CASE WHEN status = 'refunded' THEN 1 ELSE 0 END) AS refunded_count,
+                   SUM(CASE WHEN status = 'refunded' THEN price ELSE 0 END) AS refunded_amount
+            FROM transaction_history
+            WHERE status IN ('success', 'refunded')
+            GROUP BY plan_id, plan_name
+        ";
+        $breakdown_raw = $conn->query($breakdown_sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        $breakdown_data = [];
+        foreach ($breakdown_raw as $row) {
+            $s_count = (int)$row['success_count'];
+            $s_amount = (int)$row['success_amount'];
+            $r_count = (int)$row['refunded_count'];
+            $r_amount = (int)$row['refunded_amount'];
+            
+            $gross_revenue = $s_amount + $r_amount;
+            $net_revenue = $s_amount;
+            
+            $total_count = $s_count + $r_count;
+            $refund_rate = $total_count > 0 ? round(($r_count / $total_count) * 100, 1) : 0;
+            
+            $breakdown_data[] = [
+                'plan_id' => $row['plan_id'],
+                'plan_name' => $row['plan_name'],
+                'success_count' => $s_count,
+                'gross_revenue' => $gross_revenue,
+                'refunded_count' => $r_count,
+                'refunded_amount' => $r_amount,
+                'net_revenue' => $net_revenue,
+                'refund_rate' => $refund_rate
+            ];
+        }
+
+        // lấy danh sách tất cả giao dịch theo thứ tự thời gian tăng dần
+        $sql = "SELECT created_at, price, status FROM transaction_history WHERE status = 'success' OR status = 'refunded' ORDER BY created_at ASC";
+        $raw_chart = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        // tính doanh thu luỹ kế bắt đầu từ 0
+        $chart_data = [];
+        $chart_data[] = [
+            'label' => 'Bắt đầu',
+            'total' => 0
+        ];
         
-        $chart_data = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $running_total = 0;
+        foreach ($raw_chart as $tx) {
+            $price = (int)$tx['price'];
+            if ($tx['status'] === 'success') {
+                $running_total += $price;
+                $chart_data[] = [
+                    'label' => date('d/m/Y H:i', strtotime($tx['created_at'])),
+                    'total' => $running_total
+                ];
+            } elseif ($tx['status'] === 'refunded') {
+                // cộng tiền thanh toán trước
+                $running_total += $price;
+                $chart_data[] = [
+                    'label' => date('d/m/Y H:i', strtotime($tx['created_at'])) . ' (Thanh toán)',
+                    'total' => $running_total
+                ];
+                // trừ tiền hoàn trả sau
+                $running_total -= $price;
+                $chart_data[] = [
+                    'label' => date('d/m/Y H:i', strtotime($tx['created_at'])) . ' (Hoàn tiền)',
+                    'total' => $running_total
+                ];
+            }
+        }
 
         sendJson([
             'success' => true,
             'data' => [
                 'current_month' => $current_month_revenue,
                 'all_time' => $all_time_revenue,
+                'success_count' => $success_count,
+                'refunded_count' => $refunded_count,
+                'refunded_amount' => $refunded_amount,
+                'breakdown' => $breakdown_data,
                 'chart' => $chart_data
             ]
         ]);
@@ -263,14 +431,14 @@ function getAdminTransactions() {
 
     try {
         // lấy tổng số giao dịch
-        $total = (int)$conn->query("SELECT COUNT(*) FROM transaction_history WHERE status = 'success'")->fetchColumn();
+        $total = (int)$conn->query("SELECT COUNT(*) FROM transaction_history WHERE status = 'success' OR status = 'refunded'")->fetchColumn();
 
         // lấy danh sách giao dịch
-        $sql = "SELECT t.id, t.tx_id, t.plan_id, t.plan_name, t.price, t.period, t.created_at,
-                       u.first_name, u.last_name, u.email
+        $sql = "SELECT t.id, t.tx_id, t.plan_id, t.plan_name, t.price, t.period, t.status, t.created_at,
+                       u.first_name, u.last_name, u.email, u.avatar
                 FROM transaction_history t
                 JOIN users u ON t.user_id = u.id
-                WHERE t.status = 'success'
+                WHERE t.status = 'success' OR t.status = 'refunded'
                 ORDER BY t.created_at DESC
                 LIMIT :limit OFFSET :offset";
 
@@ -360,7 +528,7 @@ function getInnerHtmlNode($node) {
 }
 
 // phân tích khối câu hỏi từ html
-function helperParseQuestion($xpath, $node, $examAudioUrl, &$isFirstQuestion) {
+function helperParseQuestion($xpath, $node, $examAudioUrl, &$isFirstQuestion, $partNum = 1) {
     $q = ['correct_answer' => 'A'];
     $numNodes = $xpath->query("descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' question-num ')]", $node);
     $numText = '';
@@ -384,7 +552,13 @@ function helperParseQuestion($xpath, $node, $examAudioUrl, &$isFirstQuestion) {
     if ($imgNodes->length > 0) {
         $src = $imgNodes->item(0)->getAttribute('src');
         if ($src) {
-            $q['image_url'] = basename($src);
+            $imgUrl = trim($src);
+            if (str_starts_with($imgUrl, '/')) {
+                $imgUrl = 'https://tienganhmoingay.com' . $imgUrl;
+            } elseif (!str_starts_with($imgUrl, 'http://') && !str_starts_with($imgUrl, 'https://')) {
+                $imgUrl = 'https://tienganhmoingay.com/static/ToeicTests/images/Practice_Tests/Part_' . $partNum . '/' . basename($imgUrl);
+            }
+            $q['image_url'] = $imgUrl;
         }
     }
     $options = [];
@@ -461,7 +635,10 @@ function helperParseExamHtml($htmlContent) {
             $duration = (int)$matches[1];
         }
         if (preg_match('/listeningAudio\s*=\s*["\']([^"\']+)["\']/', $text, $matches)) {
-            $audioUrl = basename($matches[1]);
+            $audioUrl = trim($matches[1]);
+            if (str_starts_with($audioUrl, '/')) {
+                $audioUrl = 'https://tienganhmoingay.com' . $audioUrl;
+            }
         }
     }
     if (empty($audioUrl)) {
@@ -469,7 +646,10 @@ function helperParseExamHtml($htmlContent) {
         if ($audioSources->length > 0) {
             $src = $audioSources->item(0)->getAttribute('src');
             if ($src) {
-                $audioUrl = basename($src);
+                $audioUrl = trim($src);
+                if (str_starts_with($audioUrl, '/')) {
+                    $audioUrl = 'https://tienganhmoingay.com' . $audioUrl;
+                }
             }
         }
     }
@@ -502,7 +682,7 @@ function helperParseExamHtml($htmlContent) {
                 if ($closestSection !== $section) {
                     continue;
                 }
-                $q = helperParseQuestion($xpath, $s, null, $isFirstQuestion);
+                $q = helperParseQuestion($xpath, $s, null, $isFirstQuestion, $partNum);
                 if (isset($q['question_number'])) {
                     $questions[] = $q;
                 }
@@ -540,7 +720,7 @@ function helperParseExamHtml($htmlContent) {
                     if ($closestMCQG !== null) {
                         continue;
                     }
-                    $q = helperParseQuestion($xpath, $qSel, null, $isFirstQuestion);
+                    $q = helperParseQuestion($xpath, $qSel, null, $isFirstQuestion, $partNum);
                     if (isset($q['question_number'])) {
                         $questions[] = $q;
                     }
@@ -551,7 +731,13 @@ function helperParseExamHtml($htmlContent) {
                 if ($imgNodes->length > 0) {
                     $src = $imgNodes->item(0)->getAttribute('src');
                     if ($src) {
-                        $passage['image_url'] = basename($src);
+                        $imgUrl = trim($src);
+                        if (str_starts_with($imgUrl, '/')) {
+                            $imgUrl = 'https://tienganhmoingay.com' . $imgUrl;
+                        } elseif (!str_starts_with($imgUrl, 'http://') && !str_starts_with($imgUrl, 'https://')) {
+                            $imgUrl = 'https://tienganhmoingay.com/static/ToeicTests/images/Practice_Tests/Part_' . $partNum . '/' . basename($imgUrl);
+                        }
+                        $passage['image_url'] = $imgUrl;
                     }
                 }
                 if (in_array($partNum, [6, 7])) {
@@ -621,6 +807,15 @@ function helperParseAnswerHtml($htmlContent) {
             }
             $parent = $parent->parentNode;
         }
+        $partNum = 1;
+        if ($num >= 1 && $num <= 6) $partNum = 1;
+        elseif ($num >= 7 && $num <= 31) $partNum = 2;
+        elseif ($num >= 32 && $num <= 70) $partNum = 3;
+        elseif ($num >= 71 && $num <= 100) $partNum = 4;
+        elseif ($num >= 101 && $num <= 130) $partNum = 5;
+        elseif ($num >= 131 && $num <= 146) $partNum = 6;
+        elseif ($num >= 147 && $num <= 200) $partNum = 7;
+
         if ($parentMCQG) {
             $viDivNode = $xpath->query("descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' reading-text-wrapper ') and contains(concat(' ', normalize-space(@class), ' '), ' text-vi ')]/div", $parentMCQG)->item(0);
             if ($viDivNode) {
@@ -637,6 +832,8 @@ function helperParseAnswerHtml($htmlContent) {
                     $passageAudio = trim($src);
                     if (str_starts_with($passageAudio, '/')) {
                         $passageAudio = 'https://tienganhmoingay.com' . $passageAudio;
+                    } elseif (!str_starts_with($passageAudio, 'http://') && !str_starts_with($passageAudio, 'https://')) {
+                        $passageAudio = 'https://tienganhmoingay.com/static/ToeicTests/audios/Practice_Tests/Part_' . $partNum . '/' . basename($passageAudio);
                     }
                 }
             }
@@ -649,6 +846,9 @@ function helperParseAnswerHtml($htmlContent) {
                 $questionAudio = trim($src);
                 if (str_starts_with($questionAudio, '/')) {
                     $questionAudio = 'https://tienganhmoingay.com' . $questionAudio;
+                } elseif (!str_starts_with($questionAudio, 'http://') && !str_starts_with($questionAudio, 'https://')) {
+                    // map to original website domain for downloaded assets
+                    $questionAudio = 'https://tienganhmoingay.com/static/ToeicTests/audios/Practice_Tests/Part_' . $partNum . '/' . basename($questionAudio);
                 }
             }
         }
@@ -735,27 +935,6 @@ function importAdminTest() {
         $answerFile = $_FILES['answer_file']['tmp_name'];
     }
 
-    $mediaFile = $_FILES['media_file']['tmp_name'] ?? null;
-    $mediaAnswerFile = $_FILES['media_answer_file']['tmp_name'] ?? null;
-    $tempDir = __DIR__ . '/../../server/uploads/temp_import_' . uniqid();
-    if (!is_dir($tempDir)) {
-        mkdir($tempDir, 0777, true);
-        chmod($tempDir, 0777);
-    }
-    if ($mediaFile && is_uploaded_file($mediaFile)) {
-        $zip = new ZipArchive();
-        if ($zip->open($mediaFile) === true) {
-            $zip->extractTo($tempDir);
-            $zip->close();
-        }
-    }
-    if ($mediaAnswerFile && is_uploaded_file($mediaAnswerFile)) {
-        $zip = new ZipArchive();
-        if ($zip->open($mediaAnswerFile) === true) {
-            $zip->extractTo($tempDir);
-            $zip->close();
-        }
-    }
     try {
         if ($isSplit) {
             $listeningHtml = file_get_contents($listeningFile);
@@ -828,30 +1007,15 @@ function importAdminTest() {
             throw new Exception("File đề thi không hợp lệ hoặc không có dữ liệu câu hỏi");
         }
         global $conn;
-        $testTitle = $examData['title'] ?? 'Đề thi thử mới';
-        $slug = helperSlugify($testTitle);
-        $targetImageDir = __DIR__ . '/../../server/uploads/image/' . $slug;
-        if (!is_dir($targetImageDir)) {
-            mkdir($targetImageDir, 0777, true);
-            chmod($targetImageDir, 0777);
-        }
-        $copyImage = function($imgName, $newBaseName) use ($slug, $targetImageDir, $tempDir) {
-            if (empty($imgName)) return null;
-            $ext = pathinfo($imgName, PATHINFO_EXTENSION);
-            $newFileName = $newBaseName . '.' . $ext;
-            $sourceFile = findFileInDirRecursive($tempDir, $imgName);
-            if ($sourceFile && file_exists($sourceFile)) {
-                copy($sourceFile, $targetImageDir . '/' . $newFileName);
-            }
-            return "/server/uploads/image/" . $slug . "/" . $newFileName;
-        };
+        $testTitle = isset($_POST['title']) && trim($_POST['title']) !== '' ? trim($_POST['title']) : ($examData['title'] ?? 'Đề thi thử mới');
+        $testDesc = isset($_POST['desc']) && trim($_POST['desc']) !== '' ? trim($_POST['desc']) : 'Đề thi import tự động, ở trạng thái chờ duyệt';
         $conn->beginTransaction();
         $stmt = $conn->prepare("INSERT INTO tests (uuid, title, description, duration, audio_url, is_premium, is_active) VALUES (UUID(), :title, :desc, :duration, :audio_url, :is_premium, 0)");
         $stmt->execute([
             'title' => $testTitle,
-            'desc' => 'Đề thi import tự động, ở trạng thái chờ duyệt',
+            'desc' => $testDesc,
             'duration' => $examData['duration'] ?? 7200,
-            'audio_url' => (!empty($examData['audio_url'])) ? "/server/uploads/audio/" . $examData['audio_url'] : null,
+            'audio_url' => $examData['audio_url'] ?? null,
             'is_premium' => $isPremium
         ]);
         $testId = $conn->lastInsertId();
@@ -866,8 +1030,8 @@ function importAdminTest() {
                         'part' => $partNumber,
                         'question_number' => $q['question_number'],
                         'content' => $q['content'] ?: null,
-                        'image_url' => $copyImage($q['image_url'] ?? null, 'question_' . $q['question_number']),
-                        'audio_url' => (!empty($q['audio_url'])) ? "/server/uploads/audio/" . $q['audio_url'] : null,
+                        'image_url' => $q['image_url'] ?? null,
+                        'audio_url' => $q['audio_url'] ?? null,
                         'correct_answer' => $q['correct_answer'] ?? 'A'
                     ]);
                     $questionId = $conn->lastInsertId();
@@ -886,19 +1050,12 @@ function importAdminTest() {
             }
             if (isset($part['passages']) && is_array($part['passages'])) {
                 foreach ($part['passages'] as $passage) {
-                    $newBaseName = 'passage';
-                    if (!empty($passage['questions'])) {
-                        $nums = array_column($passage['questions'], 'question_number');
-                        if (!empty($nums)) {
-                            $newBaseName = 'question_' . min($nums) . '_' . max($nums);
-                        }
-                    }
                     $stmtPass = $conn->prepare("INSERT INTO passages (test_id, content, image_url, audio_url) VALUES (:test_id, :content, :image_url, :audio_url)");
                     $stmtPass->execute([
                         'test_id' => $testId,
                         'content' => $passage['content'] ?: null,
-                        'image_url' => $copyImage($passage['image_url'] ?? null, $newBaseName),
-                        'audio_url' => (!empty($passage['audio_url'])) ? "/server/uploads/audio/" . $passage['audio_url'] : null
+                        'image_url' => $passage['image_url'] ?? null,
+                        'audio_url' => $passage['audio_url'] ?? null
                     ]);
                     $passageId = $conn->lastInsertId();
                     if (isset($passage['questions']) && is_array($passage['questions'])) {
@@ -910,8 +1067,8 @@ function importAdminTest() {
                                 'part' => $partNumber,
                                 'question_number' => $q['question_number'],
                                 'content' => $q['content'] ?: null,
-                                'image_url' => $copyImage($q['image_url'] ?? null, 'question_' . $q['question_number']),
-                                'audio_url' => (!empty($q['audio_url'])) ? "/server/uploads/audio/" . $q['audio_url'] : null,
+                                'image_url' => $q['image_url'] ?? null,
+                                'audio_url' => $q['audio_url'] ?? null,
                                 'correct_answer' => $q['correct_answer'] ?? 'A'
                             ]);
                             $questionId = $conn->lastInsertId();
@@ -985,7 +1142,6 @@ function importAdminTest() {
             }
         }
         $conn->commit();
-        helperRemoveDir($tempDir);
         sendJson([
             'success' => true,
             'message' => 'Đề thi đã được import thành công ở chế độ chờ duyệt',
@@ -995,7 +1151,6 @@ function importAdminTest() {
         if ($conn->inTransaction()) {
             $conn->rollBack();
         }
-        helperRemoveDir($tempDir);
         sendError("Lỗi khi import đề thi: " . $e->getMessage(), 500);
     }
 }

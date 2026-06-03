@@ -180,6 +180,21 @@ try {
 				}
 				if ($passageEng) {
 					$stmtUpdatePassageEn->execute([$passageEng, $pRow['passage_id']]);
+					$stmtGetPassage = $pdo->prepare("SELECT content FROM passages WHERE id = ?");
+					$stmtGetPassage->execute([$pRow['passage_id']]);
+					$pContent = $stmtGetPassage->fetchColumn();
+					if (str_contains($pContent, '<')) {
+						$qStmt = $pdo->prepare("SELECT question_number FROM questions WHERE passage_id = ? ORDER BY question_number ASC");
+						$qStmt->execute([$pRow['passage_id']]);
+						$nums = $qStmt->fetchAll(PDO::FETCH_COLUMN);
+						$newHeader = 'Questions:';
+						if (!empty($nums)) {
+							$min = min($nums);
+							$max = max($nums);
+							$newHeader = "Questions {$min} - {$max}:";
+						}
+						$pdo->prepare("UPDATE passages SET content = ? WHERE id = ?")->execute([$newHeader, $pRow['passage_id']]);
+					}
 				}
 				if ($passageAudio) {
 					$stmtUpdatePassageAudio->execute([$passageAudio, $pRow['passage_id']]);

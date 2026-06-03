@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `transaction_history` (
     `plan_name` VARCHAR(100) NOT NULL,
     `price` INT NOT NULL,
     `period` VARCHAR(50) NOT NULL,
-    `status` ENUM('success', 'failed', 'pending') DEFAULT 'success',
+    `status` ENUM('success', 'failed', 'pending', 'refunded') DEFAULT 'success',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT `fk_transaction_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
     INDEX `idx_user` (`user_id`)

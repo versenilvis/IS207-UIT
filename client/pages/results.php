@@ -10,7 +10,6 @@ $navbarMode = 'light';
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php include './components/metadata.php'; ?>
 	<title>Kết quả bài thi | Prephub</title>
-	<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="../styles/results.css?v=<?= time() ?>">
 </head>
 
@@ -27,7 +26,7 @@ $navbarMode = 'light';
 						<span class="stat-label">Tổng điểm</span>
 						<span class="stat-value" id="total-points">-</span>
 					</div>
-					<div class="stat-bg-icon"><i class="bx bxs-trophy"></i></div>
+					<div class="stat-bg-icon"><i class="bx bx-medal-star"></i></div>
 				</div>
 				<div class="stat-card listening soft-green">
 					<div class="stat-content">
@@ -41,14 +40,14 @@ $navbarMode = 'light';
 						<span class="stat-label">Reading</span>
 						<span class="stat-value" id="reading-points">-<span class="stat-sub">/495</span></span>
 					</div>
-					<div class="stat-bg-icon"><i class="bx bxs-book-open"></i></div>
+					<div class="stat-bg-icon"><i class="bx bx-book-open"></i></div>
 				</div>
 				<div class="stat-card accuracy soft-orange">
 					<div class="stat-content">
 						<span class="stat-label">Độ chính xác</span>
 						<span class="stat-value" id="accuracy-rate">-</span>
 					</div>
-					<div class="stat-bg-icon"><i class="bx bx-target-lock"></i></div>
+					<div class="stat-bg-icon"><i class="bx bx-target"></i></div>
 				</div>
 			</div>
 

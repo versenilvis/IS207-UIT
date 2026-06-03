@@ -40,7 +40,7 @@ async function fetchExamData() {
         const testDuration = Number(questions_lists.data.duration);
 
         
-        setupExamAudio(questions);
+        setupExamAudio(questions_lists.data, questions);
         renderQuestions(questions);
         document.getElementById("exam-title").innerHTML = questions_lists.data.title;  
         renderSidebar(questions); 
@@ -60,7 +60,7 @@ async function fetchExamData() {
  * Tìm link audio đầu tiên có trong danh sách câu hỏi -> Gán vào thẻ <audio> -> 
  * Nếu không có audio thì khóa nút Play.
  */
-function setupExamAudio(questions) {
+function setupExamAudio(testData, questions) {
     const audioEl = document.getElementById('exam-audio');
     const playBtn = document.getElementById('custom-play-btn');
     const statusText = document.getElementById('audio-status');
@@ -80,13 +80,16 @@ function setupExamAudio(questions) {
         return;
     }
 
-    // Tìm URL audio đầu tiên xuất hiện trong đề
-    const firstAudioUrl = questions.reduce((foundUrl, q) => {
-        if (foundUrl) return foundUrl;
-        return q.passage_audio || q.audio_url || '';
-    }, '');
+    // láy
+    let targetAudioUrl = testData?.audio_url || '';
+    if (!targetAudioUrl || targetAudioUrl === 'null' || targetAudioUrl === 'NULL') {
+        targetAudioUrl = questions.reduce((foundUrl, q) => {
+            if (foundUrl) return foundUrl;
+            return q.passage_audio || q.audio_url || '';
+        }, '');
+    }
 
-    if (!firstAudioUrl) {
+    if (!targetAudioUrl || targetAudioUrl === 'null' || targetAudioUrl === 'NULL') {
         audioEl.removeAttribute('src');
         playBtn.disabled = true;
         playBtn.classList.replace('btn-primary', 'btn-secondary');
@@ -95,7 +98,7 @@ function setupExamAudio(questions) {
         return;
     }
 
-    audioEl.src = firstAudioUrl;
+    audioEl.src = targetAudioUrl;
     audioEl.load();
 
     const warningBox = document.getElementById('listening-intro-warning');
@@ -188,7 +191,8 @@ function renderQuestions(questions) {
                 const hasImage = !!q.passage_image;
                 const headerClass = hasImage ? 'passage-group-header grid-full-width mb-3' : 'passage-group-header grid-full-width no-image';
                 
-                const isPlaceholder = q.paragraph.trim().startsWith('Questions ') && !q.paragraph.includes('<');
+                const hasPassageText = q.passage_translation_en && q.passage_translation_en.trim() !== '';
+                const isPlaceholder = !hasPassageText && q.paragraph.trim().startsWith('Questions ') && !q.paragraph.includes('<');
                 let passageHtml = '';
                 
                 if (isPlaceholder) {
@@ -198,16 +202,26 @@ function renderQuestions(questions) {
                     const nums = passageQuestions.map(item => parseInt(item.question_number)).filter(Number.isInteger);
                     const min = Math.min(...nums);
                     const max = Math.max(...nums);
-                    const rangeHeader = (Number.isInteger(min) && Number.isInteger(max))
-                        ? `<p class="fw-bold mb-1 text-dark" style="font-size: 1rem;">Questions ${min} - ${max}:</p>`
-                        : '';
                     
+                    let rangeHeader = '';
+                    let bodyHtml = '';
                     let titleHtml = '';
-                    let bodyHtml = q.paragraph;
-                    const headerMatch = q.paragraph.match(/^(\s*<h[1-6]>.*?<\/h[1-6]>)(.*)$/is);
-                    if (headerMatch) {
-                        titleHtml = headerMatch[1];
-                        bodyHtml = headerMatch[2];
+
+                    if (hasPassageText) {
+                        // hiển thị tiêu đề nhóm ở content và nội dung ở translation_en
+                        rangeHeader = `<p class="fw-bold mb-1 text-dark" style="font-size: 1rem;">${q.paragraph}</p>`;
+                        bodyHtml = q.passage_translation_en;
+                    } else {
+                        // fallback cũ khi nội dung nằm ở content
+                        rangeHeader = (Number.isInteger(min) && Number.isInteger(max))
+                            ? `<p class="fw-bold mb-1 text-dark" style="font-size: 1rem;">Questions ${min} - ${max}:</p>`
+                            : '';
+                        bodyHtml = q.paragraph;
+                        const headerMatch = q.paragraph.match(/^(\s*<h[1-6]>.*?<\/h[1-6]>)(.*)$/is);
+                        if (headerMatch) {
+                            titleHtml = headerMatch[1];
+                            bodyHtml = headerMatch[2];
+                        }
                     }
                     
                     passageHtml = `
@@ -234,7 +248,11 @@ function renderQuestions(questions) {
                 lastParagraph = '';
             }
 
-            let imageHtml = q.image_url ? `<img src="${q.image_url}" class="img-fluid mb-3" style="max-height: 250px; display: block;">` : '';
+            const supportsImage = [1, 3, 4, 7].includes(parseInt(q.part));
+            let imageHtml = '';
+            if (supportsImage && q.image_url && q.image_url !== 'null' && q.image_url !== 'NULL' && q.image_url.trim() !== '') {
+                imageHtml = `<img src="${q.image_url}" class="img-fluid mb-3" style="max-height: 250px; display: block;">`;
+            }
             let optionsHtml = '';
             
             q.options.forEach(opt => {

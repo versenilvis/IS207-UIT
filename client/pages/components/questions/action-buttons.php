@@ -1,8 +1,12 @@
 <div class="header-actions">
-	<button class="btn btn-add" onclick="addBlock('single')">+ Thêm Câu Đơn</button>
-	<button class="btn btn-add-group" onclick="addBlock('group')">+ Thêm Cụm Câu Hỏi</button>
+	<button class="btn btn-add" onclick="addBlock('single')">
+		<i class="bx bx-plus"></i>Thêm câu đơn
+	</button>
+	<button class="btn btn-add-group" onclick="addBlock('group')">
+		<i class="bx bx-layer-plus"></i>Thêm cụm câu hỏi
+	</button>
 	<button class="btn btn-delete-all" onclick="deleteAllBlocks()">
-		<i class="bx bx-trash-alt" style="font-size: 1.2rem; vertical-align: -0.125em; margin-right: 5px;"></i>Xóa Tất Cả</button>
+		<i class="bx bx-trash-alt"></i>Xóa tất cả</button>
 	<button class="btn btn-submit" onclick="submitData(event)">
-		<i class="bx bx-save" style="font-size: 1.2rem; vertical-align: -0.125em; margin-right: 5px;"></i>Lưu Bài Test</button>
+		<i class="bx bx-save"></i>Lưu đề & đáp án</button>
 </div>

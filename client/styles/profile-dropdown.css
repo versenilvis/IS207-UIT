@@ -19,12 +19,20 @@
     font-weight: 700;
     color: #1a1a1a;
     line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
 }
 
 .user-email-text {
     font-size: 13px;
     font-weight: 500;
     color: #71717a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
 }
 
 /* ─── avatar ────────────────────────────────────────────────────── */

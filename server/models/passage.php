@@ -10,15 +10,17 @@ function passageCreate(PDO $db, $data) {
 		}
 
 		$sql = "INSERT INTO passages 
-				(test_id, content, audio_url, image_url) 
+				(test_id, content, translation_en, translation, audio_url, image_url) 
 				VALUES 
-				(:test_id, :content, :audio_url, :image_url)";
+				(:test_id, :content, :translation_en, :translation, :audio_url, :image_url)";
 
 		$stmt = $db->prepare($sql);
 
 		$result = $stmt->execute([
 			':test_id' => $data['test_id'] ?? null,
 			':content' => $data['content'] ?? null,
+			':translation_en' => $data['translation_en'] ?? null,
+			':translation' => $data['translation'] ?? null,
 			':audio_url' => $data['audio_url'] ?? null,
 			':image_url' => $data['image_url'] ?? null,
 		]);
@@ -38,7 +40,7 @@ function passageCreate(PDO $db, $data) {
  */
 function passageGetById(PDO $db, $passageId) {
 	try {
-		$sql = "SELECT id, test_id, content, audio_url, image_url 
+		$sql = "SELECT id, test_id, content, translation_en, translation, audio_url, image_url 
 				FROM passages 
 				WHERE id = :id";
 
@@ -57,7 +59,7 @@ function passageGetById(PDO $db, $passageId) {
  */
 function passageGetByTestId(PDO $db, $testId) {
 	try {
-		$sql = "SELECT id, test_id, content, audio_url, image_url 
+		$sql = "SELECT id, test_id, content, translation_en, translation, audio_url, image_url 
 				FROM passages 
 				WHERE test_id = :test_id 
 				ORDER BY id ASC";
@@ -82,6 +84,16 @@ function passageUpdate(PDO $db, $passageId, $data) {
 		if (isset($data['content'])) {
 			$updates[] = "content = :content";
 			$params[':content'] = $data['content'];
+		}
+
+		if (isset($data['translation_en'])) {
+			$updates[] = "translation_en = :translation_en";
+			$params[':translation_en'] = $data['translation_en'];
+		}
+
+		if (isset($data['translation'])) {
+			$updates[] = "translation = :translation";
+			$params[':translation'] = $data['translation'];
 		}
 
 		if (isset($data['audio_url'])) {

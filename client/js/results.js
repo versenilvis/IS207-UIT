@@ -104,42 +104,58 @@ function renderReviewList(questions) {
                     passageImgHtml = `<img src="${item.passage_image}" class="passage-image img-fluid mb-3" style="max-height: 350px; display: block; margin: 10px auto;">`;
                 }
                 let passageTransHtml = '';
-                if (item.passage_translation_en && item.passage_translation_en.trim() && item.passage_translation && item.passage_translation.trim()) {
+                const hasPassageEn = item.passage_translation_en && item.passage_translation_en.trim();
+                const hasPassageVi = item.passage_translation && item.passage_translation.trim();
+
+                if (hasPassageEn || hasPassageVi) {
                     const uniqueId = `trans_p_${item.question_number}`;
-                    passageTransHtml = `
-                    <div class="mt-2">
-                        <button class="btn btn-sm btn-outline-primary py-0 px-2" type="button" data-bs-toggle="collapse" data-bs-target="#${uniqueId}" aria-expanded="false" style="font-size: 0.78rem; font-weight: 500;">
-                            <i class="bx bx-translate me-1"></i>Xem đoạn văn & Bản dịch
-                        </button>
-                        <div class="collapse mt-2" id="${uniqueId}">
-                            <div class="p-3 rounded text-dark" style="background-color: #f8fafc; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
-                                <div class="row">
-                                    <div class="col-md-6 border-end">
-                                        <strong style="color: #475569; display: block; margin-bottom: 8px;"><i class="bx bx-file me-1"></i>Reading text:</strong>
-                                        <div style="font-size: 0.88rem; line-height: 1.6; color: #334155;">
-                                            ${item.passage_translation_en.trim()}
-                                        </div>
+                    let contentHtml = '';
+
+                    if (hasPassageEn && hasPassageVi) {
+                        contentHtml = `
+                            <div class="row">
+                                <div class="col-md-6 border-end">
+                                    <strong style="color: #475569; display: block; margin-bottom: 8px;"><i class="bx bx-file me-1"></i>Reading text / Transcript:</strong>
+                                    <div style="font-size: 0.88rem; line-height: 1.6; color: #334155;">
+                                        ${item.passage_translation_en.trim()}
                                     </div>
-                                    <div class="col-md-6">
-                                        <strong style="color: #2563eb; display: block; margin-bottom: 8px;"><i class="bx bx-globe me-1"></i>Dịch đoạn văn:</strong>
-                                        <div style="font-size: 0.88rem; line-height: 1.6; color: #334155;">
-                                            ${item.passage_translation.trim()}
-                                        </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong style="color: #2563eb; display: block; margin-bottom: 8px;"><i class="bx bx-globe me-1"></i>Dịch đoạn văn / Lời thoại:</strong>
+                                    <div style="font-size: 0.88rem; line-height: 1.6; color: #334155;">
+                                        ${item.passage_translation.trim()}
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>`;
-                } else if (item.passage_translation && item.passage_translation.trim()) {
-                    const uniqueId = `trans_p_${item.question_number}`;
+                        `;
+                    } else if (hasPassageEn) {
+                        contentHtml = `
+                            <div>
+                                <strong style="color: #475569; display: block; margin-bottom: 8px;"><i class="bx bx-file me-1"></i>Reading text / Transcript:</strong>
+                                <div style="font-size: 0.88rem; line-height: 1.6; color: #334155;">
+                                    ${item.passage_translation_en.trim()}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        contentHtml = `
+                            <div>
+                                <strong style="color: #2563eb; display: block; margin-bottom: 8px;"><i class="bx bx-globe me-1"></i>Dịch đoạn văn / Lời thoại:</strong>
+                                <div style="font-size: 0.88rem; line-height: 1.6; color: #334155;">
+                                    ${item.passage_translation.trim()}
+                                </div>
+                            </div>
+                        `;
+                    }
+
                     passageTransHtml = `
                     <div class="mt-2">
                         <button class="btn btn-sm btn-outline-primary py-0 px-2" type="button" data-bs-toggle="collapse" data-bs-target="#${uniqueId}" aria-expanded="false" style="font-size: 0.78rem; font-weight: 500;">
-                            <i class="bx bx-translate me-1"></i>Dịch đoạn văn
+                            <i class="bx bx-translate me-1"></i>Xem đoạn văn / Bản dịch
                         </button>
                         <div class="collapse mt-2" id="${uniqueId}">
-                            <div class="p-3 rounded text-dark" style="background-color: #f1f5f9; font-size: 0.88rem; line-height: 1.5; border-left: 3px solid #3b82f6;">
-                                ${item.passage_translation.trim()}
+                            <div class="p-3 rounded text-dark" style="background-color: #f8fafc; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
+                                ${contentHtml}
                             </div>
                         </div>
                     </div>`;
@@ -193,8 +209,13 @@ function renderReviewList(questions) {
             }
 
             let mediaHtml = '';
-            if (item.image_url) mediaHtml += `<img src="${item.image_url}" class="img-fluid mt-2" style="max-height:280px;">`;
-            if (item.audio_url) mediaHtml += `<audio controls src="${item.audio_url}" class="mt-2" style="max-width: 320px; display: block;"></audio>`;
+            const supportsImage = [1, 3, 4, 7].includes(parseInt(item.part));
+            if (supportsImage && item.image_url && item.image_url !== 'null' && item.image_url !== 'NULL' && item.image_url.trim() !== '') {
+                mediaHtml += `<img src="${item.image_url}" class="img-fluid mt-2" style="max-height:280px;">`;
+            }
+            if (item.audio_url && item.audio_url !== 'null' && item.audio_url !== 'NULL' && item.audio_url.trim() !== '') {
+                mediaHtml += `<audio controls src="${item.audio_url}" class="mt-2" style="max-width: 320px; display: block;"></audio>`;
+            }
 
             const displayContent = item.question_content || (parseInt(item.part) === 2 ? 'Mark your answer on your answer sheet.' : '');
             const contentHtml = displayContent || (mediaHtml ? '' : '<i style="color:#94a3b8;">Nội dung không khả dụng.</i>');
