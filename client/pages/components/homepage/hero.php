@@ -8,8 +8,8 @@
 				<p class="hero-sub">Làm chủ đề thi TOEIC, tăng điểm nhanh chóng với lộ trình học tập trung</p>
 				<p class="hero-sub">Hệ thống luyện đề thi TOEIC thực tế, cập nhật mới nhất 2026</p>
 				<div class="hero-btns">
-					<button class="btn-start">Bắt đầu <i class="bxf bx-chevron-right-circle"></i></button>
-					<button class="btn-progress">Xem lộ trình</button>
+					<a href="tests.php" class="btn-start" style="text-decoration: none;">Bắt đầu <i class="bx bx-chevron-right-circle"></i></a>
+					<a href="tos.php?tab=lien-he" class="btn-progress" style="text-decoration: none;">Liên hệ</a>
 					<div class="hero-trust">
 						<div class="avatar-stack">
 							<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="user">

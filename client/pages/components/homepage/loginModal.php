@@ -267,6 +267,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             const loginModal = new bootstrap.Modal(loginModalEl);
+
+            loginModalEl.addEventListener('show.bs.modal', (e) => {
+                const triggerBtn = e.relatedTarget;
+                if (triggerBtn && triggerBtn.getAttribute('data-auth-tab') === 'signup') {
+                    authWrapper.classList.remove('forgot-active');
+                    authWrapper.classList.remove('reset-active');
+                    authWrapper.classList.add('signup-active');
+                } else if (triggerBtn) {
+                    authWrapper.classList.remove('signup-active');
+                    authWrapper.classList.remove('forgot-active');
+                    authWrapper.classList.remove('reset-active');
+                }
+            });
             
             if (toSignup && toSignin && authWrapper) {
                 toSignup.addEventListener('click', (e) => {
