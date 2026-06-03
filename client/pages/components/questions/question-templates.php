@@ -75,16 +75,16 @@
 
 			<div class="passage-section" style="margin-bottom: 15px;">
 				<div style="margin-bottom: 10px;">
-					<label style="font-weight: 600; display: block; margin-bottom: 5px;">Tiêu đề nhóm câu hỏi (e.g. Questions 32 - 34:)</label>
+					<label style="font-weight: 600; display: block; margin-bottom: 5px;">Nhóm câu hỏi</label>
 					<input type="text" class="passage-header form-control" placeholder="Questions 32 - 34:">
 				</div>
 				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
 					<div>
-						<label style="font-weight: 600; display: block; margin-bottom: 5px;">Đoạn văn tiếng Anh (Passage)</label>
+						<label style="font-weight: 600; display: block; margin-bottom: 5px;">Đoạn văn tiếng Anh</label>
 						<textarea class="form-control passage-content" placeholder="Nhập đoạn văn tiếng Anh..." style="height: 150px;"></textarea>
 					</div>
 					<div>
-						<label style="font-weight: 600; display: block; margin-bottom: 5px;">Dịch tiếng Việt (Translation)</label>
+						<label style="font-weight: 600; display: block; margin-bottom: 5px;">Dịch tiếng Việt</label>
 						<textarea class="form-control passage-translation" placeholder="Nhập bản dịch tiếng Việt..." style="height: 150px;"></textarea>
 					</div>
 				</div>
