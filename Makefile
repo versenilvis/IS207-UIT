@@ -48,7 +48,7 @@ logs-db:
 clean:
 	docker compose down -v
 
-# chạy toàn bộ migration sql theo thứ tự số thứ tự file
+# chạy toàn bộ migration sql theo thứ tự số thứ tự file (cái này chỉ cho linux/macos)
 migrate:
 	@for f in $$(ls server/db/migration_*.sql | sort); do \
 		echo ">> chạy $$f"; \
