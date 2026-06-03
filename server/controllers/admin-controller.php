@@ -552,7 +552,11 @@ function helperParseQuestion($xpath, $node, $examAudioUrl, &$isFirstQuestion) {
     if ($imgNodes->length > 0) {
         $src = $imgNodes->item(0)->getAttribute('src');
         if ($src) {
-            $q['image_url'] = basename($src);
+            $imgUrl = trim($src);
+            if (str_starts_with($imgUrl, '/')) {
+                $imgUrl = 'https://tienganhmoingay.com' . $imgUrl;
+            }
+            $q['image_url'] = $imgUrl;
         }
     }
     $options = [];
@@ -629,7 +633,10 @@ function helperParseExamHtml($htmlContent) {
             $duration = (int)$matches[1];
         }
         if (preg_match('/listeningAudio\s*=\s*["\']([^"\']+)["\']/', $text, $matches)) {
-            $audioUrl = basename($matches[1]);
+            $audioUrl = trim($matches[1]);
+            if (str_starts_with($audioUrl, '/')) {
+                $audioUrl = 'https://tienganhmoingay.com' . $audioUrl;
+            }
         }
     }
     if (empty($audioUrl)) {
@@ -637,7 +644,10 @@ function helperParseExamHtml($htmlContent) {
         if ($audioSources->length > 0) {
             $src = $audioSources->item(0)->getAttribute('src');
             if ($src) {
-                $audioUrl = basename($src);
+                $audioUrl = trim($src);
+                if (str_starts_with($audioUrl, '/')) {
+                    $audioUrl = 'https://tienganhmoingay.com' . $audioUrl;
+                }
             }
         }
     }
@@ -719,7 +729,11 @@ function helperParseExamHtml($htmlContent) {
                 if ($imgNodes->length > 0) {
                     $src = $imgNodes->item(0)->getAttribute('src');
                     if ($src) {
-                        $passage['image_url'] = basename($src);
+                        $imgUrl = trim($src);
+                        if (str_starts_with($imgUrl, '/')) {
+                            $imgUrl = 'https://tienganhmoingay.com' . $imgUrl;
+                        }
+                        $passage['image_url'] = $imgUrl;
                     }
                 }
                 if (in_array($partNum, [6, 7])) {
@@ -903,27 +917,6 @@ function importAdminTest() {
         $answerFile = $_FILES['answer_file']['tmp_name'];
     }
 
-    $mediaFile = $_FILES['media_file']['tmp_name'] ?? null;
-    $mediaAnswerFile = $_FILES['media_answer_file']['tmp_name'] ?? null;
-    $tempDir = __DIR__ . '/../../server/uploads/temp_import_' . uniqid();
-    if (!is_dir($tempDir)) {
-        mkdir($tempDir, 0777, true);
-        chmod($tempDir, 0777);
-    }
-    if ($mediaFile && is_uploaded_file($mediaFile)) {
-        $zip = new ZipArchive();
-        if ($zip->open($mediaFile) === true) {
-            $zip->extractTo($tempDir);
-            $zip->close();
-        }
-    }
-    if ($mediaAnswerFile && is_uploaded_file($mediaAnswerFile)) {
-        $zip = new ZipArchive();
-        if ($zip->open($mediaAnswerFile) === true) {
-            $zip->extractTo($tempDir);
-            $zip->close();
-        }
-    }
     try {
         if ($isSplit) {
             $listeningHtml = file_get_contents($listeningFile);
@@ -997,29 +990,13 @@ function importAdminTest() {
         }
         global $conn;
         $testTitle = $examData['title'] ?? 'Đề thi thử mới';
-        $slug = helperSlugify($testTitle);
-        $targetImageDir = __DIR__ . '/../../server/uploads/image/' . $slug;
-        if (!is_dir($targetImageDir)) {
-            mkdir($targetImageDir, 0777, true);
-            chmod($targetImageDir, 0777);
-        }
-        $copyImage = function($imgName, $newBaseName) use ($slug, $targetImageDir, $tempDir) {
-            if (empty($imgName)) return null;
-            $ext = pathinfo($imgName, PATHINFO_EXTENSION);
-            $newFileName = $newBaseName . '.' . $ext;
-            $sourceFile = findFileInDirRecursive($tempDir, $imgName);
-            if ($sourceFile && file_exists($sourceFile)) {
-                copy($sourceFile, $targetImageDir . '/' . $newFileName);
-            }
-            return "/server/uploads/image/" . $slug . "/" . $newFileName;
-        };
         $conn->beginTransaction();
         $stmt = $conn->prepare("INSERT INTO tests (uuid, title, description, duration, audio_url, is_premium, is_active) VALUES (UUID(), :title, :desc, :duration, :audio_url, :is_premium, 0)");
         $stmt->execute([
             'title' => $testTitle,
             'desc' => 'Đề thi import tự động, ở trạng thái chờ duyệt',
             'duration' => $examData['duration'] ?? 7200,
-            'audio_url' => (!empty($examData['audio_url'])) ? "/server/uploads/audio/" . $examData['audio_url'] : null,
+            'audio_url' => $examData['audio_url'] ?? null,
             'is_premium' => $isPremium
         ]);
         $testId = $conn->lastInsertId();
@@ -1034,8 +1011,8 @@ function importAdminTest() {
                         'part' => $partNumber,
                         'question_number' => $q['question_number'],
                         'content' => $q['content'] ?: null,
-                        'image_url' => $copyImage($q['image_url'] ?? null, 'question_' . $q['question_number']),
-                        'audio_url' => (!empty($q['audio_url'])) ? "/server/uploads/audio/" . $q['audio_url'] : null,
+                        'image_url' => $q['image_url'] ?? null,
+                        'audio_url' => $q['audio_url'] ?? null,
                         'correct_answer' => $q['correct_answer'] ?? 'A'
                     ]);
                     $questionId = $conn->lastInsertId();
@@ -1054,19 +1031,12 @@ function importAdminTest() {
             }
             if (isset($part['passages']) && is_array($part['passages'])) {
                 foreach ($part['passages'] as $passage) {
-                    $newBaseName = 'passage';
-                    if (!empty($passage['questions'])) {
-                        $nums = array_column($passage['questions'], 'question_number');
-                        if (!empty($nums)) {
-                            $newBaseName = 'question_' . min($nums) . '_' . max($nums);
-                        }
-                    }
                     $stmtPass = $conn->prepare("INSERT INTO passages (test_id, content, image_url, audio_url) VALUES (:test_id, :content, :image_url, :audio_url)");
                     $stmtPass->execute([
                         'test_id' => $testId,
                         'content' => $passage['content'] ?: null,
-                        'image_url' => $copyImage($passage['image_url'] ?? null, $newBaseName),
-                        'audio_url' => (!empty($passage['audio_url'])) ? "/server/uploads/audio/" . $passage['audio_url'] : null
+                        'image_url' => $passage['image_url'] ?? null,
+                        'audio_url' => $passage['audio_url'] ?? null
                     ]);
                     $passageId = $conn->lastInsertId();
                     if (isset($passage['questions']) && is_array($passage['questions'])) {
@@ -1078,8 +1048,8 @@ function importAdminTest() {
                                 'part' => $partNumber,
                                 'question_number' => $q['question_number'],
                                 'content' => $q['content'] ?: null,
-                                'image_url' => $copyImage($q['image_url'] ?? null, 'question_' . $q['question_number']),
-                                'audio_url' => (!empty($q['audio_url'])) ? "/server/uploads/audio/" . $q['audio_url'] : null,
+                                'image_url' => $q['image_url'] ?? null,
+                                'audio_url' => $q['audio_url'] ?? null,
                                 'correct_answer' => $q['correct_answer'] ?? 'A'
                             ]);
                             $questionId = $conn->lastInsertId();
@@ -1153,7 +1123,6 @@ function importAdminTest() {
             }
         }
         $conn->commit();
-        helperRemoveDir($tempDir);
         sendJson([
             'success' => true,
             'message' => 'Đề thi đã được import thành công ở chế độ chờ duyệt',
@@ -1163,7 +1132,6 @@ function importAdminTest() {
         if ($conn->inTransaction()) {
             $conn->rollBack();
         }
-        helperRemoveDir($tempDir);
         sendError("Lỗi khi import đề thi: " . $e->getMessage(), 500);
     }
 }

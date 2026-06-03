@@ -173,16 +173,6 @@
                                 <small style="color: var(--text-secondary); margin-top: 4px; font-size: 11px;">Tệp đáp án Reading lưu dạng .html</small>
                             </div>
                         </div>
-                        <div class="form-group" style="margin-top: 12px;">
-                            <label>File ZIP hình ảnh / âm thanh đề thi (không bắt buộc)</label>
-                            <input type="file" id="import_media_file" name="media_file" accept=".zip">
-                            <small style="color: var(--text-secondary); margin-top: 4px; font-size: 11px;">Tệp nén .zip chứa thư mục media của trang đề thi</small>
-                        </div>
-                        <div class="form-group" style="margin-top: 12px;">
-                            <label>File ZIP hình ảnh / âm thanh đáp án (không bắt buộc)</label>
-                            <input type="file" id="import_media_answer_file" name="media_answer_file" accept=".zip">
-                            <small style="color: var(--text-secondary); margin-top: 4px; font-size: 11px;">Tệp nén .zip chứa thư mục media của trang đáp án</small>
-                        </div>
                         <div class="checkbox-group-wrapper" style="margin-top: 16px;">
                             <div class="checkbox-group">
                                 <input type="checkbox" id="import_premium" name="is_premium" value="1">
@@ -190,7 +180,7 @@
                             </div>
                         </div>
                         <div id="importLoading" style="display: none; text-align: center; margin-top: 15px; color: var(--accent-blue); font-weight: 600;">
-                            <i class="bx bx-loader-alt bx-spin" style="margin-right: 5px;"></i> Đang giải nén & import đề thi, vui lòng đợi...
+                            <i class="bx bx-loader-alt bx-spin" style="margin-right: 5px;"></i> Đang import đề thi, vui lòng đợi...
                         </div>
                         <div id="importMessage" style="display: none; margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 13px;"></div>
                     </div>
