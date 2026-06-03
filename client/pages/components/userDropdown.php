@@ -44,9 +44,9 @@ $shortcuts = [
                     <div class="avatar-wrapper-custom">
                         <img src="<?= htmlspecialchars($userDropdownData['avatarUrl']) ?>" alt="avatar" class="avatar-img-custom">
                     </div>
-                    <div class="d-flex flex-column">
-                        <span class="user-name-text"><?= htmlspecialchars($userDropdownData['name']) ?></span>
-                        <span class="user-email-text"><?= htmlspecialchars($userDropdownData['email']) ?></span>
+                    <div class="d-flex flex-column" style="min-width: 0; overflow: hidden; flex: 1;">
+                        <span class="user-name-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;" title="<?= htmlspecialchars($userDropdownData['name']) ?>"><?= htmlspecialchars($userDropdownData['name']) ?></span>
+                        <span class="user-email-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;" title="<?= htmlspecialchars($userDropdownData['email']) ?>"><?= htmlspecialchars($userDropdownData['email']) ?></span>
                     </div>
                 </div>
 
