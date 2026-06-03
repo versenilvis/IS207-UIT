@@ -193,8 +193,13 @@ function renderReviewList(questions) {
             }
 
             let mediaHtml = '';
-            if (item.image_url) mediaHtml += `<img src="${item.image_url}" class="img-fluid mt-2" style="max-height:280px;">`;
-            if (item.audio_url) mediaHtml += `<audio controls src="${item.audio_url}" class="mt-2" style="max-width: 320px; display: block;"></audio>`;
+            const supportsImage = [1, 3, 4, 7].includes(parseInt(item.part));
+            if (supportsImage && item.image_url && item.image_url !== 'null' && item.image_url !== 'NULL' && item.image_url.trim() !== '') {
+                mediaHtml += `<img src="${item.image_url}" class="img-fluid mt-2" style="max-height:280px;">`;
+            }
+            if (item.audio_url && item.audio_url !== 'null' && item.audio_url !== 'NULL' && item.audio_url.trim() !== '') {
+                mediaHtml += `<audio controls src="${item.audio_url}" class="mt-2" style="max-width: 320px; display: block;"></audio>`;
+            }
 
             const displayContent = item.question_content || (parseInt(item.part) === 2 ? 'Mark your answer on your answer sheet.' : '');
             const contentHtml = displayContent || (mediaHtml ? '' : '<i style="color:#94a3b8;">Nội dung không khả dụng.</i>');

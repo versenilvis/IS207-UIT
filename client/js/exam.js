@@ -234,7 +234,11 @@ function renderQuestions(questions) {
                 lastParagraph = '';
             }
 
-            let imageHtml = q.image_url ? `<img src="${q.image_url}" class="img-fluid mb-3" style="max-height: 250px; display: block;">` : '';
+            const supportsImage = [1, 3, 4, 7].includes(parseInt(q.part));
+            let imageHtml = '';
+            if (supportsImage && q.image_url && q.image_url !== 'null' && q.image_url !== 'NULL' && q.image_url.trim() !== '') {
+                imageHtml = `<img src="${q.image_url}" class="img-fluid mb-3" style="max-height: 250px; display: block;">`;
+            }
             let optionsHtml = '';
             
             q.options.forEach(opt => {
