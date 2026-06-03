@@ -15,7 +15,12 @@ function formatVND(value) {
 // định dạng ngày tháng sang DD/MM/YYYY
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
-    const date = new Date(dateString);
+    // sửa lại đúng định dạng giờ từ database
+    let normalized = dateString;
+    if (typeof normalized === 'string' && !normalized.endsWith('Z') && !normalized.includes('+') && !normalized.includes('GMT')) {
+        normalized = normalized.replace(' ', 'T');
+    }
+    const date = new Date(normalized);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
@@ -25,7 +30,12 @@ function formatDate(dateString) {
 // định dạng ngày giờ sang DD/MM/YYYY HH:MM:SS
 function formatDateTime(dateString) {
     if (!dateString) return 'N/A';
-    const date = new Date(dateString);
+    // sửa lại đúng định dạng giờ từ database
+    let normalized = dateString;
+    if (typeof normalized === 'string' && !normalized.endsWith('Z') && !normalized.includes('+') && !normalized.includes('GMT')) {
+        normalized = normalized.replace(' ', 'T');
+    }
+    const date = new Date(normalized);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();

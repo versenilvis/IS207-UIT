@@ -35,3 +35,5 @@ function loadEnvFile(string $path): void
 }
 
 loadEnvFile(dirname(__DIR__, 2) . '/.env');
+
+date_default_timezone_set('Asia/Ho_Chi_Minh');
