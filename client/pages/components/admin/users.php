@@ -87,7 +87,7 @@
                     <th>Tiến trình học tập</th>
                     <th>Ngày đăng ký</th>
                     <th>Trạng thái</th>
-                    <th style="text-align: right; min-width: 160px;">Hành động</th>
+                    <th style="text-align: right; min-width: 220px;">Hành động</th>
                 </tr>
             </thead>
             <tbody id="userTableBody">

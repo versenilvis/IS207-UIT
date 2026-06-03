@@ -70,7 +70,7 @@
                         <th>Phân loại</th>
                         <th>Trạng thái</th>
                         <th>Ngày tạo</th>
-                        <th style="text-align: right;">Hành động</th>
+                        <th style="text-align: right; min-width: 200px;">Hành động</th>
                     </tr>
                 </thead>
                 <tbody id="testTableBody">
