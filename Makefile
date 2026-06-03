@@ -1,4 +1,4 @@
-.PHONY: all up down app db logs clean build query composer-install install
+.PHONY: all up down app db logs clean build query composer-install install migrate rebuild
 
 # lệnh chạy toàn bộ khi chỉ gõ `make`
 all: up
@@ -47,3 +47,14 @@ logs-db:
 # dọn sạch hệ thống tắt mọi container (cảnh báo: sẽ drop toàn bộ data tables trong mysql)
 clean:
 	docker compose down -v
+
+# chạy toàn bộ migration sql theo thứ tự số thứ tự file
+migrate:
+	@for f in $$(ls server/db/migration_*.sql | sort); do \
+		echo ">> chạy $$f"; \
+		docker exec -i prephub_db mysql -u prephub -p123 prephub < $$f; \
+	done
+
+# build lại image (khi Dockerfile thay đổi) rồi restart
+rebuild:
+	docker compose up -d --build --force-recreate app
