@@ -62,8 +62,8 @@ function questionCreate(PDO $db, $data)
  */
 function questionAddOptions(PDO $db, $questionId, $options)
 {
-	$sql = "INSERT INTO options (question_id, label, content) 
-            VALUES (:question_id, :label, :content)";
+	$sql = "INSERT INTO options (question_id, label, content, translation) 
+            VALUES (:question_id, :label, :content, :translation)";
 
 	$stmt = $db->prepare($sql);
 
@@ -71,7 +71,8 @@ function questionAddOptions(PDO $db, $questionId, $options)
 		$result = $stmt->execute([
 			':question_id' => $questionId,
 			':label' => $option['label'], 
-			':content' => $option['content']
+			':content' => $option['content'],
+			':translation' => $option['translation'] ?? null
 		]);
 
 		if (!$result) {
@@ -96,7 +97,7 @@ function questionGetWithOptions(PDO $db, $questionId)
 		return null;
 	}
 
-	$optionsSql = "SELECT id, label, content, image_url FROM options WHERE question_id = :question_id ORDER BY label ASC";
+	$optionsSql = "SELECT id, label, content, translation, image_url FROM options WHERE question_id = :question_id ORDER BY label ASC";
 	$stmt = $db->prepare($optionsSql);
 	$stmt->execute([':question_id' => $questionId]);
 	$question['options'] = $stmt->fetchAll(PDO::FETCH_ASSOC);

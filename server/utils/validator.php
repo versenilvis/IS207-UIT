@@ -5,7 +5,8 @@
  */
 function validateQuestionContent($content, $part = null)
 {
-	if ($part == 1) {
+	$partNum = intval($part);
+	if ($partNum === 1 || $partNum === 2) {
 		if (empty($content)) return true;
 	} else {
 		if (!isset($content) || empty(trim($content))) {
@@ -15,8 +16,8 @@ function validateQuestionContent($content, $part = null)
 
 	if (!empty($content)) {
 		$length = mb_strlen(trim($content), 'UTF-8');
-		if ($length < 5) {
-			throw new InvalidArgumentException("Nội dung câu hỏi quá ngắn (tối thiểu 5 ký tự).");
+		if ($length < 1) {
+			throw new InvalidArgumentException("Nội dung câu hỏi quá ngắn (tối thiểu 1 ký tự).");
 		}
 		if ($length > 5000) {
 			throw new InvalidArgumentException("Nội dung câu hỏi quá dài (tối đa 5000 ký tự).");
@@ -28,23 +29,29 @@ function validateQuestionContent($content, $part = null)
 /**
  * Kiểm tra mảng đáp án
  */
-function validateOptions($options)
+function validateOptions($options, $part = null)
 {
-	if (!is_array($options) || count($options) !== 4) {
-		throw new InvalidArgumentException("Câu hỏi phải có chính xác 4 đáp án.");
+	$partNum = intval($part);
+	$expectedCount = ($partNum === 2) ? 3 : 4;
+	$labels = ($partNum === 2) ? ['A', 'B', 'C'] : ['A', 'B', 'C', 'D'];
+
+	if (!is_array($options) || count($options) !== $expectedCount) {
+		throw new InvalidArgumentException("Câu hỏi phải có chính xác " . $expectedCount . " đáp án");
 	}
 
-	$labels = ['A', 'B', 'C', 'D'];
 	$index = 0;
 	foreach ($options as $option) {
 		$content = is_array($option) ? ($option['content'] ?? '') : $option;
-		if (empty(trim($content))) {
-			$label = $labels[$index] ?? '?';
-			throw new InvalidArgumentException("Nội dung của đáp án {$label} không được để trống.");
-		}
-		if (mb_strlen(trim($content), 'UTF-8') < 1) {
-			$label = $labels[$index] ?? '?';
-			throw new InvalidArgumentException("Nội dung của đáp án {$label} quá ngắn.");
+		// skip empty content validation for listening parts 1 and 2
+		if ($partNum !== 1 && $partNum !== 2) {
+			if (empty(trim($content))) {
+				$label = $labels[$index] ?? '?';
+				throw new InvalidArgumentException("Nội dung của đáp án " . $label . " không được để trống");
+			}
+			if (mb_strlen(trim($content), 'UTF-8') < 1) {
+				$label = $labels[$index] ?? '?';
+				throw new InvalidArgumentException("Nội dung của đáp án " . $label . " quá ngắn");
+			}
 		}
 		$index++;
 	}
@@ -133,7 +140,7 @@ function validatePassageExists(PDO $db, $passageId, $testId)
 function validateAudioUrl($url)
 {
 	if (empty($url)) return true;
-	if (!filter_var($url, FILTER_VALIDATE_URL) && !preg_match('#^/uploads/audio/.*\.(mp3|wav|ogg|m4a)$#i', $url)) {
+	if (!filter_var($url, FILTER_VALIDATE_URL) && !preg_match('#^(?:/server)?/?uploads/audio/.*\.(mp3|wav|ogg|m4a)$#i', $url)) {
 		throw new InvalidArgumentException("Định dạng URL audio không hợp lệ.");
 	}
 	return true;
@@ -145,7 +152,7 @@ function validateAudioUrl($url)
 function validateImageUrl($url)
 {
 	if (empty($url)) return true;
-	if (!filter_var($url, FILTER_VALIDATE_URL) && !preg_match('#^/uploads/image/.*\.(jpg|jpeg|png|gif)$#i', $url)) {
+	if (!filter_var($url, FILTER_VALIDATE_URL) && !preg_match('#^(?:/server)?/?uploads/image/.*\.(jpg|jpeg|png|gif)$#i', $url)) {
 		throw new InvalidArgumentException("Định dạng URL hình ảnh không hợp lệ.");
 	}
 	return true;
@@ -174,7 +181,6 @@ function validatePartSpecificRequirements($part, $data)
 			if (empty($data['image_url'])) throw new InvalidArgumentException("Part 1 yêu cầu phải có hình ảnh.");
 			break;
 		case 2: case 3: case 4:
-			if (empty($data['audio_url'])) throw new InvalidArgumentException("Part {$part} yêu cầu phải có âm thanh.");
 			if (empty($data['content'])) throw new InvalidArgumentException("Part {$part} yêu cầu phải có nội dung câu hỏi.");
 			break;
 		case 5: case 6:
