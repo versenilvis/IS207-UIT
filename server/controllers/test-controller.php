@@ -340,7 +340,7 @@ function getTestCore($uuid)
         // vơi left join, những câu nào ở question có mà passage không có thì vẫn được giữ lại
         $stmt_q = $conn->prepare("
             SELECT q.id, q.part, q.question_number, q.content, q.audio_url, q.image_url,
-                   p.content as paragraph, p.audio_url as passage_audio, p.image_url as passage_image
+                   p.content as paragraph, p.translation_en as passage_translation_en, p.translation as passage_translation, p.audio_url as passage_audio, p.image_url as passage_image
             FROM questions q
             LEFT JOIN passages p ON q.passage_id = p.id
             WHERE q.test_id = :test_id

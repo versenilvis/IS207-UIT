@@ -70,7 +70,12 @@ function validateAllBlocks(blocks, part) {
 			if (checkError(blockPart === '1' && !hasMedia, `Câu #${blockIndex + 1}: Part 1 cần hình ảnh hoặc âm thanh`)) return;
 
 		} else {
-			if (checkError(!block.querySelector('.passage-content')?.value.trim(), `Cụm #${blockIndex + 1}: Vui lòng nhập nội dung đoạn văn`)) return;
+			const isReadingPart = ['6', '7'].includes(blockPart);
+			if (isReadingPart) {
+				if (checkError(!block.querySelector('.passage-content')?.value.trim(), `Cụm #${blockIndex + 1}: Vui lòng nhập nội dung đoạn văn`)) return;
+			} else {
+				if (checkError(!block.querySelector('.passage-header')?.value.trim(), `Cụm #${blockIndex + 1}: Vui lòng nhập tiêu đề nhóm câu hỏi`)) return;
+			}
 			
 			const subQs = block.querySelectorAll('.sub-question-item');
 			if (checkError(subQs.length === 0, `Cụm #${blockIndex + 1}: Vui lòng thêm ít nhất 1 câu hỏi`)) return;

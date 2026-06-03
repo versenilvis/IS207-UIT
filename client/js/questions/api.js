@@ -366,7 +366,9 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 	let errorMessages = [];
 	try {
 		let passageId = null;
-		const passageContent = block.querySelector('.passage-content').value.trim();
+		const passageHeader = block.querySelector('.passage-header')?.value.trim() || '';
+		const passageContent = block.querySelector('.passage-content')?.value.trim() || '';
+		const passageTranslation = block.querySelector('.passage-translation')?.value.trim() || '';
 		const subQuestions = block.querySelectorAll('.sub-question-item');
 
 		const existingPassageId = block.dataset.passageId;
@@ -375,7 +377,9 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 		const pFormData = new FormData();
 		pFormData.append('test_id', testId);
 		pFormData.append('part', part);
-		if (passageContent) pFormData.append('content', passageContent);
+		pFormData.append('content', passageHeader);
+		pFormData.append('translation_en', passageContent);
+		pFormData.append('translation', passageTranslation);
 
 		const aIn = block.querySelector('.group-audio-file');
 		if (aIn?.files[0]) pFormData.append('audio_file', aIn.files[0]);

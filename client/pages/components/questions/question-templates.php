@@ -57,22 +57,37 @@
 			<button class="btn-remove" onclick="removeBlock(this)">Xóa</button>
 		</div>
 
-		<div class="group-resource-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-			<div class="upload-item">
-				<label> <i class="bx bx-camera-alt" style="font-size: 1.2rem; vertical-align: -0.125em;"></i> Hình ảnh <span class="media-required-badge" style="color: red;"></span></label>
-				<input type="file" accept="image/*" class="group-image-file" onchange="previewMedia(this, 'image')">
-				<small class="media-hint" style="color: #666;">Tùy chọn</small>
-				<div class="preview-container"></div>
+		<div class="group-resource-grid" style="margin-bottom: 15px;">
+			<div class="group-media-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+				<div class="upload-item">
+					<label> <i class="bx bx-camera-alt" style="font-size: 1.2rem; vertical-align: -0.125em;"></i> Hình ảnh <span class="media-required-badge" style="color: red;"></span></label>
+					<input type="file" accept="image/*" class="group-image-file" onchange="previewMedia(this, 'image')">
+					<small class="media-hint" style="color: #666;">Tùy chọn</small>
+					<div class="preview-container"></div>
+				</div>
+				<div class="upload-item">
+					<label> <i class="bx bx-volume-full" style="font-size: 1.2rem; vertical-align: -0.125em;"></i> Âm thanh (đáp án) <span class="media-required-badge" style="color: red;"></span></label>
+					<input type="file" accept="audio/*" class="group-audio-file" onchange="previewMedia(this, 'audio')">
+					<small class="media-hint" style="color: #666;">Tùy chọn</small>
+					<div class="preview-container"></div>
+				</div>
 			</div>
-			<div class="upload-item">
-				<label> <i class="bx bx-volume-full" style="font-size: 1.2rem; vertical-align: -0.125em;"></i> Âm thanh (đáp án) <span class="media-required-badge" style="color: red;"></span></label>
-				<input type="file" accept="audio/*" class="group-audio-file" onchange="previewMedia(this, 'audio')">
-				<small class="media-hint" style="color: #666;">Tùy chọn</small>
-				<div class="preview-container"></div>
-			</div>
-			<div class="upload-item">
-				<label> <i class="bx bx-file" style="font-size: 1.2rem; vertical-align: -0.125em;"></i> Đoạn văn (Passages)</label>
-				<textarea class="form-control passage-content" placeholder="Dán đoạn văn dùng chung vào đây..." style="height: 120px;"></textarea>
+
+			<div class="passage-section" style="margin-bottom: 15px;">
+				<div style="margin-bottom: 10px;">
+					<label style="font-weight: 600; display: block; margin-bottom: 5px;">Tiêu đề nhóm câu hỏi (e.g. Questions 32 - 34:)</label>
+					<input type="text" class="passage-header form-control" placeholder="Questions 32 - 34:">
+				</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+					<div>
+						<label style="font-weight: 600; display: block; margin-bottom: 5px;">Đoạn văn tiếng Anh (Passage)</label>
+						<textarea class="form-control passage-content" placeholder="Nhập đoạn văn tiếng Anh..." style="height: 150px;"></textarea>
+					</div>
+					<div>
+						<label style="font-weight: 600; display: block; margin-bottom: 5px;">Dịch tiếng Việt (Translation)</label>
+						<textarea class="form-control passage-translation" placeholder="Nhập bản dịch tiếng Việt..." style="height: 150px;"></textarea>
+					</div>
+				</div>
 			</div>
 		</div>
 

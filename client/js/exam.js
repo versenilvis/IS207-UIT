@@ -191,7 +191,8 @@ function renderQuestions(questions) {
                 const hasImage = !!q.passage_image;
                 const headerClass = hasImage ? 'passage-group-header grid-full-width mb-3' : 'passage-group-header grid-full-width no-image';
                 
-                const isPlaceholder = q.paragraph.trim().startsWith('Questions ') && !q.paragraph.includes('<');
+                const hasPassageText = q.passage_translation_en && q.passage_translation_en.trim() !== '';
+                const isPlaceholder = !hasPassageText && q.paragraph.trim().startsWith('Questions ') && !q.paragraph.includes('<');
                 let passageHtml = '';
                 
                 if (isPlaceholder) {
@@ -201,16 +202,26 @@ function renderQuestions(questions) {
                     const nums = passageQuestions.map(item => parseInt(item.question_number)).filter(Number.isInteger);
                     const min = Math.min(...nums);
                     const max = Math.max(...nums);
-                    const rangeHeader = (Number.isInteger(min) && Number.isInteger(max))
-                        ? `<p class="fw-bold mb-1 text-dark" style="font-size: 1rem;">Questions ${min} - ${max}:</p>`
-                        : '';
                     
+                    let rangeHeader = '';
+                    let bodyHtml = '';
                     let titleHtml = '';
-                    let bodyHtml = q.paragraph;
-                    const headerMatch = q.paragraph.match(/^(\s*<h[1-6]>.*?<\/h[1-6]>)(.*)$/is);
-                    if (headerMatch) {
-                        titleHtml = headerMatch[1];
-                        bodyHtml = headerMatch[2];
+
+                    if (hasPassageText) {
+                        // hiển thị tiêu đề nhóm ở content và nội dung ở translation_en
+                        rangeHeader = `<p class="fw-bold mb-1 text-dark" style="font-size: 1rem;">${q.paragraph}</p>`;
+                        bodyHtml = q.passage_translation_en;
+                    } else {
+                        // fallback cũ khi nội dung nằm ở content
+                        rangeHeader = (Number.isInteger(min) && Number.isInteger(max))
+                            ? `<p class="fw-bold mb-1 text-dark" style="font-size: 1rem;">Questions ${min} - ${max}:</p>`
+                            : '';
+                        bodyHtml = q.paragraph;
+                        const headerMatch = q.paragraph.match(/^(\s*<h[1-6]>.*?<\/h[1-6]>)(.*)$/is);
+                        if (headerMatch) {
+                            titleHtml = headerMatch[1];
+                            bodyHtml = headerMatch[2];
+                        }
                     }
                     
                     passageHtml = `

@@ -66,8 +66,19 @@ function fillSingleQuestionData(question, block) {
 function fillGroupQuestionData(passage, subQuestions, block) {
 	if (!block) return;
 
-	const passageInput = block.querySelector('.passage-content');
-	if (passageInput) passageInput.value = passage.content || '';
+	const passageHeader = block.querySelector('.passage-header');
+	const passageContent = block.querySelector('.passage-content');
+	const passageTranslation = block.querySelector('.passage-translation');
+
+	const isLegacy = passage.content && (passage.content.includes('<') || !passage.content.trim().startsWith('Questions '));
+	if (isLegacy) {
+		if (passageContent) passageContent.value = passage.content || '';
+		if (passageHeader) passageHeader.value = '';
+	} else {
+		if (passageHeader) passageHeader.value = passage.content || '';
+		if (passageContent) passageContent.value = passage.translation_en || '';
+	}
+	if (passageTranslation) passageTranslation.value = passage.translation || '';
 
 	const updateGroupMedia = (selector, url, type) => {
 		const input = block.querySelector(selector);

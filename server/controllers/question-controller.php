@@ -309,6 +309,14 @@ function apiCreatePassage(PDO $db)
 		if ($content === 'null' || $content === 'NULL')
 			$content = null;
 
+		$translationEn = helperGetPostValue('translation_en');
+		if ($translationEn === 'null' || $translationEn === 'NULL')
+			$translationEn = null;
+
+		$translation = helperGetPostValue('translation');
+		if ($translation === 'null' || $translation === 'NULL')
+			$translation = null;
+
 		$internalTestId = helperGetInternalTestId($db, $testId);
 		if (empty($testId))
 			throw new Exception("test_id là bắt buộc");
@@ -351,6 +359,8 @@ function apiCreatePassage(PDO $db)
 		$passageData = [
 			'test_id' => $internalTestId,
 			'content' => ($content !== null && $content !== '') ? trim($content) : null,
+			'translation_en' => ($translationEn !== null && $translationEn !== '') ? trim($translationEn) : null,
+			'translation' => ($translation !== null && $translation !== '') ? trim($translation) : null,
 			'audio_url' => $audioUrl,
 			'image_url' => $imageUrl
 		];
@@ -710,6 +720,14 @@ function apiUpdatePassage(PDO $db, $passageId)
 		if ($content === 'null' || $content === 'NULL')
 			$content = null;
 
+		$translationEn = helperGetPostValue('translation_en', $passage['translation_en']);
+		if ($translationEn === 'null' || $translationEn === 'NULL')
+			$translationEn = null;
+
+		$translation = helperGetPostValue('translation', $passage['translation']);
+		if ($translation === 'null' || $translation === 'NULL')
+			$translation = null;
+
 		$audioUrl = $passage['audio_url'];
 		$imageUrl = $passage['image_url'];
 
@@ -749,6 +767,8 @@ function apiUpdatePassage(PDO $db, $passageId)
 
 		$passageData = [
 			'content' => ($content !== null && $content !== '') ? trim($content) : null,
+			'translation_en' => ($translationEn !== null && $translationEn !== '') ? trim($translationEn) : null,
+			'translation' => ($translation !== null && $translation !== '') ? trim($translation) : null,
 			'audio_url' => $audioUrl,
 			'image_url' => $imageUrl
 		];
