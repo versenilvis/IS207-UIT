@@ -57,8 +57,11 @@ async function loadTestsData() {
 
 		result.data.forEach(test => {
 			const option = document.createElement('option');
-			option.value = test.id;
-			option.textContent = test.title || `Đề thi ${test.id}`;
+			const testUuid = test.uuid || test.id;
+			option.value = testUuid;
+			option.dataset.questionCount = test.total_questions || '';
+			option.dataset.audioUrl = test.audio_url || '';
+			option.textContent = test.title || `Đề thi ${testUuid}`;
 			testSelect.appendChild(option);
 		});
 	} catch (error) {
@@ -191,14 +194,15 @@ async function handleCreateTestSubmit(e) {
   "count": 1
 }
  */
-async function loadSavedQuestionsToForm() {
+async function loadSavedQuestionsToForm(options = {}) {
 	const testSelect = document.getElementById('testSelect');
 	const partSelect = document.getElementById('partSelect');
 	if (!testSelect || !partSelect) return;
 
 	const testId = testSelect.value;
 	const part = partSelect.value;
-	if (!testId || !part) return;
+	const loadAllParts = options.allParts === true || part === 'all';
+	if (!testId || (!part && !loadAllParts)) return;
 
 	AppState.loadedQuestionIds.clear();
 	AppState.loadedPassageIds.clear();
@@ -207,9 +211,15 @@ async function loadSavedQuestionsToForm() {
 		const response = await fetch(`/api/questions?test_id=${testId}`);
 		if (!response.ok) throw new Error(`HTTP ${response.status}`);
 		const result = await response.json();
+		const editorCount = document.getElementById('editorQuestionCount');
+		if (editorCount && typeof result.count !== 'undefined') {
+			editorCount.textContent = `${result.count} câu hỏi`;
+		}
 
 		AppState.allTestQuestionNumbers.clear();
+		AppState.savedQuestions = [];
 		if (result.success && Array.isArray(result.data)) {
+			AppState.savedQuestions = result.data;
 			result.data.forEach(q => {
 				if (q.question_number) AppState.allTestQuestionNumbers.add(parseInt(q.question_number));
 			});
@@ -217,18 +227,20 @@ async function loadSavedQuestionsToForm() {
 
 		if (!result.success || !result.data || result.data.length === 0) {
 			deleteAllBlocks();
-			addBlock('single');
+			if (!loadAllParts) addBlock('single');
 			return;
 		}
 
-		const partQuestions = result.data.filter(q => parseInt(q.part) === parseInt(part));
+		const partQuestions = loadAllParts
+			? result.data
+			: result.data.filter(q => parseInt(q.part) === parseInt(part));
 		if (partQuestions.length === 0) {
 			deleteAllBlocks();
-			addBlock('single');
+			if (!loadAllParts) addBlock('single');
 			return;
 		}
 
-		partQuestions.sort((a, b) => parseInt(a.question_number) - parseInt(b.question_number));
+		partQuestions.sort((a, b) => parseInt(a.part) - parseInt(b.part) || parseInt(a.question_number) - parseInt(b.question_number));
 		deleteAllBlocks();
 
 		const groupQuestions = partQuestions.filter(q => q.passage_id);
@@ -254,20 +266,45 @@ async function loadSavedQuestionsToForm() {
 
 		const processedPassages = new Set();
 
+		let currentRenderedPart = null;
+		const renderedParts = new Set();
+		const container = document.getElementById('questions-container');
+
 		partQuestions.forEach(q => {
+			const questionPart = String(q.part);
+			if (loadAllParts && currentRenderedPart !== questionPart && container) {
+				currentRenderedPart = questionPart;
+				renderedParts.add(questionPart);
+				const heading = document.createElement('div');
+				heading.className = 'part-section-heading';
+				heading.id = `part-${questionPart}`;
+				heading.dataset.part = questionPart;
+				heading.innerHTML = `
+					<span>Part ${questionPart}</span>
+					<strong>${PART_CONFIG[parseInt(questionPart)]?.name || 'Câu hỏi'}</strong>
+				`;
+				container.appendChild(heading);
+			}
+
 			if (q.passage_id) {
 				if (!processedPassages.has(q.passage_id)) {
 					processedPassages.add(q.passage_id);
-					addBlock('group');
+					addBlock('group', questionPart);
 					const blockDiv = document.querySelector('.question-block.group-type:last-child');
 					if (blockDiv) fillGroupQuestionData(passagesMap[q.passage_id], passageToQuestions[q.passage_id], blockDiv);
 				}
 			} else {
-				addBlock('single');
+				addBlock('single', questionPart);
 				const blockDiv = document.querySelector('.question-block.single-type:last-child');
 				if (blockDiv) fillSingleQuestionData(q, blockDiv);
 			}
 		});
+
+		if (loadAllParts) {
+			renderPartQuickNav(Array.from(renderedParts));
+			const firstPart = Array.from(renderedParts)[0] || '1';
+			setActiveEditorPart(firstPart, false);
+		}
 
 	} catch (error) {
 		console.error('Error loading saved questions:', error);
@@ -287,19 +324,18 @@ async function loadSavedQuestionsToForm() {
  */
 async function submitSingleQuestionAPIWithResult(block, testId, part) {
 	try {
-		const opts = block.querySelectorAll('.options-container .option-item .option-content');
-		const options = { A: opts[0]?.value.trim(), B: opts[1]?.value.trim(), C: opts[2]?.value.trim(), D: opts[3]?.value.trim() };
+		const options = collectOptionsPayload(block.querySelectorAll('.options-container .option-item'), part);
 
 		const questionId = block.dataset.questionId;
-		if (questionId) await fetch('/api/questions/' + questionId, { method: 'DELETE' });
+		const url = questionId ? '/api/questions/' + questionId : '/api/questions';
 
 		const formData = new FormData();
 		formData.append('test_id', testId);
 		formData.append('part', part);
 		formData.append('question_number', block.querySelector('.question-number').value);
-		formData.append('content', block.querySelector('.question-content').value.trim() || null);
+		formData.append('content', block.querySelector('.question-content').value.trim() || '');
 		formData.append('correct_answer', block.querySelector('.correct-radio:checked')?.value || '');
-		formData.append('explanation', block.querySelector('.explanation').value.trim() || null);
+		formData.append('explanation', block.querySelector('.explanation').value.trim() || '');
 		formData.append('options', JSON.stringify(options));
 
 		const audioIn = block.querySelector('.audio-file');
@@ -310,7 +346,7 @@ async function submitSingleQuestionAPIWithResult(block, testId, part) {
 		if (imageIn?.files[0]) formData.append('image_file', imageIn.files[0]);
 		else if (imageIn?.dataset.existingUrl) formData.append('image_url', imageIn.dataset.existingUrl);
 
-		const response = await fetch('/api/questions', { method: 'POST', body: formData });
+		const response = await fetch(url, { method: 'POST', body: formData });
 		return await response.json();
 	} catch (error) {
 		return { success: false, message: error.message };
@@ -334,7 +370,7 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 		const subQuestions = block.querySelectorAll('.sub-question-item');
 
 		const existingPassageId = block.dataset.passageId;
-		if (existingPassageId) await fetch('/api/passages/' + existingPassageId, { method: 'DELETE' });
+		const pUrl = existingPassageId ? '/api/passages/' + existingPassageId : '/api/passages';
 
 		const pFormData = new FormData();
 		pFormData.append('test_id', testId);
@@ -349,20 +385,21 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 		if (iIn?.files[0]) pFormData.append('image_file', iIn.files[0]);
 		else if (iIn?.dataset.existingUrl) pFormData.append('image_url', iIn.dataset.existingUrl);
 
-		const pRes = await fetch('/api/passages', { method: 'POST', body: pFormData });
+		const pRes = await fetch(pUrl, { method: 'POST', body: pFormData });
 		const pResult = await pRes.json();
 
 		if (pResult.success) {
-			passageId = pResult.data.passage_id;
-			subQuestions.forEach(sq => delete sq.dataset.questionId);
+			passageId = existingPassageId || pResult.data.passage_id;
 		} else {
-			return { success: false, created: 0, message: `Lỗi tạo Passage: ${pResult.message}` };
+			return { success: false, created: 0, message: `Lỗi lưu Passage: ${pResult.message}` };
 		}
 
 		for (let subQ of subQuestions) {
 			try {
-				const opts = subQ.querySelectorAll('.sub-options-grid .option-content');
-				const options = { A: opts[0]?.value.trim(), B: opts[1]?.value.trim(), C: opts[2]?.value.trim(), D: opts[3]?.value.trim() };
+				const options = collectOptionsPayload(subQ.querySelectorAll('.sub-options-grid .sub-option'), part);
+
+				const qId = subQ.dataset.questionId;
+				const qUrl = qId ? '/api/questions/' + qId : '/api/questions';
 
 				const qFormData = new FormData();
 				qFormData.append('test_id', testId);
@@ -372,10 +409,10 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 				qFormData.append('question_number', qNum);
 				qFormData.append('content', subQ.querySelector('.question-content').value.trim());
 				qFormData.append('correct_answer', subQ.querySelector('input[type="radio"]:checked')?.value || '');
-				qFormData.append('explanation', subQ.querySelector('.explanation').value.trim() || null);
+				qFormData.append('explanation', subQ.querySelector('.explanation').value.trim() || '');
 				qFormData.append('options', JSON.stringify(options));
 
-				const qRes = await fetch('/api/questions', { method: 'POST', body: qFormData });
+				const qRes = await fetch(qUrl, { method: 'POST', body: qFormData });
 				const qResult = await qRes.json();
 				if (qResult.success) {
 					created++;
@@ -396,6 +433,23 @@ async function submitGroupQuestionsAPI(block, testId, part) {
 	}
 }
 
+function collectOptionsPayload(optionRows, part = null) {
+	const partNum = parseInt(part);
+	const labels = (partNum === 2) ? ['A', 'B', 'C'] : ['A', 'B', 'C', 'D'];
+	const payload = {};
+
+	optionRows.forEach((row, index) => {
+		const label = labels[index];
+		if (!label) return;
+		payload[label] = {
+			content: row.querySelector('.option-content')?.value.trim() || '',
+			translation: row.querySelector('.option-translation')?.value.trim() || ''
+		};
+	});
+
+	return payload;
+}
+
 /**
  * Hàm tổng hợp để thu thập và lưu tất cả các khối câu hỏi đang hiển thị trên giao diện.
  * Duyệt qua từng khối (Single/Group) và gọi API lưu trữ tương ứng.
@@ -412,8 +466,18 @@ async function submitData(event) {
 	const testId = testSelect.value;
 	const part = partSelect.value;
 
-	if (!testId || !part) {
+	if (!testId) {
+		return showMessage('Vui lòng chọn đề thi trước khi lưu', 'error');
+	}
+
+	if (!part && !IS_FULL_TEST_EDIT) {
 		return showMessage('Vui lòng chọn đề thi và phần thi trước khi lưu', 'error');
+	}
+
+	const selectedOption = testSelect?.selectedOptions?.[0];
+	const testAudioUrl = selectedOption?.dataset.audioUrl;
+	if (!testAudioUrl) {
+		return showMessage('Vui lòng tải lên âm thanh tổng của đề thi ở đầu trang trước khi lưu', 'error');
 	}
 
 	const blocks = document.querySelectorAll('.question-block');
@@ -421,7 +485,25 @@ async function submitData(event) {
 		return showMessage('Không có dữ liệu để lưu', 'warning');
 	}
 
+	// validate first using validateAllBlocks
+	if (typeof validateAllBlocks === 'function') {
+		if (!validateAllBlocks(blocks, part)) {
+			return;
+		}
+	}
+
 	showMessage('Đang lưu dữ liệu...', 'info');
+
+	// delete explicitly removed questions and passages first
+	for (let qId of AppState.deletedQuestionIds) {
+		await fetch('/api/questions/' + qId, { method: 'DELETE' });
+	}
+	AppState.deletedQuestionIds.clear();
+
+	for (let pId of AppState.deletedPassageIds) {
+		await fetch('/api/passages/' + pId, { method: 'DELETE' });
+	}
+	AppState.deletedPassageIds.clear();
 
 	let totalCreated = 0;
 	let errorMessages = [];
@@ -430,14 +512,16 @@ async function submitData(event) {
 		const isGroup = block.classList.contains('group-type');
 		try {
 			if (isGroup) {
-				const res = await submitGroupQuestionsAPI(block, testId, part);
+				const blockPart = block.dataset.part || part;
+				const res = await submitGroupQuestionsAPI(block, testId, blockPart);
 				totalCreated += res.created;
 				if (!res.success) {
 					errorMessages.push(`Cụm câu: ${res.message}`);
 				}
 			} else {
 				const qNum = block.querySelector('.question-number')?.value || 'Không số';
-				const res = await submitSingleQuestionAPIWithResult(block, testId, part);
+				const blockPart = block.dataset.part || part;
+				const res = await submitSingleQuestionAPIWithResult(block, testId, blockPart);
 				if (res.success) {
 					totalCreated++;
 				} else {
@@ -451,7 +535,7 @@ async function submitData(event) {
 
 	if (errorMessages.length === 0) {
 		showMessage(`Đã lưu thành công ${totalCreated} mục!`, 'success');
-		await loadSavedQuestionsToForm();
+		await loadSavedQuestionsToForm({ allParts: IS_FULL_TEST_EDIT });
 	} else {
 		const errorText = errorMessages.length <= 2 ? errorMessages.join(' | ') : `Có ${errorMessages.length} lỗi xảy ra`;
 		showMessage(`Lưu ${totalCreated} mục. Lỗi: ${errorText}`, 'warning');
