@@ -16,6 +16,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? 'user') !== 'admin') {
 $section = $_GET['section'] ?? 'overview';
 $action = $_GET['action'] ?? '';
 $test_id = $_GET['test_id'] ?? '';
+$mode = $_GET['mode'] ?? 'exam';
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -26,12 +27,12 @@ $test_id = $_GET['test_id'] ?? '';
     <?php include './components/metadata.php'; ?>
     <link href="../styles/adminStyle.css?v=<?= time() ?>" rel="stylesheet">
     <?php if ($section === 'tests' && ($action === 'create' || $action === 'edit')): ?>
-        <link href="../styles/questionsStyle.css" rel="stylesheet">
+        <link href="../styles/questionsStyle.css?v=<?= time() ?>" rel="stylesheet">
     <?php endif; ?>
     <!-- tải thư viện chart.js cdn vẽ biểu đồ -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
-<body>
+<body class="<?php echo ($section === 'tests' && $action === 'edit') ? (($mode === 'answers') ? 'answer-edit-mode' : 'exam-edit-mode') : ''; ?>">
 
     <!-- thanh sidebar điều hướng -->
     <?php include './components/admin/sidebar.php'; ?>

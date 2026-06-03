@@ -8,7 +8,7 @@
                     <i class="bx bx-chevron-right"></i>
                     <span><?php echo $action === 'create' ? 'Tạo mới' : 'Biên soạn'; ?></span>
                 </div>
-                <h1 class="page-title"><?php echo $action === 'create' ? 'Tạo Đề Thi Mới' : 'Biên Soạn Câu Hỏi'; ?></h1>
+                <h1 class="page-title"><?php echo $action === 'create' ? 'Tạo Đề Thi Mới' : 'Chỉnh Sửa Đề Thi & Đáp Án'; ?></h1>
             </div>
             <a href="admin.php?section=tests" class="btn-primary" style="background-color: var(--text-secondary);">
                 <i class="bx bx-chevron-left"></i> Quay lại danh sách

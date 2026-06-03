@@ -98,13 +98,9 @@ function renderTestsTable(tests) {
                             Duyệt
                         </button>
                     ` : ''}
-                    <a href="admin.php?section=tests&action=edit&test_id=${test.uuid}" class="btn-primary" style="padding: 6px 12px; font-size: 12px;">
-                        <i class="bx bx-edit-alt"></i> Câu hỏi
+                    <a href="admin.php?section=tests&action=edit&mode=exam&test_id=${test.uuid}" class="btn-primary" style="padding: 6px 12px; font-size: 12px;">
+                        <i class="bx bx-edit-alt"></i> Sửa đề & đáp án
                     </a>
-                    <button class="btn-primary edit-info-btn" style="padding: 6px 12px; font-size: 12px; background-color: var(--accent-orange);" 
-                            data-uuid="${test.uuid}" data-title="${test.title}" data-premium="${isPremium ? '1' : '0'}" data-active="${isActive ? '1' : '0'}">
-                        Thông tin
-                    </button>
                     <button class="btn-danger delete-test-btn" style="padding: 6px 12px; font-size: 12px;" data-uuid="${test.uuid}">
                         Xóa
                     </button>
@@ -114,7 +110,7 @@ function renderTestsTable(tests) {
 
         // kích đúp để biên soạn câu hỏi
         row.addEventListener('dblclick', () => {
-            window.location.href = `admin.php?section=tests&action=edit&test_id=${test.uuid}`;
+            window.location.href = `admin.php?section=tests&action=edit&mode=exam&test_id=${test.uuid}`;
         });
 
         tbody.appendChild(row);
