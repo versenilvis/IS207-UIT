@@ -40,7 +40,7 @@ async function fetchExamData() {
         const testDuration = Number(questions_lists.data.duration);
 
         
-        setupExamAudio(questions);
+        setupExamAudio(questions_lists.data, questions);
         renderQuestions(questions);
         document.getElementById("exam-title").innerHTML = questions_lists.data.title;  
         renderSidebar(questions); 
@@ -60,7 +60,7 @@ async function fetchExamData() {
  * Tìm link audio đầu tiên có trong danh sách câu hỏi -> Gán vào thẻ <audio> -> 
  * Nếu không có audio thì khóa nút Play.
  */
-function setupExamAudio(questions) {
+function setupExamAudio(testData, questions) {
     const audioEl = document.getElementById('exam-audio');
     const playBtn = document.getElementById('custom-play-btn');
     const statusText = document.getElementById('audio-status');
@@ -80,13 +80,16 @@ function setupExamAudio(questions) {
         return;
     }
 
-    // Tìm URL audio đầu tiên xuất hiện trong đề
-    const firstAudioUrl = questions.reduce((foundUrl, q) => {
-        if (foundUrl) return foundUrl;
-        return q.passage_audio || q.audio_url || '';
-    }, '');
+    // láy
+    let targetAudioUrl = testData?.audio_url || '';
+    if (!targetAudioUrl || targetAudioUrl === 'null' || targetAudioUrl === 'NULL') {
+        targetAudioUrl = questions.reduce((foundUrl, q) => {
+            if (foundUrl) return foundUrl;
+            return q.passage_audio || q.audio_url || '';
+        }, '');
+    }
 
-    if (!firstAudioUrl) {
+    if (!targetAudioUrl || targetAudioUrl === 'null' || targetAudioUrl === 'NULL') {
         audioEl.removeAttribute('src');
         playBtn.disabled = true;
         playBtn.classList.replace('btn-primary', 'btn-secondary');
@@ -95,7 +98,7 @@ function setupExamAudio(questions) {
         return;
     }
 
-    audioEl.src = firstAudioUrl;
+    audioEl.src = targetAudioUrl;
     audioEl.load();
 
     const warningBox = document.getElementById('listening-intro-warning');
