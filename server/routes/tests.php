@@ -22,9 +22,13 @@ if ($method === 'GET') {
         getTestCore($parts[1]);
     }
 } elseif ($method === 'POST') {
-    // POST /api/tests - tạo đề mới, chỉ admin
+    // post /api/tests - tạo hoặc cập nhật đề mới, chỉ admin
     requireAdmin();
-    createTest();
+    if (!empty($parts[1])) {
+        updateTestPost($parts[1]);
+    } else {
+        createTest();
+    }
 } elseif ($method === 'PUT') {
     // PUT /api/tests/{uuid} - cập nhật đề, chỉ admin
     requireAdmin();
