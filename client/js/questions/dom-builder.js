@@ -39,6 +39,10 @@ function addBlock(type) {
 
 	container.appendChild(clone);
 	updateMediaBadges(blockDiv, part);
+	
+	if (part === '2') {
+    	blockDiv.querySelectorAll('.option-item-d, .sub-option-d').forEach(el => el.remove());
+	}
 	updateQuestionCount();
 }
 
