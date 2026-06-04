@@ -1,4 +1,4 @@
-.PHONY: all up down app db logs clean build query composer-install install migrate rebuild
+.PHONY: all up down app db logs clean build query composer-install install migrate rebuild test
 
 # lệnh chạy toàn bộ khi chỉ gõ `make`
 all: up
@@ -59,3 +59,8 @@ migrate:
 # build lại image (khi Dockerfile thay đổi) rồi restart
 rebuild:
 	docker compose up -d --build --force-recreate app
+
+# chạy test
+test:
+	docker compose exec -T app php tests/run_tests.php
+
