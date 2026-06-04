@@ -1,0 +1,20 @@
+:root {
+  --primary: #05102b;
+  --accent: #1d9e75;
+  --accent-light: #e1f5ee;
+  --bg: #fafafa;
+  --white: #fafafa;
+  --font: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font);
+  background-color: var(--bg);
+  color: var(--primary);
+  overflow-x: hidden;
+  margin: 0;
+}

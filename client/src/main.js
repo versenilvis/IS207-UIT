@@ -1,1 +1,0 @@
-// khởi tạo app, router đơn giản chuyển trang

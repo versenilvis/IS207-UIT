@@ -1,0 +1,199 @@
+.navbar {
+  --nav-text: white;
+  --nav-indicator: white;
+  --nav-logo: white;
+  --btn-bg: #fafafa;
+  --btn-text: #05102b;
+  --scrolled-bg: rgba(250, 250, 250, 0.98);
+  --scrolled-text: #05102b;
+  --scrolled-indicator: #05102b;
+  --scrolled-logo: #05102b;
+  --scrolled-btn-bg: #05102b;
+  --scrolled-btn-text: white;
+  --scrolled-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+  --scrolled-blur: blur(12px);
+
+  background-color: transparent !important;
+  transition: all 0.3s ease;
+  padding: 16px 0;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar[data-navbar-bg="light"] {
+  --nav-text: #05102b;
+  --nav-indicator: #05102b;
+  --nav-logo: #05102b;
+  --btn-bg: #05102b;
+  --btn-text: white;
+  --scrolled-bg: #05102b;
+  --scrolled-text: white;
+  --scrolled-indicator: white;
+  --scrolled-logo: white;
+  --scrolled-btn-bg: white;
+  --scrolled-btn-text: #05102b;
+  --scrolled-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+  --scrolled-blur: none;
+}
+
+.navbar.scrolled {
+  background-color: var(--scrolled-bg) !important;
+  backdrop-filter: var(--scrolled-blur);
+  padding: 8px 0;
+  box-shadow: var(--scrolled-shadow);
+}
+
+.navbar .container-fluid {
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(40px, 6vw, 100px);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: auto;
+}
+
+.navbar-brand svg {
+  height: 1.5rem;
+  width: auto;
+}
+
+.navbar-collapse {
+  position: static !important;
+}
+
+.navbar-nav.nav-center {
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  flex-direction: row !important;
+  gap: clamp(4px, 1vw, 12px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.navbar-nav.nav-right {
+  margin-left: auto !important;
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+.navbar-brand svg path {
+  fill: var(--nav-logo);
+  transition: fill 0.3s ease;
+}
+
+.navbar.scrolled .navbar-brand svg path {
+  fill: var(--scrolled-logo);
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand-text {
+  font-weight: 700;
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  color: var(--nav-text);
+  letter-spacing: -0.4px;
+  transition: color 0.3s ease;
+}
+
+.navbar.scrolled .brand-text {
+  color: var(--scrolled-text);
+}
+
+.brand-subtext {
+  font-weight: 300;
+  font-size: 0.6rem;
+  color: var(--nav-text);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  margin-top: 4px;
+}
+
+.navbar.scrolled .brand-subtext {
+  color: var(--scrolled-text);
+  opacity: 0.7;
+}
+
+.nav-link {
+  color: var(--nav-text) !important;
+  opacity: 0.65;
+  font-weight: 500;
+  font-size: 0.85rem;
+  position: relative;
+  transition: all 0.3s ease;
+  padding: 6px 12px !important;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  opacity: 1 !important;
+}
+
+.navbar.scrolled .nav-link {
+  color: var(--scrolled-text) !important;
+  opacity: 0.65;
+}
+
+.navbar.scrolled .nav-link:hover,
+.navbar.scrolled .nav-link.active {
+  opacity: 1 !important;
+}
+
+.nav-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background-color: var(--nav-indicator);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.navbar.scrolled .nav-indicator {
+  background-color: var(--scrolled-indicator);
+}
+
+.btn-login {
+  background-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  border-radius: 8px !important;
+  padding: 8px 18px !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  transition: all 0.3s ease;
+  opacity: 1 !important;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navbar.scrolled .btn-login {
+  background-color: var(--scrolled-btn-bg) !important;
+  color: var(--scrolled-btn-text) !important;
+}
+
+.btn-login:hover {
+  opacity: 1 !important;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+  cursor: pointer;
+}

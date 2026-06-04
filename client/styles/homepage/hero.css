@@ -1,0 +1,252 @@
+.hero-banner-wrapper {
+  position: relative;
+}
+
+.hero-section {
+  position: relative;
+  height: 100dvh;
+  background-color: var(--primary);
+  color: white;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.hero-section .container-fluid {
+  padding: 0 clamp(40px, 6vw, 100px);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-content h1 {
+  font-weight: 800;
+  font-size: clamp(3.2rem, 6vw, 4.8rem);
+  line-height: 1.15;
+  margin-bottom: 24px;
+  letter-spacing: -0.025em;
+}
+
+.hero-content .hero-sub {
+  font-weight: 400;
+  font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+  opacity: 0.85;
+  margin-bottom: 20px;
+  color: white;
+  max-width: 650px;
+  line-height: 1.6;
+}
+
+.hero-btns {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.btn-start {
+  background-color: var(--white);
+  color: var(--primary);
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-start i {
+  transition: transform 0.4s ease;
+}
+
+.btn-start:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.btn-start:hover i {
+  transform: rotate(360deg);
+}
+
+.btn-progress {
+  background-color: transparent;
+  color: var(--white);
+  border: 1.5px solid rgba(250, 250, 250, 0.5);
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-progress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--white);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.btn-progress:hover {
+  color: var(--primary);
+  border-color: var(--white);
+}
+
+.btn-progress:hover::before {
+  left: 0;
+}
+
+.hero-trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-stack {
+  display: flex;
+}
+
+.avatar-stack img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  object-fit: cover;
+  margin-left: -10px;
+}
+
+.avatar-stack img:first-child {
+  margin-left: 0;
+}
+
+.trust-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.9;
+  color: white;
+  white-space: nowrap;
+}
+
+.hero-image-container {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 55%;
+  height: 90%;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.hero-image {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: right bottom;
+  display: block;
+}
+
+.hero-bottom-stats {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  padding: 30px 0;
+}
+
+.hero-bottom-stats .container-fluid {
+  padding: 0 clamp(40px, 6vw, 100px);
+}
+
+.stats-inner {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.stat-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 0 1 auto;
+}
+
+.stat-number {
+  font-size: clamp(2rem, min(2.5vw, 4vh), 3.2rem);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+
+.stat-text {
+  font-size: clamp(0.75rem, 1vw, 0.95rem);
+  opacity: 0.8;
+  color: var(--white);
+  line-height: 1.4;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 0 32px;
+}
+
+.banner-section {
+  flex-shrink: 0;
+  padding: 0;
+  background-color: var(--bg);
+}
+
+.banner-section .container-fluid {
+  padding: 0;
+}
+
+.promo-banner {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.promo-banner img {
+  max-height: 100%;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.promo-banner-large {
+  height: auto;
+  border-radius: 40px;
+  box-shadow: 0 20px 40px rgba(5, 16, 43, 0.1);
+}
+
+.promo-banner-large img {
+  width: 100%;
+  max-height: none;
+  object-fit: cover;
+}

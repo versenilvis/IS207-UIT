@@ -1,0 +1,80 @@
+.about-section,
+.test-section {
+  padding: 90px 0 70px;
+}
+
+.about-desc {
+  margin-top: 0;
+}
+
+.stats-grid {
+  margin-top: 48px;
+  background-image: url('../../img/hero_section/about_us.png');
+  background-size: cover;
+  background-position: center;
+  border-radius: 24px;
+  padding: 90px 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(5, 16, 43, 0.15);
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 40px 20px;
+  border-radius: 18px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, background 0.3s ease;
+  color: white;
+}
+
+.stat-card-val {
+  font-weight: 700;
+  font-size: clamp(2rem, 3vw, 3rem);
+  display: block;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.stat-card-label {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: white;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.grid-logo-bottom {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.9;
+}
+
+.grid-logo-bottom img {
+  width: 24px;
+  filter: brightness(0) invert(1);
+}
+
+.grid-logo-bottom span {
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.logo-small-bottom {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  width: 28px;
+  opacity: 0.15;
+}

@@ -27,7 +27,7 @@ prephub/
 │   │   └── database.php   # kết nối pdo mysql
 │   ├── controllers/       # xử lý logic các api endpoint
 │   │   ├── auth-controller.php
-│   │   ├── test-controller.php
+│   │   ├── question-controller.php
 │   │   └── score-controller.php
 │   ├── db/                # chứa code migration hoặc dump SQL tự nạp
 │   ├── models/            # tương tác trực tiếp với db thông qua pdo

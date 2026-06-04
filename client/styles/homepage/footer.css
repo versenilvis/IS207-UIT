@@ -1,0 +1,140 @@
+.footer {
+  background-color: var(--primary);
+  color: white;
+  padding: 60px 0 40px;
+}
+
+.footer .container {
+  max-width: 960px;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 36px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-brand {
+  text-decoration: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  color: white;
+}
+
+.footer-brand svg {
+  height: 2.9rem;
+  width: auto;
+}
+
+.footer-brand .brand-text {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  display: block;
+}
+
+.footer-brand .brand-subtext {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 6px;
+  display: block;
+}
+
+.uit-banner img {
+  height: 48px;
+  border-radius: 8px;
+  background: white;
+  padding: 6px 16px;
+  object-fit: contain;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 20px;
+}
+
+.footer-col h5 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: white;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-col ul li {
+  margin-bottom: 6px;
+}
+
+.footer-col ul li a {
+  color: white;
+  opacity: 0.6;
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: opacity 0.2s;
+}
+
+.footer-col ul li a:hover {
+  opacity: 1;
+}
+
+.contact-col p {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+.contact-org {
+  font-weight: 700;
+  margin-bottom: 12px !important;
+  font-size: 0.75rem !important;
+  opacity: 0.7 !important;
+}
+
+.footer-mail {
+  color: white;
+  text-decoration: underline;
+  opacity: 1 !important;
+}
+
+.footer-social {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.footer-social a {
+  color: white;
+  font-size: 1rem;
+  opacity: 0.7;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.footer-social a:hover {
+  opacity: 1;
+}
+
+.footer-bottom {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: left;
+}
+
+.footer-bottom p {
+  font-size: 0.75rem;
+  opacity: 0.4;
+}

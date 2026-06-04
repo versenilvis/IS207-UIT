@@ -1,0 +1,3 @@
+/* pricing section styles đã được chuyển sang dùng
+   client/styles/pricing.css trực tiếp trong component.
+   File này được giữ để tránh lỗi @import trong main.css */

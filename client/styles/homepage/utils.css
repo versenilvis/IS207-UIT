@@ -1,0 +1,41 @@
+.section-badge,
+.about-badge,
+.feedback-badge,
+.exam-badge {
+  display: inline-block;
+  background-color: var(--primary);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.section-title,
+.about-title,
+.exam-section h2,
+.testimonials-section h2 {
+  font-weight: 800;
+  font-size: clamp(2.2rem, 4.5vw, 2.8rem);
+  color: #1a1a1a;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.section-desc,
+.about-desc,
+.hero-quote,
+.section-sub {
+  font-weight: 400 !important;
+  font-size: 1.1rem;
+  color: #334155;
+  line-height: 1.6;
+  opacity: 1 !important;
+  max-width: 500px;
+  margin-left: auto;
+  text-align: left;
+}

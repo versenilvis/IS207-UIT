@@ -1,1 +1,0 @@
-// file dùng chung để gọi fetch/axios lên server php

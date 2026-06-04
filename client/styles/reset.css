@@ -1,0 +1,153 @@
+.reset-password-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(29, 158, 117, 0.12), transparent 28%),
+    linear-gradient(135deg, #f8fafc 0%, #edf7f3 42%, #f8fafc 100%);
+}
+
+.reset-page-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+}
+
+.reset-page-card {
+  width: min(100%, 1040px);
+}
+
+.reset-page-wrapper {
+  min-height: 620px;
+  border-radius: 12px;
+}
+
+.reset-page-form {
+  position: relative;
+  left: 0;
+  opacity: 1;
+  visibility: visible;
+}
+
+.reset-page-visual {
+  position: relative;
+  right: auto;
+  min-height: 620px;
+}
+
+.reset-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 34px;
+  color: #05102b;
+  text-decoration: none;
+}
+
+.reset-brand img {
+  width: 42px;
+  height: 42px;
+}
+
+.reset-brand span {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.reset-brand small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.reset-alert {
+  margin: 0 0 22px;
+  padding: 13px 15px;
+  border-radius: 8px;
+  background: #fff1f2;
+  color: #be123c;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.reset-page-actions {
+  margin-top: 6px;
+}
+
+.reset-page-actions .btn-auth-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.reset-page-form .input-wrapper input {
+  padding-right: 48px;
+}
+
+.reset-success-container {
+  text-align: center;
+}
+
+.reset-success-container .reset-brand {
+  justify-content: center;
+}
+
+.reset-success-icon {
+  width: 72px;
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 26px;
+  border-radius: 50%;
+  background: #e1f5ee;
+  color: #1d9e75;
+  font-size: 2rem;
+}
+
+.reset-success-header h1 {
+  margin-bottom: 20px;
+}
+
+.reset-success-header p {
+  margin-bottom: 34px;
+}
+
+.reset-home-button {
+  text-decoration: none;
+}
+
+@media (max-width: 991px) {
+  .reset-page-shell {
+    padding: 24px 14px;
+  }
+
+  .reset-page-wrapper {
+    min-height: auto;
+  }
+
+  .reset-page-form.auth-side {
+    width: 100% !important;
+    flex-basis: 100% !important;
+    padding: 34px 24px;
+  }
+
+  .reset-page-visual {
+    display: none;
+  }
+
+  .auth-header h1 {
+    font-size: 2.25rem;
+    margin-bottom: 22px;
+  }
+
+  .auth-header p {
+    margin-bottom: 30px;
+  }
+}

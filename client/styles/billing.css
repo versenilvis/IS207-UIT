@@ -1,0 +1,529 @@
+/* ======================================
+   Prephub - Billing Page
+   Font: Satoshi (Fontshare)
+   Palette: #05102b base, #1d9e75 accent
+   DESIGN_VARIANCE: 8 | MOTION_INTENSITY: 6 | VISUAL_DENSITY: 4
+   ====================================== */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f7f8fa;
+  color: #0f1722;
+  min-height: 100dvh;
+}
+
+/* ── Page shell ── */
+.billing-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 110px 24px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ── Headings ── */
+.billing-page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #05102b;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.billing-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+/* ── Section wrapper ── */
+.billing-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Active plan card ── */
+.plan-active-card {
+  background: #05102b;
+  border-radius: 20px;
+  padding: 36px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle grain texture overlay */
+.plan-active-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 80% 0%, rgba(29, 158, 117, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 10% 110%, rgba(29, 158, 117, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.pac-left {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pac-plan-name {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.pac-price {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -2px;
+  line-height: 1;
+  font-family: 'JetBrains Mono', 'DM Mono', ui-monospace, monospace;
+}
+
+.pac-price-period {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+.pac-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pac-expiry {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.pac-expiry strong {
+  color: #4ecca3;
+  font-weight: 700;
+}
+
+/* progress */
+.pac-right {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.pac-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.pac-progress-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.pac-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pac-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1d9e75, #4ecca3);
+  border-radius: 2px;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-refund {
+  background: rgba(220, 60, 60, 0.85);
+  color: #fff;
+  border: 1px solid rgba(255, 100, 100, 0.25);
+  padding: 9px 18px;
+  border-radius: 9px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.btn-refund:hover {
+  background: rgba(200, 40, 40, 0.95);
+}
+
+.btn-refund:active { transform: scale(0.98); }
+
+/* ── Free plan card ── */
+.plan-free-card {
+  background: #fff;
+  border: 1px solid #e8edf3;
+  border-radius: 20px;
+  padding: 32px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.pfc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pfc-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #05102b;
+  letter-spacing: -0.3px;
+}
+
+.pfc-hint {
+  font-size: 0.83rem;
+  color: #94a3b8;
+  font-weight: 500;
+  max-width: 40ch;
+}
+
+.btn-upgrade {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #05102b;
+  color: #fff;
+  padding: 11px 24px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-upgrade:hover { background: #0d1f45; }
+.btn-upgrade:active { transform: scale(0.98); }
+
+/* ── Empty state ── */
+.billing-empty {
+  padding: 60px 24px;
+  border-top: 1px solid #eef1f5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.billing-empty p {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.billing-empty span {
+  font-size: 0.78rem;
+  color: #c8d0da;
+  font-weight: 500;
+}
+
+/* ── Table ── */
+.billing-table-wrap {
+  background: #fff;
+  border: 1px solid #e8edf3;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.billing-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.84rem;
+}
+
+.billing-table thead tr {
+  border-bottom: 1px solid #f0f3f7;
+}
+
+.billing-table th {
+  padding: 14px 22px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+  background: #f9fafc;
+}
+
+.billing-table tbody tr {
+  border-bottom: 1px solid #f5f7fa;
+  transition: background 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.billing-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.billing-table tbody tr:hover {
+  background: #fafbfd;
+}
+
+.billing-table td {
+  padding: 15px 22px;
+  color: #1e2a3d;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.bt-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+}
+
+.bt-plan-name {
+  font-weight: 700;
+  color: #05102b;
+}
+
+.bt-price {
+  font-weight: 700;
+  color: #05102b;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+.bt-status {
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.2px;
+}
+
+.bt-status--success { color: #1d9e75; }
+.bt-status--refunded { color: #c08000; }
+.bt-status--failed { color: #e03e3e; }
+
+.bt-refund-link {
+  background: none;
+  border: none;
+  color: #e03e3e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+}
+
+.bt-refund-link:hover { opacity: 1; }
+
+.bt-na {
+  color: #d8dde5;
+  font-size: 0.82rem;
+}
+
+/* ── Refund modal ── */
+.refund-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.refund-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 16, 43, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.refund-overlay.rfm-active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.refund-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow:
+    0 24px 60px rgba(5, 16, 43, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transform: scale(0.96) translateY(12px);
+  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.refund-overlay.rfm-active .refund-modal {
+  transform: scale(1) translateY(0);
+}
+
+.rfm-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #05102b;
+  letter-spacing: -0.3px;
+  margin-bottom: 10px;
+}
+
+.rfm-desc {
+  font-size: 0.84rem;
+  color: #6b7a8f;
+  line-height: 1.65;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.rfm-note {
+  background: #f7f8fa;
+  border: 1px solid #eef1f5;
+  border-radius: 10px;
+  padding: 13px 16px;
+  margin: 0 0 24px;
+}
+
+.rfm-note span {
+  font-size: 0.78rem;
+  color: #6b7a8f;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.rfm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rfm-cancel {
+  background: #f0f2f5;
+  border: none;
+  color: #4a5a70;
+  padding: 13px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rfm-cancel:hover { background: #e4e7ec; }
+
+.rfm-confirm {
+  position: relative;
+  background: #05102b;
+  border: none;
+  color: #fff;
+  padding: 13px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.13s;
+  overflow: hidden;
+}
+
+.rfm-confirm:hover { background: #0d1f45; }
+.rfm-confirm:active { transform: scale(0.98); }
+
+.rfm-loader {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 2.5px solid rgba(255, 255, 255, 0.25);
+  border-left-color: #fff;
+  border-radius: 50%;
+  animation: rfm-spin 0.7s linear infinite;
+}
+
+@keyframes rfm-spin { to { transform: rotate(360deg); } }
+
+.rfm-confirm.rfm-loading .rfm-confirm-text { visibility: hidden; }
+.rfm-confirm.rfm-loading .rfm-loader { display: block; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .billing-page {
+    padding: 32px 16px 72px;
+    gap: 28px;
+  }
+
+  .plan-active-card {
+    grid-template-columns: 1fr;
+    padding: 28px 24px;
+    gap: 24px;
+  }
+
+  .pac-right {
+    align-items: flex-start;
+  }
+
+  .pac-progress-wrap {
+    min-width: 100%;
+    align-items: flex-start;
+  }
+
+  .plan-free-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px;
+  }
+
+  .billing-table th:nth-child(3),
+  .billing-table td:nth-child(3) {
+    display: none;
+  }
+
+  .rfm-actions {
+    grid-template-columns: 1fr;
+  }
+}

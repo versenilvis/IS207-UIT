@@ -1,4 +1,4 @@
-.PHONY: all up down frontend backend db logs clean build
+.PHONY: all up down app db logs clean build query composer-install install migrate rebuild
 
 # lệnh chạy toàn bộ khi chỉ gõ `make`
 all: up
@@ -15,26 +15,32 @@ down:
 build:
 	docker compose up -d --build
 
-# chạy test riêng lẻ từng phân nhánh project
-frontend:
-	docker compose up -d frontend
-
-backend:
-	docker compose up -d backend
+# chạy cả ui và server
+app:
+	docker compose up -d app
 
 db:
 	docker compose up -d db
+
+# cài đặt thư viện PHP từ composer.json bằng Docker
+composer-install:
+	docker run --rm -v "$(CURDIR):/app" -w /app composer install
+	docker run --rm -v "$(CURDIR):/app" -w /app composer require google/apiclient
+
+# alias ngắn gọn để setup dependencies
+install: composer-install
+
+# chạy thẳng vào prephub + đổi tên [mysql] trong terminal thành [prephub luôn]
+query:
+	docker exec -it prephub_db mysql -u root -p --prompt="[\d]> " prephub
 
 # xem màn hình console log realtime của toàn cục
 logs:
 	docker compose logs -f
 
 # xem log cá nhân từng phân khu nhỏ để tiện debug
-logs-fe:
-	docker compose logs -f frontend
-
-logs-be:
-	docker compose logs -f backend
+logs-app:
+	docker compose logs -f app
 
 logs-db:
 	docker compose logs -f db
@@ -42,3 +48,14 @@ logs-db:
 # dọn sạch hệ thống tắt mọi container (cảnh báo: sẽ drop toàn bộ data tables trong mysql)
 clean:
 	docker compose down -v
+
+# chạy toàn bộ migration sql theo thứ tự số thứ tự file (cái này chỉ cho linux/macos)
+migrate:
+	@for f in $$(ls server/db/migration_*.sql | sort); do \
+		echo ">> chạy $$f"; \
+		docker exec -i prephub_db mysql -u prephub -p123 prephub < $$f; \
+	done
+
+# build lại image (khi Dockerfile thay đổi) rồi restart
+rebuild:
+	docker compose up -d --build --force-recreate app

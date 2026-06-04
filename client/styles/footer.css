@@ -1,0 +1,120 @@
+.ocw-footer {
+  background: #f0f2f4;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 18px 0 16px;
+  border-top: 1px solid #e0e3e7;
+}
+
+.footer-container {
+  width: 90%;
+  max-width: 1720px;
+  margin: 0 auto;
+}
+
+.footer-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  margin-bottom: 18px;
+}
+
+.footer-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  color: #111;
+  flex-shrink: 0;
+}
+
+.mit-text {
+  font-size: 34px;
+  line-height: 0.85;
+  font-weight: 900;
+  letter-spacing: -3px;
+}
+
+.open-learning-text {
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.footer-description h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.footer-description p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.3;
+}
+
+.footer-description a,
+.footer-copyright a {
+  color: #555;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-top: 5px;
+}
+
+.footer-socials a {
+  color: #888;
+  font-size: 21px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-socials a:hover {
+  color: #2c3e50;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+
+.footer-copyright {
+  font-size: 14px;
+  color: #888;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+}
+
+.ocw-footer .ph-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  color: #2c3e50;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.ph-brand i {
+  font-size: 24px;
+  color: #3498db;
+}
