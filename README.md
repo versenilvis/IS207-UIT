@@ -1,5 +1,4 @@
-
-<img width="3000" height="1000" alt="image" src="https://github.com/user-attachments/assets/58f94b03-cbc5-40c4-9155-d64d4dea3543" />
+<img src="client/img/banner/large.png"/>
 
 <div align="center">
 
@@ -89,5 +88,5 @@ Chân thành cảm ơn thầy cùng các bạn đã hỗ trợ dồ án trong qu
 Cũng như cảm ơn sự nỗ lực của tất cả thành viên trong nhóm 5 người. 
 Rất mong nhận được sự đặt câu hỏi và góp ý từ thầy cùng các bạn để dự án hoàn thiện hơn!
 
-<img width="3000" height="500" alt="image" src="https://github.com/user-attachments/assets/333b93ef-11e2-4584-bb0d-06475657427c" />
+<img src="client/img/banner/small.png"/>
 
