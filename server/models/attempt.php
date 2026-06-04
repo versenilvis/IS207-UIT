@@ -6,14 +6,14 @@
  */
 function calculateToeicScore($correct)
 {
-	// Đúng 96-100 câu: Max 495 điểm
+	// đúng 96-100 câu: max 495 điểm
 	if ($correct >= 96)
 		return 495;
-	// Đúng 91-95 câu: Giảm dần mỗi câu 5 điểm
+	// đúng 91-95 câu: giảm dần mỗi câu 5 điểm
 	if ($correct >= 91)
 		return 490 - (95 - $correct) * 5;
-	// Dưới 90 câu: Mỗi câu đúng được 5 điểm (Logic đơn giản cho đề thi thử)
-	return $correct * 5;
+	// dưới 90 câu: mỗi câu đúng được 5 điểm, tối thiểu 5 điểm
+	return max(5, $correct * 5);
 }
 
 /**
@@ -103,7 +103,7 @@ function submitAndGrade($conn, $user_id, $test_uuid, $user_answers, $time_spent)
 		$total_l = 0;
 		$total_r = 0;
 		foreach ($correct_answers as $row) {
-			if ((int)$row['part'] <= 4) {
+			if ((int) $row['part'] <= 4) {
 				$total_l++;
 			} else {
 				$total_r++;
@@ -139,14 +139,14 @@ function submitAndGrade($conn, $user_id, $test_uuid, $user_answers, $time_spent)
 
 		// quy đổi điểm
 		if ($total_l > 0) {
-			$scaled_l = (int)round(($l_correct / $total_l) * 100);
+			$scaled_l = (int) round(($l_correct / $total_l) * 100);
 			$l_score = calculateToeicScore($scaled_l);
 		} else {
 			$l_score = 0;
 		}
 
 		if ($total_r > 0) {
-			$scaled_r = (int)round(($r_correct / $total_r) * 100);
+			$scaled_r = (int) round(($r_correct / $total_r) * 100);
 			$r_score = calculateToeicScore($scaled_r);
 		} else {
 			$r_score = 0;

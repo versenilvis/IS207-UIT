@@ -1,5 +1,4 @@
 .env
-tests
 answer
 server/uploads
 /vendor/

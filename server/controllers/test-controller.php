@@ -302,8 +302,18 @@ function getTestCore($uuid)
 {
     global $conn;
     try {
-        // Tìm đề thi theo UUID
-        $stmt = $conn->prepare("SELECT id, uuid, title, duration, is_premium, audio_url FROM tests WHERE uuid = :uuid AND is_active = 1");
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $role = $_SESSION['role'] ?? 'user';
+
+        if ($role === 'admin') {
+            // admin xem được cả đề ẩn
+            $stmt = $conn->prepare("SELECT id, uuid, title, duration, is_premium, audio_url, is_active FROM tests WHERE uuid = :uuid");
+        } else {
+            // user thường chỉ được xem đề đang active
+            $stmt = $conn->prepare("SELECT id, uuid, title, duration, is_premium, audio_url, is_active FROM tests WHERE uuid = :uuid AND is_active = 1");
+        }
         $stmt->execute(['uuid' => $uuid]);
         $test = $stmt->fetch();
 

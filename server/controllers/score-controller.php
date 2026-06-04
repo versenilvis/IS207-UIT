@@ -12,6 +12,18 @@ header('Content-Type: application/json; charset=utf-8');
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
+	// kiểm tra đăng nhập bắt buộc cho cả get và post
+	$user_id = $_SESSION['user_id'] ?? null;
+	if (!$user_id) {
+		http_response_code(401);
+		echo json_encode([
+			'success' => false,
+			'message' => 'Unauthorized: Vui lòng đăng nhập để tiếp tục',
+			'error' => 'Vui lòng đăng nhập để tiếp tục'
+		]);
+		exit;
+	}
+
 	if ($method === 'POST') {
 		$inputJSON = file_get_contents('php://input');
 		$data = json_decode($inputJSON, true);
@@ -23,13 +35,6 @@ try {
 		if (empty($test_uuid)) {
 			http_response_code(400);
 			echo json_encode(['error' => 'Thiếu test_uuid để chấm điểm']);
-			exit;
-		}
-
-		$user_id = $_SESSION['user_id'] ?? null;
-		if (!$user_id) {
-			http_response_code(401);
-			echo json_encode(['error' => 'Vui lòng đăng nhập để nộp bài!']);
 			exit;
 		}
 
