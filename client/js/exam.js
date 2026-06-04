@@ -27,6 +27,12 @@ async function fetchExamData() {
 
         const response = await fetch(`/api/tests/${uuid}`);
         
+        if (response.redirected) {
+            // chuyển hướng trình duyệt nếu api trả về redirect
+            window.location.href = response.url;
+            return;
+        }
+        
         if (response.status === 403) {
             alert("Đề thi này dành riêng cho tài khoản đã mua!");
             window.location.href = "pricing.php"; 

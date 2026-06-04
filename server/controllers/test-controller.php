@@ -43,54 +43,54 @@ require_once __DIR__ . '/../utils/fileHandler.php';
 */
 function getTestList()
 {
-    global $conn;
-    try {
-        if (session_status() === PHP_SESSION_NONE)
-            session_start();
-        $user_id = $_SESSION['user_id'] ?? null;
-        $role = $_SESSION['role'] ?? 'user';
+	global $conn;
+	try {
+		if (session_status() === PHP_SESSION_NONE)
+			session_start();
+		$user_id = $_SESSION['user_id'] ?? null;
+		$role = $_SESSION['role'] ?? 'user';
 
-        // Lấy tất cả (cả ẩn và hiện) để admin quản lý
-        $stmt = $conn->prepare("SELECT id, uuid, title, is_premium, is_active, total_questions, created_at, duration, description, audio_url FROM tests ORDER BY id DESC");
-        $stmt->execute();
-        $tests = $stmt->fetchAll();
+		// Lấy tất cả (cả ẩn và hiện) để admin quản lý
+		$stmt = $conn->prepare("SELECT id, uuid, title, is_premium, is_active, total_questions, created_at, duration, description, audio_url FROM tests ORDER BY id DESC");
+		$stmt->execute();
+		$tests = $stmt->fetchAll();
 
-        // gói subscription (pro, ultra...) unlock hết đề premium
-        // course-only không được, chỉ dùng cho khoá học
-        $sub_plans = ['pro', 'pro_year', 'ultra', 'ultra_year'];
-        $has_sub_plan = isset($_SESSION['is_premium']) && $_SESSION['is_premium']
-            && in_array($_SESSION['premium_plan'] ?? '', $sub_plans);
+		// gói subscription (pro, ultra...) unlock hết đề premium
+		// course-only không được, chỉ dùng cho khoá học
+		$sub_plans = ['pro', 'pro_year', 'ultra', 'ultra_year'];
+		$has_sub_plan = isset($_SESSION['is_premium']) && $_SESSION['is_premium']
+			&& in_array($_SESSION['premium_plan'] ?? '', $sub_plans);
 
-        $formatted_tests = [];
-        foreach ($tests as $test) {
-            $test_id = (int) $test['id'];
-            $is_premium = (bool) $test['is_premium'];
+		$formatted_tests = [];
+		foreach ($tests as $test) {
+			$test_id = (int) $test['id'];
+			$is_premium = (bool) $test['is_premium'];
 
-            // unlock nếu: admin | đề free | có gói sub
-            $is_unlocked = ($role === 'admin') || !$is_premium || $has_sub_plan;
+			// unlock nếu: admin | đề free | có gói sub
+			$is_unlocked = ($role === 'admin') || !$is_premium || $has_sub_plan;
 
-            $formatted_tests[] = [
-                //Sửa id thành uuid
-                'uuid' => $test['uuid'], // Trả về UUID làm định danh công khai
-                'title' => $test['title'],
-                'description' => $test['description'],
-                'duration' => $test['duration'],
-                'total_questions' => $test['total_questions'],
-                'is_premium' => $is_premium,
-                'is_active' => (int) $test['is_active'],
-                'created_at' => $test['created_at'],
-                'is_unlocked' => $is_unlocked,
-                'audio_url' => $test['audio_url']
-            ];
-        }
+			$formatted_tests[] = [
+				//Sửa id thành uuid
+				'uuid' => $test['uuid'], // Trả về UUID làm định danh công khai
+				'title' => $test['title'],
+				'description' => $test['description'],
+				'duration' => $test['duration'],
+				'total_questions' => $test['total_questions'],
+				'is_premium' => $is_premium,
+				'is_active' => (int) $test['is_active'],
+				'created_at' => $test['created_at'],
+				'is_unlocked' => $is_unlocked,
+				'audio_url' => $test['audio_url']
+			];
+		}
 
-        sendJson([
-            "success" => true,
-            "data" => $formatted_tests
-        ]);
-    } catch (PDOException $e) {
-        sendError($e->getMessage(), 500);
-    }
+		sendJson([
+			"success" => true,
+			"data" => $formatted_tests
+		]);
+	} catch (PDOException $e) {
+		sendError($e->getMessage(), 500);
+	}
 }
 
 // POST /api/tests/{uuid} - tạo một bài test mới
@@ -99,58 +99,58 @@ function getTestList()
 // hàm này chính là hàm trả xử lí cho handleCreateTestSubmit() ở file questions/api.js
 function createTest()
 {
-    global $conn;
-    try {
-        // Hỗ trợ cả dữ liệu gửi từ Form hoặc từ JSON
-        $input = json_decode(file_get_contents('php://input'), true);
+	global $conn;
+	try {
+		// Hỗ trợ cả dữ liệu gửi từ Form hoặc từ JSON
+		$input = json_decode(file_get_contents('php://input'), true);
 
-        $title = trim($_POST['title'] ?? $input['title'] ?? '');
-        $description = trim($_POST['description'] ?? $input['description'] ?? '');
-        $is_premium = isset($_POST['is_premium']) ? 1 : ($input['is_premium'] ?? 0);
-        $is_active = isset($_POST['is_active']) ? 1 : ($input['is_active'] ?? 1);
+		$title = trim($_POST['title'] ?? $input['title'] ?? '');
+		$description = trim($_POST['description'] ?? $input['description'] ?? '');
+		$is_premium = isset($_POST['is_premium']) ? 1 : ($input['is_premium'] ?? 0);
+		$is_active = isset($_POST['is_active']) ? 1 : ($input['is_active'] ?? 1);
 
-        if (empty($title)) {
-            sendError("Tiêu đề không được để trống", 400);
-        }
+		if (empty($title)) {
+			sendError("Tiêu đề không được để trống", 400);
+		}
 
-        // Kiểm tra tiêu đề trùng lặp
-        $stmt_check = $conn->prepare("SELECT id FROM tests WHERE title = :title LIMIT 1");
-        $stmt_check->execute(['title' => $title]);
-        if ($stmt_check->fetch()) {
-            sendError("Tiêu đề đề thi '{$title}' đã tồn tại, vui lòng chọn tên khác", 400);
-        }
+		// Kiểm tra tiêu đề trùng lặp
+		$stmt_check = $conn->prepare("SELECT id FROM tests WHERE title = :title LIMIT 1");
+		$stmt_check->execute(['title' => $title]);
+		if ($stmt_check->fetch()) {
+			sendError("Tiêu đề đề thi '{$title}' đã tồn tại, vui lòng chọn tên khác", 400);
+		}
 
-        // Tạo đề thi mới với UUID tự động từ MySQL
-        $stmt = $conn->prepare("
+		// Tạo đề thi mới với UUID tự động từ MySQL
+		$stmt = $conn->prepare("
             INSERT INTO tests (uuid, title, description, is_premium, is_active) 
             VALUES (UUID(), :title, :description, :is_premium, :is_active)
         ");
 
-        $stmt->execute([
-            'title' => $title,
-            'description' => $description,
-            'is_premium' => $is_premium,
-            'is_active' => $is_active
-        ]);
+		$stmt->execute([
+			'title' => $title,
+			'description' => $description,
+			'is_premium' => $is_premium,
+			'is_active' => $is_active
+		]);
 
-        $new_id = $conn->lastInsertId();
+		$new_id = $conn->lastInsertId();
 
-        // Lấy lại thông tin đề vừa tạo (để lấy được UUID)
-        $stmt_get = $conn->prepare("SELECT uuid FROM tests WHERE id = ?");
-        $stmt_get->execute([$new_id]);
-        $test_info = $stmt_get->fetch();
+		// Lấy lại thông tin đề vừa tạo (để lấy được UUID)
+		$stmt_get = $conn->prepare("SELECT uuid FROM tests WHERE id = ?");
+		$stmt_get->execute([$new_id]);
+		$test_info = $stmt_get->fetch();
 
-        sendJson([
-            "success" => true,
-            "message" => "Tạo đề thi thành công",
-            "data" => [
-                "id" => $test_info['uuid'],
-                "title" => $title
-            ]
-        ]);
-    } catch (PDOException $e) {
-        sendError("Lỗi database: " . $e->getMessage(), 500);
-    }
+		sendJson([
+			"success" => true,
+			"message" => "Tạo đề thi thành công",
+			"data" => [
+				"id" => $test_info['uuid'],
+				"title" => $title
+			]
+		]);
+	} catch (PDOException $e) {
+		sendError("Lỗi database: " . $e->getMessage(), 500);
+	}
 }
 
 // PUT /api/tests/{uuid} - cập nhật tiêu đề, mô tả, trạng thái đề thi
@@ -164,35 +164,35 @@ function createTest()
  */
 function updateTest($uuid)
 {
-    global $conn;
-    try {
-        $input = json_decode(file_get_contents('php://input'), true);
+	global $conn;
+	try {
+		$input = json_decode(file_get_contents('php://input'), true);
 
-        $title = trim($input['title'] ?? '');
-        $description = isset($input['description']) ? trim($input['description']) : null;
-        $is_premium = isset($input['is_premium']) ? (int) $input['is_premium'] : null;
-        $is_active = isset($input['is_active']) ? (int) $input['is_active'] : null;
+		$title = trim($input['title'] ?? '');
+		$description = isset($input['description']) ? trim($input['description']) : null;
+		$is_premium = isset($input['is_premium']) ? (int) $input['is_premium'] : null;
+		$is_active = isset($input['is_active']) ? (int) $input['is_active'] : null;
 
-        if (empty($title)) {
-            sendError("Tiêu đề không được để trống", 400);
-        }
+		if (empty($title)) {
+			sendError("Tiêu đề không được để trống", 400);
+		}
 
-        // kiểm tra đề tồn tại
-        $stmt_check = $conn->prepare("SELECT id FROM tests WHERE uuid = :uuid LIMIT 1");
-        $stmt_check->execute([':uuid' => $uuid]);
-        $test = $stmt_check->fetch();
-        if (!$test) {
-            sendError("Không tìm thấy đề thi", 404);
-        }
+		// kiểm tra đề tồn tại
+		$stmt_check = $conn->prepare("SELECT id FROM tests WHERE uuid = :uuid LIMIT 1");
+		$stmt_check->execute([':uuid' => $uuid]);
+		$test = $stmt_check->fetch();
+		if (!$test) {
+			sendError("Không tìm thấy đề thi", 404);
+		}
 
-        // coalesce là chọn phần tử không null đầu tiên
-        // ví dụ trong body json, request gửi có is_premium = 1 thì biến is_premiumn = 1
-        // nhưng nếu không gửi, tức là null, coalesce sẽ bỏ qua các phần tử null
-        // cú pháp ":is_premium, is_premium" nghĩa là "giá trị trong body json, giá trị cũ"
-        // coalesce sẽ check nếu như is_premium thì cập nhật, nếu null thì skip
-        // ví dụ request có body json = 1, thì nó sẽ cập nhật cột is_premium thành 1
-        // nếu null thì lấy giá trị cũ
-        $stmt = $conn->prepare("
+		// coalesce là chọn phần tử không null đầu tiên
+		// ví dụ trong body json, request gửi có is_premium = 1 thì biến is_premiumn = 1
+		// nhưng nếu không gửi, tức là null, coalesce sẽ bỏ qua các phần tử null
+		// cú pháp ":is_premium, is_premium" nghĩa là "giá trị trong body json, giá trị cũ"
+		// coalesce sẽ check nếu như is_premium thì cập nhật, nếu null thì skip
+		// ví dụ request có body json = 1, thì nó sẽ cập nhật cột is_premium thành 1
+		// nếu null thì lấy giá trị cũ
+		$stmt = $conn->prepare("
             UPDATE tests SET
                 title      = :title,
                 description = COALESCE(:description, description),
@@ -200,52 +200,52 @@ function updateTest($uuid)
                 is_active  = COALESCE(:is_active,  is_active)
             WHERE uuid = :uuid
         ");
-        $stmt->execute([
-            'title' => $title,
-            'description' => $description,
-            'is_premium' => $is_premium,
-            'is_active' => $is_active,
-            'uuid' => $uuid
-        ]);
+		$stmt->execute([
+			'title' => $title,
+			'description' => $description,
+			'is_premium' => $is_premium,
+			'is_active' => $is_active,
+			'uuid' => $uuid
+		]);
 
-        sendJson(["success" => true, "message" => "Cập nhật đề thi thành công"]);
-    } catch (PDOException $e) {
-        sendError("Lỗi database: " . $e->getMessage(), 500);
-    }
+		sendJson(["success" => true, "message" => "Cập nhật đề thi thành công"]);
+	} catch (PDOException $e) {
+		sendError("Lỗi database: " . $e->getMessage(), 500);
+	}
 }
 
 // post /api/tests/{uuid} - cập nhật đề thi bằng phương thức post để hỗ trợ tải tệp lên
 function updateTestPost($uuid)
 {
-    global $conn;
-    try {
-        // kiểm tra đề tồn tại
-        $stmt_check = $conn->prepare("SELECT id, title, description, is_premium, is_active, audio_url FROM tests WHERE uuid = :uuid LIMIT 1");
-        $stmt_check->execute([':uuid' => $uuid]);
-        $test = $stmt_check->fetch();
-        if (!$test) {
-            sendError("Không tìm thấy đề thi", 404);
-        }
+	global $conn;
+	try {
+		// kiểm tra đề tồn tại
+		$stmt_check = $conn->prepare("SELECT id, title, description, is_premium, is_active, audio_url FROM tests WHERE uuid = :uuid LIMIT 1");
+		$stmt_check->execute([':uuid' => $uuid]);
+		$test = $stmt_check->fetch();
+		if (!$test) {
+			sendError("Không tìm thấy đề thi", 404);
+		}
 
-        $title = isset($_POST['title']) ? trim($_POST['title']) : $test['title'];
-        $description = isset($_POST['description']) ? trim($_POST['description']) : $test['description'];
-        $is_premium = isset($_POST['is_premium']) ? (int) $_POST['is_premium'] : (int) $test['is_premium'];
-        $is_active = isset($_POST['is_active']) ? (int) $_POST['is_active'] : (int) $test['is_active'];
+		$title = isset($_POST['title']) ? trim($_POST['title']) : $test['title'];
+		$description = isset($_POST['description']) ? trim($_POST['description']) : $test['description'];
+		$is_premium = isset($_POST['is_premium']) ? (int) $_POST['is_premium'] : (int) $test['is_premium'];
+		$is_active = isset($_POST['is_active']) ? (int) $_POST['is_active'] : (int) $test['is_active'];
 
-        $audioUrl = $test['audio_url'];
-        // xử lý tải tệp âm thanh lên nếu có gửi file mới
-        if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
-            try {
-                if (!empty($audioUrl)) {
-                    fh_delete_file($audioUrl);
-                }
-                $audioUrl = fh_upload_file($_FILES['audio_file'], 'audio');
-            } catch (Exception $e) {
-                throw new Exception("Lỗi tải tệp âm thanh lên: " . $e->getMessage());
-            }
-        }
+		$audioUrl = $test['audio_url'];
+		// xử lý tải tệp âm thanh lên nếu có gửi file mới
+		if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
+			try {
+				if (!empty($audioUrl)) {
+					fh_delete_file($audioUrl);
+				}
+				$audioUrl = fh_upload_file($_FILES['audio_file'], 'audio');
+			} catch (Exception $e) {
+				throw new Exception("Lỗi tải tệp âm thanh lên: " . $e->getMessage());
+			}
+		}
 
-        $stmt = $conn->prepare("
+		$stmt = $conn->prepare("
             UPDATE tests SET
                 title      = :title,
                 description = :description,
@@ -254,45 +254,45 @@ function updateTestPost($uuid)
                 audio_url  = :audio_url
             WHERE uuid = :uuid
         ");
-        $stmt->execute([
-            'title' => $title,
-            'description' => $description,
-            'is_premium' => $is_premium,
-            'is_active' => $is_active,
-            'audio_url' => $audioUrl,
-            'uuid' => $uuid
-        ]);
+		$stmt->execute([
+			'title' => $title,
+			'description' => $description,
+			'is_premium' => $is_premium,
+			'is_active' => $is_active,
+			'audio_url' => $audioUrl,
+			'uuid' => $uuid
+		]);
 
-        sendJson([
-            "success" => true,
-            "message" => "Cập nhật đề thi thành công",
-            "data" => [
-                "audio_url" => $audioUrl
-            ]
-        ]);
-    } catch (Exception $e) {
-        sendError("Lỗi: " . $e->getMessage(), 500);
-    }
+		sendJson([
+			"success" => true,
+			"message" => "Cập nhật đề thi thành công",
+			"data" => [
+				"audio_url" => $audioUrl
+			]
+		]);
+	} catch (Exception $e) {
+		sendError("Lỗi: " . $e->getMessage(), 500);
+	}
 }
 
 // DELETE /api/tests/{uuid} - xóa đề thi và toàn bộ dữ liệu liên quan
 function deleteTest($uuid)
 {
-    global $conn;
-    try {
-        $stmt_check = $conn->prepare("SELECT id FROM tests WHERE uuid = :uuid LIMIT 1");
-        $stmt_check->execute([':uuid' => $uuid]);
-        if (!$stmt_check->fetch()) {
-            sendError("Không tìm thấy đề thi", 404);
-        }
+	global $conn;
+	try {
+		$stmt_check = $conn->prepare("SELECT id FROM tests WHERE uuid = :uuid LIMIT 1");
+		$stmt_check->execute([':uuid' => $uuid]);
+		if (!$stmt_check->fetch()) {
+			sendError("Không tìm thấy đề thi", 404);
+		}
 
-        $stmt = $conn->prepare("DELETE FROM tests WHERE uuid = :uuid");
-        $stmt->execute([':uuid' => $uuid]);
+		$stmt = $conn->prepare("DELETE FROM tests WHERE uuid = :uuid");
+		$stmt->execute([':uuid' => $uuid]);
 
-        sendJson(["success" => true, "message" => "Đã xóa đề thi"]);
-    } catch (PDOException $e) {
-        sendError("Lỗi database: " . $e->getMessage(), 500);
-    }
+		sendJson(["success" => true, "message" => "Đã xóa đề thi"]);
+	} catch (PDOException $e) {
+		sendError("Lỗi database: " . $e->getMessage(), 500);
+	}
 }
 
 
@@ -300,61 +300,61 @@ function deleteTest($uuid)
 // NOTE: nó sẽ trả về data qua endpoint /api/tests/uuid, được điều khiển thông qua router (mở folder route để xem)
 function getTestCore($uuid)
 {
-    global $conn;
-    try {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        $role = $_SESSION['role'] ?? 'user';
+	global $conn;
+	try {
+		if (session_status() === PHP_SESSION_NONE) {
+			session_start();
+		}
+		$role = $_SESSION['role'] ?? 'user';
 
-        if ($role === 'admin') {
-            // admin xem được cả đề ẩn
-            $stmt = $conn->prepare("SELECT id, uuid, title, duration, is_premium, audio_url, is_active FROM tests WHERE uuid = :uuid");
-        } else {
-            // user thường chỉ được xem đề đang active
-            $stmt = $conn->prepare("SELECT id, uuid, title, duration, is_premium, audio_url, is_active FROM tests WHERE uuid = :uuid AND is_active = 1");
-        }
-        $stmt->execute(['uuid' => $uuid]);
-        $test = $stmt->fetch();
+		if ($role === 'admin') {
+			// admin xem được cả đề ẩn
+			$stmt = $conn->prepare("SELECT id, uuid, title, duration, is_premium, audio_url, is_active FROM tests WHERE uuid = :uuid");
+		} else {
+			// user thường chỉ được xem đề đang active
+			$stmt = $conn->prepare("SELECT id, uuid, title, duration, is_premium, audio_url, is_active FROM tests WHERE uuid = :uuid AND is_active = 1");
+		}
+		$stmt->execute(['uuid' => $uuid]);
+		$test = $stmt->fetch();
 
-        if (!$test) {
-            sendError("Không tìm thấy đề", 404);
-        }
+		if (!$test) {
+			sendError("Không tìm thấy đề", 404);
+		}
 
-        // Lấy ID nội bộ để đi JOIN các bảng khác, vì theo thiết kế ta dùng ID để 
-        // JOIN, WHERE, nói chung để query và dùng UUID để show ra người dùng
-        $internal_id = (int) $test['id'];
+		// Lấy ID nội bộ để đi JOIN các bảng khác, vì theo thiết kế ta dùng ID để 
+		// JOIN, WHERE, nói chung để query và dùng UUID để show ra người dùng
+		$internal_id = (int) $test['id'];
 
-        // check premium
-        /*
-        if ($test['is_premium']) {
-            if (session_status() === PHP_SESSION_NONE) session_start();
-            $user_id = $_SESSION['user_id'] ?? null;
-            $role = $_SESSION['role'] ?? 'user';
+		// kiểm tra bản quyền premium nếu đề thi yêu cầu
+		if ($test['is_premium']) {
+			$user_id = $_SESSION['user_id'] ?? null;
+			$role = $_SESSION['role'] ?? 'user';
 
-            if ($role !== 'admin') {
-                $stmt_pay = $conn->prepare("SELECT id FROM payments WHERE user_id = :uid AND test_id = :tid");
-                $stmt_pay->execute(['uid' => $user_id, 'tid' => $internal_id]);
-                if (!$stmt_pay->fetch()) {
-                    sendError("Forbidden: Bạn cần mua hoặc mở khóa đề thi này để tiếp tục", 403);
-                }
-            }
-        }
-        */
-        // PDO nó luôn trả về string
-        // nếu không ép kiểu sang bool chẳng hạn mà check if (is_premium) trong JS thì "0" nó sẽ luôn là True
-        $test['id'] = (int) $test['id'];
-        $test['duration'] = (int) $test['duration'];
-        $test['is_premium'] = (bool) $test['is_premium'];
+			// gói subscription pro, ultra... unlock đề premium
+			$sub_plans = ['pro', 'pro_year', 'ultra', 'ultra_year'];
+			$has_sub_plan = isset($_SESSION['is_premium']) && $_SESSION['is_premium']
+				&& in_array($_SESSION['premium_plan'] ?? '', $sub_plans);
 
-        // như trong thiết kế của database, ta tách riêng đoạn văn và câu hỏi thường ra
-        // tương tự với img, audio của chúng
-        // đầu tiên mình sẽ query lấy toàn các câu hỏi của đề
+			if ($role !== 'admin' && !$has_sub_plan) {
+				// chuyển hướng về pricing nếu không đủ quyền truy cập premium
+				header("Location: /client/pages/pricing.php");
+				exit();
+			}
+		}
+		// PDO nó luôn trả về string
+		// nếu không ép kiểu sang bool chẳng hạn mà check if (is_premium) trong JS thì "0" nó sẽ luôn là True
+		$test['id'] = (int) $test['id'];
+		$test['duration'] = (int) $test['duration'];
+		$test['is_premium'] = (bool) $test['is_premium'];
 
-        // giải thích 1 chút về left join
-        // vì không phải part nào cũng có đoạn văn, nếu dùng join nó sẽ lấy các cột có chung ở 2 bảng
-        // vơi left join, những câu nào ở question có mà passage không có thì vẫn được giữ lại
-        $stmt_q = $conn->prepare("
+		// như trong thiết kế của database, ta tách riêng đoạn văn và câu hỏi thường ra
+		// tương tự với img, audio của chúng
+		// đầu tiên mình sẽ query lấy toàn các câu hỏi của đề
+
+		// giải thích 1 chút về left join
+		// vì không phải part nào cũng có đoạn văn, nếu dùng join nó sẽ lấy các cột có chung ở 2 bảng
+		// vơi left join, những câu nào ở question có mà passage không có thì vẫn được giữ lại
+		$stmt_q = $conn->prepare("
             SELECT q.id, q.part, q.question_number, q.content, q.audio_url, q.image_url,
                    p.content as paragraph, p.translation_en as passage_translation_en, p.translation as passage_translation, p.audio_url as passage_audio, p.image_url as passage_image
             FROM questions q
@@ -362,57 +362,57 @@ function getTestCore($uuid)
             WHERE q.test_id = :test_id
             ORDER BY q.part ASC, q.question_number ASC
         ");
-        $stmt_q->execute(['test_id' => $internal_id]);
-        $questions = $stmt_q->fetchAll();
+		$stmt_q->execute(['test_id' => $internal_id]);
+		$questions = $stmt_q->fetchAll();
 
-        // lấy hết tất cả đáp áp mỗi câu hỏi
-        $stmt_o = $conn->prepare("
+		// lấy hết tất cả đáp áp mỗi câu hỏi
+		$stmt_o = $conn->prepare("
             SELECT o.id, o.question_id, o.label, o.content
             FROM options o
             JOIN questions q ON o.question_id = q.id
             WHERE q.test_id = :test_id
             ORDER BY o.label ASC
         ");
-        $stmt_o->execute(['test_id' => $internal_id]);
-        $options = $stmt_o->fetchAll();
+		$stmt_o->execute(['test_id' => $internal_id]);
+		$options = $stmt_o->fetchAll();
 
-        // đưa các đáp án vào hash map dựa trên question_id để dùng index
-        $options_by_qid = [];
-        foreach ($options as $opt) {
-            $q_id = $opt['question_id'];
-            if (!isset($options_by_qid[$q_id])) {
-                $options_by_qid[$q_id] = [];
-            }
+		// đưa các đáp án vào hash map dựa trên question_id để dùng index
+		$options_by_qid = [];
+		foreach ($options as $opt) {
+			$q_id = $opt['question_id'];
+			if (!isset($options_by_qid[$q_id])) {
+				$options_by_qid[$q_id] = [];
+			}
 
-            // bỏ question_id vì thừa
-            unset($opt['question_id']);
-            $opt['id'] = (int) $opt['id'];
+			// bỏ question_id vì thừa
+			unset($opt['question_id']);
+			$opt['id'] = (int) $opt['id'];
 
-            // cách viết tắt của push vào cuối mảng
-            $options_by_qid[$q_id][] = $opt;
-        }
+			// cách viết tắt của push vào cuối mảng
+			$options_by_qid[$q_id][] = $opt;
+		}
 
-        // merge đáp án vào list câu hỏi
-        foreach ($questions as &$q) {
-            $q['id'] = (int) $q['id'];
-            $q['part'] = (int) $q['part'];
-            $q['question_number'] = (int) $q['question_number'];
-            // lấy ID hịện tại theo vòng lặp $q['id']
-            // sau đó lôi value của map option_by_id với key là $q['id']
-            // gán vào $q['options']
-            // ?? [] nhằm mục đích, nếu câu này trong đề chưa có đáp án thì trả về rỗng
-            $q['options'] = $options_by_qid[$q['id']] ?? [];
-        }
-        // unset($q) để tránh lỗi reference khi loop
-        unset($q);
+		// merge đáp án vào list câu hỏi
+		foreach ($questions as &$q) {
+			$q['id'] = (int) $q['id'];
+			$q['part'] = (int) $q['part'];
+			$q['question_number'] = (int) $q['question_number'];
+			// lấy ID hịện tại theo vòng lặp $q['id']
+			// sau đó lôi value của map option_by_id với key là $q['id']
+			// gán vào $q['options']
+			// ?? [] nhằm mục đích, nếu câu này trong đề chưa có đáp án thì trả về rỗng
+			$q['options'] = $options_by_qid[$q['id']] ?? [];
+		}
+		// unset($q) để tránh lỗi reference khi loop
+		unset($q);
 
-        $test['questions'] = $questions;
+		$test['questions'] = $questions;
 
-        sendJson([
-            "success" => true,
-            "data" => $test
-        ]);
-    } catch (PDOException $e) {
-        sendError($e->getMessage(), 500);
-    }
+		sendJson([
+			"success" => true,
+			"data" => $test
+		]);
+	} catch (PDOException $e) {
+		sendError($e->getMessage(), 500);
+	}
 }
