@@ -173,9 +173,9 @@ $greet = $hour < 12 ? 'Chào buổi sáng ☀️' : ($hour < 18 ? 'Chào buổi 
 					</h2>
 					<p style="font-size:12px; color:#64748b; margin:0; padding-left:23px;">Kết quả các bài thi gần đây</p>
 				</div>
-				<a href="attempts.php"
+				<!-- <a href="attempts.php"
 					style="font-size:13px; font-weight:600; color:#1d9e75; text-decoration:none; display:inline-flex; align-items:center; gap:2px;">Xem
-					tất cả <i class='bx bx-chevron-right' style='font-size:16px;'></i></a>
+					tất cả <i class='bx bx-chevron-right' style='font-size:16px;'></i></a> -->
 			</div>
 			<div style="overflow-x:auto;">
 				<table style="width:100%; border-collapse:collapse; text-align:left;">
@@ -309,7 +309,7 @@ $greet = $hour < 12 ? 'Chào buổi sáng ☀️' : ($hour < 18 ? 'Chào buổi 
 					} else {
 						let html = '';
 						history.forEach(item => {
-							const d = new Date(item.created_at ? item.created_at.replace(' ', 'T') : '');
+							const d = new Date(item.created_at);
 							const day = String(d.getDate()).padStart(2, '0');
 							const month = String(d.getMonth() + 1).padStart(2, '0');
 							const year = d.getFullYear();
